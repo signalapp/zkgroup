@@ -1,0 +1,75 @@
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+version = '0.1'
+group   = 'org.signal'
+
+def isReleaseBuild() {
+    return version.contains("SNAPSHOT") == false
+}
+
+def getReleaseRepositoryUrl() {
+    return hasProperty('sonatypeRepo') ? sonatypeRepo
+            : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+}
+
+def getRepositoryUsername() {
+    return hasProperty('whisperSonatypeUsername') ? whisperSonatypeUsername : ""
+}
+
+def getRepositoryPassword() {
+    return hasProperty('whisperSonatypePassword') ? whisperSonatypePassword : ""
+}
+
+signing {
+    required { isReleaseBuild() && gradle.taskGraph.hasTask('uploadArchives') }
+    sign configurations.archives
+}
+
+uploadArchives {
+    configuration = configurations.archives
+    repositories.mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+        repository(url: getReleaseRepositoryUrl()) {
+            authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+        }
+
+        pom.project {
+            name archivesBaseName
+            description 'Zero Knowledge Groups library'
+            url 'https://github.com/signalapp/zkgroup'
+
+            scm {
+                url 'scm:git@github.com:signalapp/zkgroup.git'
+                connection 'scm:git@github.com:signalapp/zkgroup.git'
+                developerConnection 'scm:git@github.com:signalapp/zkgroup.git'
+            }
+
+            licenses {
+                license {
+                    name 'GPLv3'
+                    url 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                    distribution 'repo'
+                }
+            }
+
+            developers {
+                developer {
+                    name 'Trevor Perrin'
+                }
+            }
+        }
+    }
+}
+
+task installArchives(type: Upload) {
+    group 'Deploy'
+    description 'Installs the artifacts to the local Maven repository.'
+    configuration = configurations['archives']
+    repositories {
+        mavenDeployer {
+            repository url: "file://${System.properties['user.home']}/.m2/repository"
+        }
+    }
+}

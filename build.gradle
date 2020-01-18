@@ -1,0 +1,27 @@
+//
+// Copyright (C) 2020 Signal Messenger, LLC.
+// All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-only
+//
+
+task makeMac(type:Exec) {
+  group 'Rust'
+  description 'Build the mac library'
+
+  commandLine 'make', 'mac_dylib'
+}
+
+task makeServer(type:Exec) {
+  group 'Rust'
+  description 'Build the server linux library'
+
+  commandLine 'make', 'server_so'
+}
+
+task makeAll() {
+  group 'Rust'
+  description 'Build the android libraries'
+
+  dependsOn 'makeMac', 'makeServer'
+}
