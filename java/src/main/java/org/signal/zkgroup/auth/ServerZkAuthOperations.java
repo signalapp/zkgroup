@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.signal.zkgroup.InvalidInputException;
 import org.signal.zkgroup.ServerSecretParams;
 import org.signal.zkgroup.VerificationFailedException;
+import org.signal.zkgroup.InvalidRedemptionTimeException;
 import org.signal.zkgroup.ZkGroupError;
 import org.signal.zkgroup.groups.GroupPublicParams;
 import org.signal.zkgroup.internal.Native;
@@ -43,7 +44,26 @@ public class ServerZkAuthOperations {
 
   }
 
-  public void verifyAuthCredentialPresentation(GroupPublicParams groupPublicParams, AuthCredentialPresentation authCredentialPresentation) throws VerificationFailedException {
+  public void verifyAuthCredentialPresentation(GroupPublicParams groupPublicParams, AuthCredentialPresentation authCredentialPresentation) throws VerificationFailedException, InvalidRedemptionTimeException {
+    verifyAuthCredentialPresentation(groupPublicParams, authCredentialPresentation, System.currentTimeMillis());
+  }
+
+
+  public void verifyAuthCredentialPresentation(GroupPublicParams groupPublicParams, AuthCredentialPresentation authCredentialPresentation, long currentTimeMillis) throws VerificationFailedException, InvalidRedemptionTimeException {
+
+    long secondsPerDay = 24 * 3600;
+    long redemptionDate = authCredentialPresentation.getRedemptionTime();
+
+    long redemptionDayStartTime = redemptionDate * secondsPerDay;
+    long redemptionDayEndTime = redemptionDayStartTime + secondsPerDay;
+
+    long acceptableStartTime = redemptionDayStartTime - secondsPerDay;
+    long acceptableEndTime = redemptionDayEndTime + secondsPerDay;
+
+    if (currentTimeMillis < acceptableStartTime || currentTimeMillis > acceptableEndTime) {
+        throw new InvalidRedemptionTimeException(); 
+    }
+
     int ffi_return = Native.serverSecretParamsVerifyAuthCredentialPresentationJNI(serverSecretParams.getInternalContentsForJNI(), groupPublicParams.getInternalContentsForJNI(), authCredentialPresentation.getInternalContentsForJNI());
     if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
       throw new VerificationFailedException();

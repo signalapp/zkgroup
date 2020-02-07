@@ -16,6 +16,7 @@ import org.signal.zkgroup.SecureRandomTest;
 import org.signal.zkgroup.ServerPublicParams;
 import org.signal.zkgroup.ServerSecretParams;
 import org.signal.zkgroup.VerificationFailedException;
+import org.signal.zkgroup.InvalidRedemptionTimeException;
 import org.signal.zkgroup.auth.AuthCredential;
 import org.signal.zkgroup.auth.AuthCredentialPresentation;
 import org.signal.zkgroup.auth.AuthCredentialResponse;
@@ -79,7 +80,7 @@ private static final byte[] profileKeyPresentationResult = Hex.fromStringCondens
 
 
   @Test
-  public void testAuthIntegration() throws VerificationFailedException, InvalidInputException {
+  public void testAuthIntegration() throws VerificationFailedException, InvalidInputException, InvalidRedemptionTimeException {
 
     UUID uuid           = UUIDUtil.deserialize(TEST_ARRAY_16);
     int  redemptionTime = 123456;
@@ -118,11 +119,28 @@ private static final byte[] profileKeyPresentationResult = Hex.fromStringCondens
     // Create presentation
     AuthCredentialPresentation presentation = clientZkAuthCipher.createAuthCredentialPresentation(createSecureRandom(TEST_ARRAY_32_5), groupSecretParams, authCredential);
 
-    // Verify presentation
+    // Verify presentation, using times at the edge of the acceptable window
     UuidCiphertext uuidCiphertextRecv = presentation.getUuidCiphertext();
     assertArrayEquals(uuidCiphertext.serialize(), uuidCiphertextRecv.serialize());
     assertEquals(presentation.getRedemptionTime(), redemptionTime);
-    serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation);
+
+    serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, 123455L * 86400L);
+    serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, 123458L * 86400L);
+
+    try {
+        serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, (123455L * 86400L) - 1L);
+        throw new AssertionError("verifyAuthCredentialPresentation should fail #1!");
+    } catch(InvalidRedemptionTimeException e) {
+      // good
+    }
+
+    try {
+        serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, (123458L * 86400L) + 1L);
+        throw new AssertionError("verifyAuthCredentialPresentation should fail #2!");
+    } catch(InvalidRedemptionTimeException e) {
+      // good
+    }
+
 
     assertArrayEquals(presentation.serialize(), authPresentationResult);
   }
