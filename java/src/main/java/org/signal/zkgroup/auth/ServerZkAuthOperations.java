@@ -3,6 +3,7 @@ package org.signal.zkgroup.auth;
 
 import java.security.SecureRandom;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.signal.zkgroup.InvalidInputException;
 import org.signal.zkgroup.ServerSecretParams;
 import org.signal.zkgroup.VerificationFailedException;
@@ -51,14 +52,14 @@ public class ServerZkAuthOperations {
 
   public void verifyAuthCredentialPresentation(GroupPublicParams groupPublicParams, AuthCredentialPresentation authCredentialPresentation, long currentTimeMillis) throws VerificationFailedException, InvalidRedemptionTimeException {
 
-    long secondsPerDay = 24 * 3600;
+    long millisecondsPerDay = TimeUnit.MILLISECONDS.convert(1L, TimeUnit.DAYS);
     long redemptionDate = authCredentialPresentation.getRedemptionTime();
 
-    long redemptionDayStartTime = redemptionDate * secondsPerDay;
-    long redemptionDayEndTime = redemptionDayStartTime + secondsPerDay;
+    long redemptionDayStartTime = redemptionDate * millisecondsPerDay;
+    long redemptionDayEndTime = redemptionDayStartTime + millisecondsPerDay;
 
-    long acceptableStartTime = redemptionDayStartTime - secondsPerDay;
-    long acceptableEndTime = redemptionDayEndTime + secondsPerDay;
+    long acceptableStartTime = redemptionDayStartTime - millisecondsPerDay;
+    long acceptableEndTime = redemptionDayEndTime + millisecondsPerDay;
 
     if (currentTimeMillis < acceptableStartTime || currentTimeMillis > acceptableEndTime) {
         throw new InvalidRedemptionTimeException(); 

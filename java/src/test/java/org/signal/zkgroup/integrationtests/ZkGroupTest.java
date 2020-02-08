@@ -8,6 +8,7 @@
 package org.signal.zkgroup.integrationtests;
 
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.signal.zkgroup.Hex;
 import org.signal.zkgroup.InvalidInputException;
@@ -124,18 +125,18 @@ private static final byte[] profileKeyPresentationResult = Hex.fromStringCondens
     assertArrayEquals(uuidCiphertext.serialize(), uuidCiphertextRecv.serialize());
     assertEquals(presentation.getRedemptionTime(), redemptionTime);
 
-    serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, 123455L * 86400L);
-    serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, 123458L * 86400L);
+    serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, TimeUnit.MILLISECONDS.convert(123455L, TimeUnit.DAYS));
+    serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, TimeUnit.MILLISECONDS.convert(123458L, TimeUnit.DAYS));
 
     try {
-        serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, (123455L * 86400L) - 1L);
+        serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, TimeUnit.MILLISECONDS.convert(123455L, TimeUnit.DAYS) - 1L);
         throw new AssertionError("verifyAuthCredentialPresentation should fail #1!");
     } catch(InvalidRedemptionTimeException e) {
       // good
     }
 
     try {
-        serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, (123458L * 86400L) + 1L);
+        serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation, TimeUnit.MILLISECONDS.convert(123458L, TimeUnit.DAYS) + 1L);
         throw new AssertionError("verifyAuthCredentialPresentation should fail #2!");
     } catch(InvalidRedemptionTimeException e) {
       // good
@@ -144,6 +145,59 @@ private static final byte[] profileKeyPresentationResult = Hex.fromStringCondens
 
     assertArrayEquals(presentation.serialize(), authPresentationResult);
   }
+
+
+  @Test
+  public void testAuthIntegrationCurrentTime() throws VerificationFailedException, InvalidInputException, InvalidRedemptionTimeException {
+
+    // This test is mostly the same as testAuthIntegration() except instead of using a hardcoded
+    // redemption date to compare against test vectors, it uses the current time
+
+    UUID uuid           = UUIDUtil.deserialize(TEST_ARRAY_16);
+    int  redemptionTime = (int)TimeUnit.DAYS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+
+    // Generate keys (client's are per-group, server's are not)
+    // ---
+
+    // SERVER
+    ServerSecretParams serverSecretParams = ServerSecretParams.generate(createSecureRandom(TEST_ARRAY_32));
+    ServerPublicParams serverPublicParams = serverSecretParams.getPublicParams();
+    ServerZkAuthOperations serverZkAuth       = new ServerZkAuthOperations(serverSecretParams);
+
+    // CLIENT
+    GroupMasterKey    masterKey         = new GroupMasterKey(TEST_ARRAY_32_1);
+    GroupSecretParams groupSecretParams = GroupSecretParams.deriveFromMasterKey(masterKey);
+
+    assertArrayEquals(groupSecretParams.getMasterKey().serialize(), masterKey.serialize());
+
+    GroupPublicParams groupPublicParams = groupSecretParams.getPublicParams();
+
+    // SERVER
+    // Issue credential
+    AuthCredentialResponse authCredentialResponse = serverZkAuth.issueAuthCredential(createSecureRandom(TEST_ARRAY_32_2), uuid, redemptionTime);
+
+    // CLIENT
+    // Receive credential
+    ClientZkAuthOperations clientZkAuthCipher  = new ClientZkAuthOperations(serverPublicParams);
+    ClientZkGroupCipher    clientZkGroupCipher = new ClientZkGroupCipher   (groupSecretParams );
+    AuthCredential         authCredential      = clientZkAuthCipher.receiveAuthCredential(uuid, redemptionTime, authCredentialResponse);
+
+    // Create and decrypt user entry
+    UuidCiphertext uuidCiphertext = clientZkGroupCipher.encryptUuid(uuid);
+    UUID           plaintext      = clientZkGroupCipher.decryptUuid(uuidCiphertext);
+    assertEquals(uuid, plaintext);
+
+    // Create presentation
+    AuthCredentialPresentation presentation = clientZkAuthCipher.createAuthCredentialPresentation(createSecureRandom(TEST_ARRAY_32_5), groupSecretParams, authCredential);
+
+    // Verify presentation, using times at the edge of the acceptable window
+    UuidCiphertext uuidCiphertextRecv = presentation.getUuidCiphertext();
+    assertArrayEquals(uuidCiphertext.serialize(), uuidCiphertextRecv.serialize());
+    assertEquals(presentation.getRedemptionTime(), redemptionTime);
+
+    serverZkAuth.verifyAuthCredentialPresentation(groupPublicParams, presentation);
+  }
+
 
   @Test
   public void testProfileKeyIntegration() throws VerificationFailedException, InvalidInputException, UnsupportedEncodingException {
