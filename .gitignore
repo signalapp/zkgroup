@@ -5,3 +5,6 @@ java/.idea
 java/build
 java/out
 *.iml
+ffi/node/node_modules
+ffi/node/dist
+.DS_Store

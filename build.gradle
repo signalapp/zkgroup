@@ -19,9 +19,16 @@ task makeServer(type:Exec) {
   commandLine 'make', 'server_so'
 }
 
+task makeAndroid(type:Exec) {
+  group 'Rust'
+  description 'Build the android libraries'
+
+  commandLine 'make', 'android_so'
+}
+
 task makeAll() {
   group 'Rust'
   description 'Build the android libraries'
 
-  dependsOn 'makeMac', 'makeServer'
+  dependsOn 'makeMac', 'makeServer', 'makeAndroid'
 }
