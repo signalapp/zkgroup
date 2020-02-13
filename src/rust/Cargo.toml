@@ -21,14 +21,14 @@ crate-type = [ "staticlib", "cdylib", "rlib"]
 bincode = "1"
 serde = { version = "1.0", features = ["derive"] }
 sha2 = "0.8.0"
-poksho = {git = "ssh://git@github.com/signalapp/poksho-private.git"}
+poksho = {git = "ssh://git@github.com/signalapp/poksho.git"}
 jni = { version = "0.12.3", default-features = false }
 hex = "0.4.0"
 
 [dependencies.curve25519-dalek]
 features = ["serde", "alloc"]
 version = "2.0.0"
-git = "ssh://git@github.com/signalapp/curve25519-dalek-private.git"
+git = "ssh://git@github.com/signalapp/curve25519-dalek2.git"
 branch="lizard2"
 
 [features]
