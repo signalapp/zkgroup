@@ -1,3 +1,6 @@
 rootProject.name = 'zkgroup'
 
 include 'java'
+include 'android'
+include 'android:lib'
+include 'android:exampleApp'
