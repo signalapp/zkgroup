@@ -1,0 +1,10 @@
+test
+tsconfig.json
+zkgroup
+.nvmrc
+Makefile
+.DS_Store
+*.tgz
+*.dylib
+*.so
+*.dll

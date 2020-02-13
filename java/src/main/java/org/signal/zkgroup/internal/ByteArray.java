@@ -24,7 +24,7 @@ public abstract class ByteArray {
     try {
       this.contents = cloneArrayOfLength(contents, expectedLength);
     } catch (InvalidInputException e) {
-      throw new RuntimeException(e);
+      throw new IllegalArgumentException(e);
     }
   }
 
