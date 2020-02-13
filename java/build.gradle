@@ -21,6 +21,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn ':makeServer'
+}
+
 jar {
     dependsOn ':makeServer'
 }
