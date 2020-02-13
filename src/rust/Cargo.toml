@@ -1,0 +1,39 @@
+#
+# Copyright (C) 2020 Signal Messenger, LLC.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+
+[package]
+name = "zkgroup"
+version = "0.2.0"
+authors = ["Trevor Perrin <trevp@signal.org>"]
+edition = "2018"
+description = "A zero-knowledge group library"
+license = "GPL-3.0-only"
+
+[lib]
+name = "zkgroup"
+crate-type = [ "staticlib", "cdylib", "rlib"]
+
+[dependencies]
+bincode = "1"
+serde = { version = "1.0", features = ["derive"] }
+sha2 = "0.8.0"
+poksho = {git = "ssh://git@github.com/signalapp/poksho-private.git"}
+jni = { version = "0.12.3", default-features = false }
+hex = "0.4.0"
+
+[dependencies.curve25519-dalek]
+features = ["serde", "alloc"]
+version = "2.0.0"
+git = "ssh://git@github.com/signalapp/curve25519-dalek-private.git"
+branch="lizard2"
+
+[features]
+default = ["u64_backend"]
+u32_backend = ["curve25519-dalek/u32_backend"]
+u64_backend = ["curve25519-dalek/u64_backend"]
+simd_backend = ["curve25519-dalek/simd_backend"]
+nightly = ["curve25519-dalek/nightly"]
