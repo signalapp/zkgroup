@@ -214,7 +214,7 @@ template_method_uuid = \
 template_method_bytearray = \
 """
   %(access)s byte[] %(method_name)s(%(param_decls)s) %(exception_decl)s{
-    byte[] newContents = new byte[%(return_len)s];
+    byte[] newContents = new byte[%(return_len)s];%(get_rand)s
 
     int ffi_return = Native.%(jni_method_name)s(%(contents)s, %(param_args)snewContents);%(exception_check)s
 
@@ -543,10 +543,17 @@ def print_class(c, runtime_error_on_serialize_dict, class_dir_dict):
             get_rand = """\n    byte[] random      = new byte[Native.RANDOM_LENGTH];
 
     secureRandom.nextBytes(random);"""
+
+            # Maybe add more cases to support different return types
+            if method.return_type == "byte[]":
+                return_name = "byte[]"
+            else:
+                return_name = method.return_name.camel()
+
             methods_string += template_method_rand_wrapper % {
                     "contents": contents,
                     "method_name": method_name,
-                    "return_name": method.return_name.camel(),
+                    "return_name": return_name,
                     "full_method_name": method_name,
                     "param_decls": get_rand_wrapper_decls(method.params),
                     "param_args": param_args,
@@ -579,7 +586,10 @@ def print_class(c, runtime_error_on_serialize_dict, class_dir_dict):
             template = template_method_bytearray
             param_args = get_args(method.params, import_strings, True)
             append_jni_function_decl(jni_method_name, method.params, True, True)
-            return_len = method.params[0][1].lower_camel()  # hardcode to first arg
+            if method.params[0][1].lower_camel() == "randomness":
+                return_len = method.params[1][1].lower_camel()  # hardcode to second arg if first is randomness
+            else:
+                return_len = method.params[0][1].lower_camel()  # hardcode to first arg
             if method.return_size_increment >= 0:
                 return_len += ".length+%d" % method.return_size_increment
             if method.return_size_increment < 0:

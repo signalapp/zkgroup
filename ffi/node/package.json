@@ -1,6 +1,6 @@
 {
   "name": "zkgroup",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "zero-knowledge group functionality",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,7 @@
     "zkgroup/modules",
     "libzkgroup.dylib",
     "libzkgroup.dll",
-    "libzkgroup.o"
+    "libzkgroup.so"
   ],
   "scripts": {
     "build": "tsc",

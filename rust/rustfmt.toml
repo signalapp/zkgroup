@@ -1,0 +1,16 @@
+#
+# Copyright (C) 2020 Signal Messenger, LLC.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+
+unstable_features            = true
+license_template_path        = "rustfmt.license-template"
+
+ignore = [
+       # Don't format code generated ffi code
+       "src/ffi/ffiapi.rs",
+       "src/ffi/ffiapijava.rs",
+       "src/ffi/simpleapi.rs",
+]

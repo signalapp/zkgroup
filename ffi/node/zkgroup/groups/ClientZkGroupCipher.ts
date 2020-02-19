@@ -57,19 +57,20 @@ export default class ClientZkGroupCipher {
     return toUUID(newContents);
   }
 
-  encryptProfileKey(profileKey: ProfileKey): ProfileKeyCiphertext {
+  encryptProfileKey(profileKey: ProfileKey, uuid: UUIDType): ProfileKeyCiphertext {
     const random = new FFICompatArray(randomBytes(RANDOM_LENGTH));
 
-    return this.encryptProfileKeyWithRandom(random, profileKey);
+    return this.encryptProfileKeyWithRandom(random, profileKey, uuid);
   }
 
-  encryptProfileKeyWithRandom(random: FFICompatArrayType, profileKey: ProfileKey): ProfileKeyCiphertext {
+  encryptProfileKeyWithRandom(random: FFICompatArrayType, profileKey: ProfileKey, uuid: UUIDType): ProfileKeyCiphertext {
     const newContents = new FFICompatArray(ProfileKeyCiphertext.SIZE);
 
     const groupSecretParamsContents = this.groupSecretParams.getContents();
     const profileKeyContents = profileKey.getContents();
+    const uuidContents = fromUUID(uuid);
 
-    const ffi_return = Native.FFI_GroupSecretParams_encryptProfileKeyDeterministic(groupSecretParamsContents, groupSecretParamsContents.length, random, random.length, profileKeyContents, profileKeyContents.length, newContents, newContents.length);
+    const ffi_return = Native.FFI_GroupSecretParams_encryptProfileKeyDeterministic(groupSecretParamsContents, groupSecretParamsContents.length, random, random.length, profileKeyContents, profileKeyContents.length, uuidContents, uuidContents.length, newContents, newContents.length);
 
     if (ffi_return != FFI_RETURN_OK) {
       throw new ZkGroupError('FFI_RETURN!=OK');
@@ -78,13 +79,14 @@ export default class ClientZkGroupCipher {
     return new ProfileKeyCiphertext(newContents);
   }
 
-  decryptProfileKey(profileKeyCiphertext: ProfileKeyCiphertext): ProfileKey {
+  decryptProfileKey(profileKeyCiphertext: ProfileKeyCiphertext, uuid: UUIDType): ProfileKey {
     const newContents = new FFICompatArray(ProfileKey.SIZE);
 
     const groupSecretParamsContents = this.groupSecretParams.getContents()
     const profileKeyCiphertextContents = profileKeyCiphertext.getContents();
+    const uuidContents = fromUUID(uuid);
 
-    const ffi_return = Native.FFI_GroupSecretParams_decryptProfileKey(groupSecretParamsContents, groupSecretParamsContents.length, profileKeyCiphertextContents, profileKeyCiphertextContents.length, newContents, newContents.length);
+    const ffi_return = Native.FFI_GroupSecretParams_decryptProfileKey(groupSecretParamsContents, groupSecretParamsContents.length, profileKeyCiphertextContents, profileKeyCiphertextContents.length, uuidContents, uuidContents.length, newContents, newContents.length);
     if (ffi_return == FFI_RETURN_INPUT_ERROR) {
       throw new VerificationFailedException('FFI_RETURN_INPUT_ERROR');
     }
@@ -97,11 +99,17 @@ export default class ClientZkGroupCipher {
   }
 
   encryptBlob(plaintext: FFICompatArrayType): FFICompatArrayType {
-    const newContents = FFICompatArray(plaintext.length);
+    const random = new FFICompatArray(randomBytes(RANDOM_LENGTH));
+
+    return this.encryptBlobWithRandom(random, plaintext);
+  }
+
+  encryptBlobWithRandom(random: FFICompatArrayType, plaintext: FFICompatArrayType): FFICompatArrayType {
+    const newContents = FFICompatArray(plaintext.length+28);
 
     const groupSecretParamsContents = this.groupSecretParams.getContents();
 
-    const ffi_return = Native.FFI_GroupSecretParams_encryptBlob(groupSecretParamsContents, groupSecretParamsContents.length, plaintext, plaintext.length, newContents, newContents.length);
+    const ffi_return = Native.FFI_GroupSecretParams_encryptBlobDeterministic(groupSecretParamsContents, groupSecretParamsContents.length, random, random.length, plaintext, plaintext.length, newContents, newContents.length);
 
     if (ffi_return != FFI_RETURN_OK) {
       throw new ZkGroupError('FFI_RETURN!=OK');
@@ -111,7 +119,7 @@ export default class ClientZkGroupCipher {
   }
 
   decryptBlob(blobCiphertext: FFICompatArrayType): FFICompatArrayType {
-    const newContents = new FFICompatArray(blobCiphertext.length);
+    const newContents = new FFICompatArray(blobCiphertext.length-28);
 
     const groupSecretParamsContents = this.groupSecretParams.getContents()
 

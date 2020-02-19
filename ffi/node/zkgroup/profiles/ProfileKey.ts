@@ -8,6 +8,7 @@ import Native, { FFI_RETURN_OK, FFI_RETURN_INPUT_ERROR } from '../internal/Nativ
 
 import ProfileKeyCommitment from './ProfileKeyCommitment';
 import ProfileKeyVersion from './ProfileKeyVersion';
+import { UUID_LENGTH, UUIDType, fromUUID, toUUID } from '../internal/UUIDUtil';
 
 export default class ProfileKey extends ByteArray {
 
@@ -17,10 +18,11 @@ export default class ProfileKey extends ByteArray {
     super(contents, ProfileKey.SIZE, true);
   }
 
-  getCommitment(): ProfileKeyCommitment {
+  getCommitment(uuid: UUIDType): ProfileKeyCommitment {
     const newContents = new FFICompatArray(ProfileKeyCommitment.SIZE);
+    const uuidContents = fromUUID(uuid);
 
-    const ffi_return = Native.FFI_ProfileKey_getCommitment(this.contents, this.contents.length, newContents, newContents.length);
+    const ffi_return = Native.FFI_ProfileKey_getCommitment(this.contents, this.contents.length, uuidContents, uuidContents.length, newContents, newContents.length);
 
     if (ffi_return != FFI_RETURN_OK) {
       throw new ZkGroupError('FFI_RETURN!=OK');
@@ -29,10 +31,11 @@ export default class ProfileKey extends ByteArray {
     return new ProfileKeyCommitment(newContents);
   }
 
-  getProfileKeyVersion(): ProfileKeyVersion {
+  getProfileKeyVersion(uuid: UUIDType): ProfileKeyVersion {
     const newContents = new FFICompatArray(ProfileKeyVersion.SIZE);
+    const uuidContents = fromUUID(uuid);
 
-    const ffi_return = Native.FFI_ProfileKey_getProfileKeyVersion(this.contents, this.contents.length, newContents, newContents.length);
+    const ffi_return = Native.FFI_ProfileKey_getProfileKeyVersion(this.contents, this.contents.length, uuidContents, uuidContents.length,newContents, newContents.length);
 
     if (ffi_return != FFI_RETURN_OK) {
       throw new ZkGroupError('FFI_RETURN!=OK');

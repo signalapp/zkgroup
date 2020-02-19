@@ -11,7 +11,7 @@ import ProfileKeyCiphertext from '../groups/ProfileKeyCiphertext';
 
 export default class ProfileKeyCredentialPresentation extends ByteArray {
 
-  static SIZE = 760;
+  static SIZE = 936;
 
   constructor(contents: FFICompatArrayType) {
     super(contents, ProfileKeyCredentialPresentation.SIZE, true);

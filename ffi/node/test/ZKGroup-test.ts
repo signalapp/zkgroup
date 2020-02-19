@@ -56,8 +56,8 @@ describe('ZKGroup', () => {
   const TEST_ARRAY_32_3 = arrayToCompatArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]);
   const TEST_ARRAY_32_4 = arrayToCompatArray([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33]);
   const TEST_ARRAY_32_5 = hexToCompatArray('030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122');
-  const authPresentationResult = hexToCompatArray('7081b1a0e0c5582ea7594c8ff4df3544e1e44da97bb85c603c03f771c9c3fd5c562988fcc6c0c0c6dda4ef19e2d70c7972173eb4fe8bb91c98769c303190a133246735075e3c1b881aae626d8430714b880d36b338349525c7a2f8a02f5579389cbc1e3df512e4937e0ce5b0b2a683d0a0b0e34ce4ec7dee93e57f38aaa46b2e36bc01bdb2d05ddcb7998783b50c614e129c6fa8a6b0b5c4b41257633e6995101068b48cdeb5501b6aaa8f7c2b10374172e73389be56a6215d61c7842e95ff7984130e95e29ade47334d6702692a52d8caa2fc78a984c1f15bedd37dbf512e74a60b1fc865fccb4fbee8f88cd7c44784dd319969a5e21094a58c2951d1a13b0a2001000000000000932141da5adbfa7d888a2119289be5729f8945dd3198632636869cab09bc87020d4e3e1933e86f956e1a2b778a5ea2e3203b73a3be0e519317708744d01bc60bae88996e8cd0dad3fd09093f0e8b1f1ee89402c49a8bc442602506f3421247068894b59efff212cf7427aea674346d9a116b960d0f35f32cfe3cde15bfe4a40dadbd8cc67ed79467abc2a64c98b4c2ba15f122217460d6b57ec43b40b8d1a50909c5a3c4e7b9cdfd70b77b40e40f98ad2dd1a0fca26768f5bae95b7975403901b082d2859d863d421127b9abdcb342be27d9bd309d21d96a310355c2d79963000ee9dee6507b98efcf84a650cf751103f4357d4257317408230d4b3eadf3a40e6b26547f9d0421b17c15d3de6e5642356e815b10300fcf9eddee8a2d57565e092047ffdb43a7b802030e20c50051edcf0fb92178e087fa5e5d1e045b38a01b3af44c192e9ea29581e9c3befd1a10aab20ccd19a6dec3ca0668d887e8f186851e40e20100');
-  const profileKeyPresentationResult = hexToCompatArray('f8a81bfd7d169872d41ed7456fa6d8b3ee3ce61f1b902e7817ad9c05881e414106e9c26592c8b2fffe8fcafa993272149ae6d8489cc0c558d7209ff48aa37a51246735075e3c1b881aae626d8430714b880d36b338349525c7a2f8a02f5579389cbc1e3df512e4937e0ce5b0b2a683d0a0b0e34ce4ec7dee93e57f38aaa46b2e36bc01bdb2d05ddcb7998783b50c614e129c6fa8a6b0b5c4b41257633e6995101068b48cdeb5501b6aaa8f7c2b10374172e73389be56a6215d61c7842e95ff794e1c1307b8c8a3d6cf3040a71d1a3ee9c21e8669931d210ecec3fb95e9212f4c58ef36e5a90059237fe22d6a5dc2d13287a72b1ce688fd91ee6cf78d2336081da60b1fc865fccb4fbee8f88cd7c44784dd319969a5e21094a58c2951d1a13b0a40010000000000005c2b1508a6acc3d4303340c0d6f6339816063c286627607200a93bebaee76c03f5c77b22c0b191ff821aab225280a84c98a3843b3338d83a6916ff820fce5308fe0ff1f75d7a3d38b3b908e2fe87bbdc54ec959a90ec85dd9107382897d05303486b972c420ef740398b8649d2013cb02e9c2a9d65813e4b34cc77b08ab4920572e3ec747eb96bf3e1ac5d16416dc6b9dc8b82bb4ecfdee0cd4bf2d985aed40ee07d57dd504fc6b1988a475efb5df74b55d7c54cf368037d10ed530d2ae3010d654c28c4baf605f7deaf5db68c9ccebd3d385b78b5f0e8226a1b96e71753fc05086e35f4702c20ef6d9f24690d16b940dbc4a3c98077ea28454cd8bbb08dc40c9b3988ffef2d5c833148f4377b17c7fdfbaaf1034f413a14eb2a8dbe13aba902afd208e40dd4d4faddd58dad881c894a8cf565da5e54d9796d7dfdc33529d80f2047ffdb43a7b802030e20c50051edcf0fb92178e087fa5e5d1e045b38a01b3af44c192e9ea29581e9c3befd1a10aab20ccd19a6dec3ca0668d887e8f186851e007efd1a1fbc7e15cd34b2b32b6d1e406b991baffcb0915ef502aa0bc655633d06b1927f3ad10cf25ed9a4cd7fa6949b0cd5842449b931a90def70dc85869e07101112131415161718191a1b1c1d1e1f');
+  const authPresentationResult = hexToCompatArray('c051a9c14dd980bbc66f30980fb99574093830ba5265f7871f5723a687dc7535ca442d45f9f439c932764613955275d822bd3ab1f29104c0358da29f8315052d7c5f9f3195e5ed27fcaf25564eb3c419da5b0d7e2f4f4baa70c12dc12174e37d50c2a93b803d8c972f12af026ab60d91a4c4ba54842e73073c0b520f2513105a6e72350204c18d686645ca4991ac56a557f1e05f771697fb6aef6d1db72e6325e0d397fb7951fdfa1e3ae328244263d48b4a74de88e54fc8b8427bf56911f04bf28f0ac87f549b33c324b0063913191686b7bbc8724636d91b567cb7543c66394856a70ebc0f09db4892499ce625bdd3fe42e3d8d8012cc50fcf76f58ab5fc3920010000000000002405bffd51b8464339da562bb00efbe2fdf2a39faac890b7ccf2a8f78ee3920347574f11f0ce50370e854660943f28474eae61c089b24deda5d272b6615a7500753a3b54c7d147005b6bf8946e2a2426e6ff22d27f5e8d011b5a226dd8a43c0b94f91314fe0b29a1c885d920251bb4fb72ceb02a3198c20fdb7ce387df2f270ac77f816111da46a6df6db05eaaed026e73f80d5bf09360b857497fe2c25954058b546ca9766f39c5dafe92709a115097271b8dc166033b0d1dc435b62afc50007b6cc6c1dbe21013164e362c14f50921ca2c5b59a1fdf1ea722144a9b57ffc0980adf58c471afbb2f9ceee8b17110a39224001db909e1ae52b89f5b6911d3902fee77c0c13a60fb2265e3f0955a6ceb143f531a9bc75228db420bbd9535f990a2047ffdb43a7b802030e20c50051edcf0fb92178e087fa5e5d1e045b38a01b3af44c192e9ea29581e9c3befd1a10aab20ccd19a6dec3ca0668d887e8f186851e40e20100');
+  const profileKeyPresentationResult = hexToCompatArray('30c7b1e8509de165c17e485832a2bbdee52c5646e4380a9e09909343e4abcf5270ad9ba7194965fd629f473c8b56bf28d2cfc46c8a32c4d391b8b195fe8b6441a60435237e987f46d017832528d70b5d675a49ed170029b7d78addffe7d8733f90efce840c498f30e3d63db38cd3e9a63e7cfdfc9223ff9abd46ab490917f93586c5f334666b37e6a6cb970b12f8ff031350dbf53371099520e7a971a0843e110ababff79b279727b0b1024d858de25505011213013152cb2fc8faced94eed166847bbcec5426ca741397d775d4430412da3eefb92e89cf0f0264150300e1f03b42cf45e71e7e5094dfb4e1dc4a19fb768aaec384667eda914cd9cf19025881aa8197230cc3112ebeaac58c3a38f5b82e288c014ffd43b67ae604721fb825a635a17a32be08443c8915d6af3a2ccc61e95963db59a6dc085d7de371f1fd9b961d442ec60bc7c0a7faac3e02cee3c4fc8a61ed427288a6225473f96d563aea26ec0010000000000002746621cdbe44ef31b0e11e9d8f62f5535cffda4c6bb17de00dffaeedc23af06c18af2efe52c882ed2f618bb956861ab7ddd2acd4bb9e6ea20c8f7001c8a3a018da6a0da3c70a74ed064af9ff271d50fbe8e4cd586611f3983b3760e08a9140ead4c3c01a56482e322d34ffeccf53b2b7a28430f1c77ded42c52579616c2000ffbdf550f4c9ee198b4ab4199b61a166609630e25692296226cfdddc79b72e60591cba308a4ec424350e3c368e2cc277e363064b6c72056fb9f84d335b6f578095c625a0420f6638528c13bf5995d3c0b33f4340083b2916cae42bd6206d7a208fcdb56310bcf116e88dc97706e153f0ec15eb4063de77833d9560af4bb946e05b3cc13ffd147a616d3e5e978a41ecce01442a39fd0492818f14aa96868c2b7008aaa44cf794b668edce21b1cd5e69890c01e178122161bb4af7c10403e30da0e45ecfd992885b4ef529c8c5228157e783224f74309d1ad211563e6362867a80ac8de97aa606f7ab75e03a9a1cda638bd7779ef6ffa008f82ae06589026794b009ae1f4d7bcdc59313b960991bf936a2cc4cbdd15493b53f406d129b0bcfbcb068f0ff90d47d9d842d5c252778ac1263d38f5f73835cb58e109735062f58b99072047ffdb43a7b802030e20c50051edcf0fb92178e087fa5e5d1e045b38a01b3af44c192e9ea29581e9c3befd1a10aab20ccd19a6dec3ca0668d887e8f186851ea67b2402dc2bb7c11f264e9510a8b8d725bdd043ad39a8989d7c9d21b4062840ce369e2f71db94c04e232b87ac3f32f5c638578ddbccea121dd9b337db6dd334');
 
   it('testAuthIntegration', () => {
     const uuid           = toUUID(TEST_ARRAY_16);
@@ -128,8 +128,8 @@ describe('ZKGroup', () => {
     const groupPublicParams     = groupSecretParams.getPublicParams();
     const clientZkProfileCipher = new ClientZkProfileOperations(serverPublicParams);
 
-    const profileKey             = new ProfileKey(TEST_ARRAY_32);
-    const profileKeyCommitment = profileKey.getCommitment();
+    const profileKey             = new ProfileKey(TEST_ARRAY_32_1);
+    const profileKeyCommitment = profileKey.getCommitment(uuid);
 
     // Create context and request
     const context = clientZkProfileCipher.createProfileKeyCredentialRequestContextWithRandom(TEST_ARRAY_32_3, uuid, profileKey);
@@ -148,8 +148,8 @@ describe('ZKGroup', () => {
     const plaintext      = clientZkGroupCipher.decryptUuid(uuidCiphertext);
     assert.strictEqual(plaintext, uuid);
 
-    const profileKeyCiphertext   = clientZkGroupCipher.encryptProfileKeyWithRandom(TEST_ARRAY_32_4, profileKey);
-    const decryptedProfileKey    = clientZkGroupCipher.decryptProfileKey(profileKeyCiphertext);
+    const profileKeyCiphertext   = clientZkGroupCipher.encryptProfileKeyWithRandom(TEST_ARRAY_32_4, profileKey, uuid);
+    const decryptedProfileKey    = clientZkGroupCipher.decryptProfileKey(profileKeyCiphertext, uuid);
     assertArrayEquals(profileKey.serialize(), decryptedProfileKey.serialize());
 
     const presentation = clientZkProfileCipher.createProfileKeyCredentialPresentationWithRandom(TEST_ARRAY_32_5, groupSecretParams, profileKeyCredential);
@@ -162,7 +162,7 @@ describe('ZKGroup', () => {
     assertArrayEquals(uuidCiphertext.serialize(), uuidCiphertextRecv.serialize());
 
     const pkvA = profileKeyCommitment.getProfileKeyVersion();
-    const pkvB = profileKey.getProfileKeyVersion();
+    const pkvB = profileKey.getProfileKeyVersion(uuid);
     assertArrayEquals(pkvA.serialize(), pkvB.serialize());
 
     const pkvC = new ProfileKeyVersion(pkvA.serialize());
@@ -246,5 +246,20 @@ describe('ZKGroup', () => {
     const ciphertext = clientZkGroupCipher.encryptBlob(plaintext);
     const plaintext2 = clientZkGroupCipher.decryptBlob(ciphertext);
     assertArrayEquals(plaintext, plaintext2);
+  });
+
+  it('testBlobEncryptionWithRandom', () => {
+    const masterKey           = new GroupMasterKey(TEST_ARRAY_32_1);
+    const groupSecretParams   = GroupSecretParams.deriveFromMasterKey(masterKey);
+    const clientZkGroupCipher = new ClientZkGroupCipher(groupSecretParams);
+
+    const plaintext = hexToCompatArray('0102030405060708111213141516171819');
+    const ciphertext = hexToCompatArray('c09c16754b32867fd5119d1881d62e7c967f6e3a8af5f09ac84f7b74fcc6d0e4d59c9f4a175e0f489c47e481f1');
+
+    const ciphertext2 = clientZkGroupCipher.encryptBlobWithRandom(TEST_ARRAY_32_2, plaintext);
+    const plaintext2 = clientZkGroupCipher.decryptBlob(ciphertext2);
+
+    assertArrayEquals(plaintext, plaintext2);
+    assertArrayEquals(ciphertext, ciphertext2);
   });
 });

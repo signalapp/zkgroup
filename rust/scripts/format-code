@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# To run, install the nightly toolchain:
+# $ rustup toolchain install nightly
+
+cargo +nightly fmt "$@"

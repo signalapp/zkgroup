@@ -8,7 +8,7 @@ import Native, { FFI_RETURN_OK, FFI_RETURN_INPUT_ERROR } from '../internal/Nativ
 
 export default class ProfileKeyCredential extends ByteArray {
 
-  static SIZE = 160;
+  static SIZE = 144;
 
   constructor(contents: FFICompatArrayType) {
     super(contents, ProfileKeyCredential.SIZE, true);

@@ -13,12 +13,12 @@ import UuidCiphertext from '../groups/UuidCiphertext';
 
 import ServerSecretParams from '../ServerSecretParams';
 import ServerPublicParams from '../ServerPublicParams';
-import ProfileKeyCredentialRequestContext from '../profiles/ProfileKeyCredentialRequestContext';
+import ProfileKeyCredentialRequestContext from './ProfileKeyCredentialRequestContext';
 import ProfileKey from './ProfileKey';
 import ProfileKeyCredential from './ProfileKeyCredential';
 import ProfileKeyCredentialPresentation from './ProfileKeyCredentialPresentation';
 import GroupSecretParams from '../groups/GroupSecretParams';
-import ProfileKeyCredentialResponse from '../profiles/ProfileKeyCredentialResponse';
+import ProfileKeyCredentialResponse from './ProfileKeyCredentialResponse';
 
 import { UUID_LENGTH, UUIDType, fromUUID, toUUID } from '../internal/UUIDUtil';
 

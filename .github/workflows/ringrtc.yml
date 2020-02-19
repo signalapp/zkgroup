@@ -1,0 +1,32 @@
+name: zkgroup ci
+
+on: [push]
+
+jobs:
+  code_formatting:
+    name: Code Formatting
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set .gitconfig to replace ssh with https
+      run: git config --global url."https://github".insteadOf ssh://git@github
+    - name: Install nightly toolchain
+      run: rustup toolchain install nightly
+    - name: Install nightly rustfmt
+      run: rustup component add rustfmt --toolchain nightly
+    - name: Check code format
+      run: cargo +nightly fmt -- --check
+#    - name: Install cargo clippy
+#      run: rustup component add clippy
+#    - name: Check rust lint
+#      run: cargo clippy -- -D warnings
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set .gitconfig to replace ssh with https
+      run: git config --global url."https://github".insteadOf ssh://git@github
+    - name: Run tests
+      run: cargo test

@@ -6,4 +6,4 @@
 #
 
 [workspace]
-members = ["src/rust"]
+members = ["rust"]

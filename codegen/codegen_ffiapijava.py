@@ -11,6 +11,8 @@ file_header = \
 
 #![allow(non_snake_case)]
 
+use std::panic;
+
 use crate::ffi::constants::*;
 
 extern crate jni;
@@ -54,6 +56,18 @@ template_method_decl_end = \
 """) -> i32 {
 """
 
+template_method_body_start = \
+    """    let result = panic::catch_unwind(|| {
+"""
+
+template_method_body_end = \
+    """
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+"""
+
 def get_args(params, commaAtEnd):
     s = ""
     for param in params:
@@ -91,35 +105,43 @@ def print_method(c, m, static):
     s += template_method_decl_end
 
     # body
+    s += template_method_body_start
+
     if not static:
-        s += "    let " + class_name.snake() + " = env.convert_byte_array(%s).unwrap();\n" % class_name.lower_camel();
+        s += "        let " + class_name.snake() + " = env.convert_byte_array(%s).unwrap();\n" % class_name.lower_camel()
     for param in m.params:
         if param[0] != "int":
-            s += "    let " + param[1].snake() + " = env.convert_byte_array(%s).unwrap();\n" % param[1].lower_camel();
+            s += "        let " + param[1].snake() + " = env.convert_byte_array(%s).unwrap();\n" % param[1].lower_camel()
         else:
-            s += "    let " + param[1].snake() + " = %s as u32;\n" % param[1].lower_camel();
+            s += "        let " + param[1].snake() + " = %s as u32;\n" % param[1].lower_camel()
     if m.return_type != "boolean":
-        s += "    let mut %s: Vec<u8> = vec![0; env.get_array_length(%sOut).unwrap() as usize];\n" % (m.return_name.snake(), m.return_name.lower_camel())
+        s += "        let mut %s: Vec<u8> = vec![0; env.get_array_length(%sOut).unwrap() as usize];\n" % (m.return_name.snake(), m.return_name.lower_camel())
 
     if not static:
         if m.return_type != "boolean":
-            s += """\n    let ffi_return = simpleapi::%s_%s(&%s, %s &mut %s);\n""" % (class_name.camel(), m.method_name.lower_camel(), class_name.snake(), get_args(m.params, True), m.return_name.snake())
+            s += """\n        let ffi_return = simpleapi::%s_%s(&%s, %s &mut %s);\n""" % (class_name.camel(), m.method_name.lower_camel(), class_name.snake(), get_args(m.params, True), m.return_name.snake())
         else:
-            s += """\n    let ffi_return = simpleapi::%s_%s(&%s, %s);\n""" % (class_name.camel(), m.method_name.lower_camel(), class_name.snake(), get_args(m.params, False))
+            s += """\n        let ffi_return = simpleapi::%s_%s(&%s, %s);\n""" % (class_name.camel(), m.method_name.lower_camel(), class_name.snake(), get_args(m.params, False))
     else:
         if m.return_type != "boolean":
-            s += """\n    let ffi_return = simpleapi::%s_%s(%s &mut %s);\n""" % (class_name.camel(), m.method_name.lower_camel(), get_args(m.params, True), m.return_name.snake())
+            s += """\n        let ffi_return = simpleapi::%s_%s(%s &mut %s);\n""" % (class_name.camel(), m.method_name.lower_camel(), get_args(m.params, True), m.return_name.snake())
         else:
-            s += """\n    let ffi_return = simpleapi::%s_%s(%s);\n""" % (class_name.camel(), m.method_name.lower_camel(), get_args(m.params, False))
+            s += """\n        let ffi_return = simpleapi::%s_%s(%s);\n""" % (class_name.camel(), m.method_name.lower_camel(), get_args(m.params, False))
 
-    s += """    if ffi_return != FFI_RETURN_OK {
-        return ffi_return;\n    }\n""";
+    s += """        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;\n        }\n"""
 
     if m.return_type != "boolean":
-        s += "\n    env.set_byte_array_region(%sOut, 0, &u8toi8(%s)[..]).unwrap();\n    FFI_RETURN_OK\n}\n" % \
+        s += "\n        env.set_byte_array_region(%sOut, 0, &u8toi8(%s)[..]).unwrap();\n        FFI_RETURN_OK\n" % \
 (m.return_name.lower_camel(), m.return_name.snake())
     else:
-        s += "    FFI_RETURN_OK\n}\n"
+        s += "        FFI_RETURN_OK\n"
+
+    s += "    });\n"
+
+    s += template_method_body_end
+    s += "}\n"
+
     return s
 
 def print_class(c):

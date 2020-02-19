@@ -1,9 +1,10 @@
+build
 target
-Cargo.lock
 .idea
-java/.idea
-java/build
-java/out
+.gradle
+ffi/java/.idea
+ffi/java/build
+ffi/java/out
 *.iml
 ffi/node/node_modules
 ffi/node/dist

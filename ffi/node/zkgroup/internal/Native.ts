@@ -19,8 +19,8 @@ const libraryPath = join(rootPath.replace('app.asar', 'app.asar.unpacked'), 'lib
 
 
 interface NativeCalls {
-  FFI_ProfileKey_getCommitment: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type) => IntType,
-  FFI_ProfileKey_getProfileKeyVersion: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type) => IntType,
+  FFI_ProfileKey_getCommitment: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type) => IntType,
+  FFI_ProfileKey_getProfileKeyVersion: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type) => IntType,
   FFI_ProfileKeyCommitment_getProfileKeyVersion: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type) => IntType,
   FFI_ProfileKeyCommitment_checkValidContents: (param2: FFICompatArrayType, param3: UInt64Type) => IntType,
   FFI_GroupSecretParams_generateDeterministic: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type) => IntType,
@@ -31,9 +31,9 @@ interface NativeCalls {
   FFI_GroupSecretParams_checkValidContents: (param2: FFICompatArrayType, param3: UInt64Type) => IntType,
   FFI_GroupSecretParams_encryptUuid: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type) => IntType,
   FFI_GroupSecretParams_decryptUuid: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type) => IntType,
-  FFI_GroupSecretParams_encryptProfileKeyDeterministic: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type, param7: FFICompatArrayType, param8: UInt64Type) => IntType,
-  FFI_GroupSecretParams_decryptProfileKey: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type) => IntType,
-  FFI_GroupSecretParams_encryptBlob: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type) => IntType,
+  FFI_GroupSecretParams_encryptProfileKeyDeterministic: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type, param7: FFICompatArrayType, param8: UInt64Type, param9: FFICompatArrayType, param10: UInt64Type) => IntType,
+  FFI_GroupSecretParams_decryptProfileKey: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type, param7: FFICompatArrayType, param8: UInt64Type) => IntType,
+  FFI_GroupSecretParams_encryptBlobDeterministic: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type, param7: FFICompatArrayType, param8: UInt64Type) => IntType,
   FFI_GroupSecretParams_decryptBlob: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type, param5: FFICompatArrayType, param6: UInt64Type) => IntType,
   FFI_ServerSecretParams_generateDeterministic: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type) => IntType,
   FFI_ServerSecretParams_getPublicParams: (param1: FFICompatArrayType, param2: UInt64Type, param3: FFICompatArrayType, param4: UInt64Type) => IntType,
@@ -71,8 +71,8 @@ interface NativeCalls {
 }
 
 const library: NativeCalls = Library(libraryPath, {
-  'FFI_ProfileKey_getCommitment': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
-  'FFI_ProfileKey_getProfileKeyVersion': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
+  'FFI_ProfileKey_getCommitment': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
+  'FFI_ProfileKey_getProfileKeyVersion': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64',  FFICompatArray, 'uint64',] ],
   'FFI_ProfileKeyCommitment_getProfileKeyVersion': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
   'FFI_ProfileKeyCommitment_checkValidContents': [ 'int', [ FFICompatArray, 'uint64' ] ],
   'FFI_GroupSecretParams_generateDeterministic': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
@@ -83,9 +83,9 @@ const library: NativeCalls = Library(libraryPath, {
   'FFI_GroupSecretParams_checkValidContents': [ 'int', [ FFICompatArray, 'uint64' ] ],
   'FFI_GroupSecretParams_encryptUuid': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
   'FFI_GroupSecretParams_decryptUuid': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
-  'FFI_GroupSecretParams_encryptProfileKeyDeterministic': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
-  'FFI_GroupSecretParams_decryptProfileKey': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
-  'FFI_GroupSecretParams_encryptBlob': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
+  'FFI_GroupSecretParams_encryptProfileKeyDeterministic': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64',   ] ],
+  'FFI_GroupSecretParams_decryptProfileKey': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64', ] ],
+  'FFI_GroupSecretParams_encryptBlobDeterministic': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64', ] ],
   'FFI_GroupSecretParams_decryptBlob': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
   'FFI_ServerSecretParams_generateDeterministic': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],
   'FFI_ServerSecretParams_getPublicParams': [ 'int', [ FFICompatArray, 'uint64', FFICompatArray, 'uint64',  ] ],

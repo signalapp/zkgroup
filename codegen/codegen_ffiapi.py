@@ -12,7 +12,8 @@ file_header = \
 #![allow(non_snake_case)]
 
 use super::simpleapi;
-use std::slice;
+use std::{panic, slice};
+use crate::ffi::constants::FFI_RETURN_INTERNAL_ERROR;
 """
 
 template_method_start = \
@@ -23,6 +24,18 @@ pub extern "C" fn %(function_name)s(
 
 template_method_decl_end = \
 """) -> i32 {
+"""
+
+template_method_body_start = \
+    """    let result = panic::catch_unwind(|| {
+"""
+
+template_method_body_end = \
+    """
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
 """
 
 def get_args(params, commaAtEnd):
@@ -65,26 +78,31 @@ def print_method(c, m, static):
     s += template_method_decl_end
 
     # body
+    s += template_method_body_start
+
     if not static:
-        s += "    let " + class_name.snake() + ": &[u8] = unsafe { slice::from_raw_parts(%s, %sLen as usize) };\n" % (class_name.lower_camel(), class_name.lower_camel())
+        s += "        let " + class_name.snake() + ": &[u8] = unsafe { slice::from_raw_parts(%s, %sLen as usize) };\n" % (class_name.lower_camel(), class_name.lower_camel())
     for param in m.params:
         if param[0] != "int":
-            s += "    let " + param[1].snake() + ": &[u8] = unsafe { slice::from_raw_parts(%s, %sLen as usize) };\n" % (param[1].lower_camel(), param[1].lower_camel())
+            s += "        let " + param[1].snake() + ": &[u8] = unsafe { slice::from_raw_parts(%s, %sLen as usize) };\n" % (param[1].lower_camel(), param[1].lower_camel())
         else:
-            s += "    let " + param[1].snake() + " = %s as u32;\n" % param[1].lower_camel();
+            s += "        let " + param[1].snake() + " = %s as u32;\n" % param[1].lower_camel()
     if m.return_type != "boolean":
-        s += "    let %s: &mut [u8] = unsafe { slice::from_raw_parts_mut(%sOut, %sLen as usize) };\n" % (m.return_name.snake(), m.return_name.lower_camel(), m.return_name.lower_camel())
+        s += "        let %s: &mut [u8] = unsafe { slice::from_raw_parts_mut(%sOut, %sLen as usize) };\n" % (m.return_name.snake(), m.return_name.lower_camel(), m.return_name.lower_camel())
 
     if not static:
         if m.return_type != "boolean":
-            s += """\n    simpleapi::%s_%s(%s, %s %s)\n""" % (class_name.camel(), m.method_name.lower_camel(), class_name.snake(), get_args(m.params, True), m.return_name.snake())
+            s += """\n        simpleapi::%s_%s(%s, %s %s)\n""" % (class_name.camel(), m.method_name.lower_camel(), class_name.snake(), get_args(m.params, True), m.return_name.snake())
         else:
-            s += """\n    simpleapi::%s_%s(%s, %s)\n""" % (class_name.camel(), m.method_name.lower_camel(), class_name.snake(), get_args(m.params, False))
+            s += """\n        simpleapi::%s_%s(%s, %s)\n""" % (class_name.camel(), m.method_name.lower_camel(), class_name.snake(), get_args(m.params, False))
     else:
         if m.return_type != "boolean":
-            s += """\n    simpleapi::%s_%s(%s %s)\n""" % (class_name.camel(), m.method_name.lower_camel(), get_args(m.params, True), m.return_name.snake())
+            s += """\n        simpleapi::%s_%s(%s %s)\n""" % (class_name.camel(), m.method_name.lower_camel(), get_args(m.params, True), m.return_name.snake())
         else:
-            s += """\n    simpleapi::%s_%s(%s)\n""" % (class_name.camel(), m.method_name.lower_camel(), get_args(m.params, False))
+            s += """\n        simpleapi::%s_%s(%s)\n""" % (class_name.camel(), m.method_name.lower_camel(), get_args(m.params, False))
+    s += "    });\n"
+
+    s += template_method_body_end
     s += "}\n"
 
     return s
