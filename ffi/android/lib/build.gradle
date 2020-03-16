@@ -14,6 +14,10 @@ android {
     }
 }
 
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn ':makeAndroid'
+}
+
 dependencies {
     api project(':ffi:java')
 }

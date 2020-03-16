@@ -3,8 +3,7 @@ This document describes how to build and package zkgroup for Android. We assume 
 
 ## tl;dr
 ```
-$ ./gradlew makeAndroid
-$ ./gradlew assemble
+$ ./gradlew build
 ```
 
 ## From Zero
@@ -53,11 +52,10 @@ cargo install cargo-ndk
 ## Building
 From the project root directory, using gradle:
 ```
-./gradlew makeAndroid
-./gradlew assemble
+./gradlew build
 ```
 
-TBD
+This will build all Rust and Java dependencies, and setup the AAR file(s) necessary for testing.
 
 ## Packaging
 TBD
