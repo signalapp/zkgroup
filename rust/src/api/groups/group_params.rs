@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Serialize, Deserialize, Default)]
 pub struct GroupMasterKey {
-    pub(crate) bytes: [u8; 32],
+    pub(crate) bytes: [u8; GROUP_MASTER_KEY_LEN],
 }
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
@@ -40,7 +40,7 @@ pub struct GroupPublicParams {
 }
 
 impl GroupMasterKey {
-    pub fn new(bytes: [u8; 32]) -> Self {
+    pub fn new(bytes: [u8; GROUP_MASTER_KEY_LEN]) -> Self {
         GroupMasterKey { bytes }
     }
 }

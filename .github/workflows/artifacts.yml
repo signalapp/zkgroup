@@ -1,0 +1,77 @@
+name: zkgroup build artifacts
+on:
+  push:
+    tags:
+      - v*
+jobs:
+    build_linux:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v1
+        - name: Set .gitconfig to replace ssh with https
+          run: git config --global url."https://github".insteadOf ssh://git@github
+        - name: Build Library
+          run: make libzkgroup
+        - name: Upload Artifact
+          uses: svenstaro/upload-release-action@v1-release
+          with:
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
+            file: target/release/libzkgroup.so
+            asset_name: libzkgroup.so
+            tag: ${{ github.ref }}
+            overwrite: true
+    build_mac:
+      runs-on: macOS-latest
+      steps:
+        - uses: actions/checkout@v1
+        - name: Set .gitconfig to replace ssh with https
+          run: git config --global url."https://github".insteadOf ssh://git@github
+        - name: Build Library
+          run: make libzkgroup
+        - name: Upload Artifact
+          uses: svenstaro/upload-release-action@v1-release
+          with:
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
+            file: target/release/libzkgroup.dylib
+            asset_name: libzkgroup.dylib
+            tag: ${{ github.ref }}
+            overwrite: true
+    build_windows:
+      runs-on: windows-latest
+      steps:
+        - uses: actions/checkout@v1
+        - name: Set .gitconfig to replace ssh with https
+          run: git config --global url."https://github".insteadOf ssh://git@github
+        - name: Build Library
+          run: make libzkgroup
+        - name: Upload Artifact
+          uses: svenstaro/upload-release-action@v1-release
+          with:
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
+            file: target/release/zkgroup.dll
+            asset_name: libzkgroup.dll
+            tag: ${{ github.ref }}
+            overwrite: true
+    build_ios:
+      runs-on: macOS-latest
+      steps:
+        - uses: actions/checkout@v1
+        - name: Set .gitconfig to replace ssh with https
+          run: git config --global url."https://github".insteadOf ssh://git@github
+        - name: Install iOS Targets
+          run: rustup target add aarch64-apple-ios x86_64-apple-ios armv7-apple-ios armv7s-apple-ios
+        - name: Build Artifacts
+          run: |
+            cd ffi/swift
+            make install_build_dependencies
+            make
+            cd ZKGroup
+            zip -r libzkgroup-ios.zip libzkgroup
+        - name: Upload Artifact
+          uses: svenstaro/upload-release-action@v1-release
+          with:
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
+            file: ffi/swift/ZKGroup/libzkgroup-ios.zip
+            asset_name: libzkgroup-ios.zip
+            tag: ${{ github.ref }}
+            overwrite: true

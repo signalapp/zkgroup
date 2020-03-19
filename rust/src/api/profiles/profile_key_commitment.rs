@@ -11,7 +11,6 @@ use crate::api;
 use crate::common::constants::*;
 use crate::common::simple_types::*;
 use crate::crypto;
-use hex;
 use poksho::ShoSha256;
 use serde::{Deserialize, Serialize};
 

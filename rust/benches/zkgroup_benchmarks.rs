@@ -1,0 +1,135 @@
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
+extern crate zkgroup;
+
+use zkgroup::common::simple_types::*;
+use zkgroup::crypto;
+
+use curve25519_dalek::ristretto::RistrettoPoint;
+use sha2::Sha256;
+
+// Copied and modified from tests/integration_tests.rs
+pub fn benchmark_integration_profile(c: &mut Criterion) {
+    // Random UID and issueTime
+    let _uid = zkgroup::TEST_ARRAY_16;
+
+    // SERVER
+    let server_secret_params = zkgroup::ServerSecretParams::generate(zkgroup::TEST_ARRAY_32);
+    let server_public_params = server_secret_params.get_public_params();
+
+    // CLIENT
+    let master_key = zkgroup::groups::GroupMasterKey::new(zkgroup::TEST_ARRAY_32_1);
+    let group_secret_params =
+        zkgroup::groups::GroupSecretParams::derive_from_master_key(master_key);
+    let group_public_params = group_secret_params.get_public_params();
+
+    let uid = zkgroup::TEST_ARRAY_16;
+    let profile_key =
+        zkgroup::profiles::ProfileKey::create(zkgroup::common::constants::TEST_ARRAY_32_1);
+    let profile_key_commitment = profile_key.get_commitment(uid);
+
+    // Create context and request
+    let randomness = zkgroup::TEST_ARRAY_32_3;
+
+    let context = server_public_params.create_profile_key_credential_request_context(
+        randomness,
+        uid,
+        profile_key,
+    );
+    let request = context.get_request();
+
+    // SERVER
+
+    let randomness = zkgroup::TEST_ARRAY_32_4;
+    let response = server_secret_params
+        .issue_profile_key_credential(randomness, &request, uid, profile_key_commitment)
+        .unwrap();
+
+    c.bench_function("issue_profile_key_credential", |b| {
+        b.iter(|| {
+            server_secret_params
+                .issue_profile_key_credential(randomness, &request, uid, profile_key_commitment)
+                .unwrap()
+        })
+    });
+
+    // CLIENT
+    // Gets stored profile credential
+    let profile_key_credential = server_public_params
+        .receive_profile_key_credential(&context, &response)
+        .unwrap();
+
+    c.bench_function("receive_profile_key_credential", |b| {
+        b.iter(|| {
+            server_public_params
+                .receive_profile_key_credential(&context, &response)
+                .unwrap()
+        })
+    });
+
+    // Create encrypted UID and profile key
+    let uuid_ciphertext = group_secret_params.encrypt_uuid(uid);
+
+    c.bench_function("encrypt_uuid", |b| {
+        b.iter(|| group_secret_params.encrypt_uuid(uid))
+    });
+
+    let plaintext = group_secret_params.decrypt_uuid(uuid_ciphertext).unwrap();
+
+    c.bench_function("decrypt_uuid", |b| {
+        b.iter(|| group_secret_params.decrypt_uuid(uuid_ciphertext))
+    });
+
+    assert!(plaintext == uid);
+
+    let profile_key_ciphertext =
+        group_secret_params.encrypt_profile_key(randomness, profile_key, uid);
+
+    c.bench_function("encrypt_profile_key", |b| {
+        b.iter(|| group_secret_params.encrypt_profile_key(randomness, profile_key, uid))
+    });
+
+    let decrypted_profile_key = group_secret_params
+        .decrypt_profile_key(profile_key_ciphertext, uid)
+        .unwrap();
+
+    c.bench_function("decrypt_profile_key", |b| {
+        b.iter(|| group_secret_params.decrypt_profile_key(profile_key_ciphertext, uid))
+    });
+
+    assert!(decrypted_profile_key.get_bytes() == profile_key.get_bytes());
+
+    // Create presentation
+    let randomness = zkgroup::TEST_ARRAY_32_5;
+
+    let presentation = server_public_params.create_profile_key_credential_presentation(
+        randomness,
+        group_secret_params,
+        profile_key_credential,
+    );
+
+    c.bench_function("create_profile_key_credential_presentation", |b| {
+        b.iter(|| {
+            server_public_params.create_profile_key_credential_presentation(
+                randomness,
+                group_secret_params,
+                profile_key_credential,
+            )
+        })
+    });
+
+    // SERVER
+    server_secret_params
+        .verify_profile_key_credential_presentation(group_public_params, &presentation)
+        .unwrap();
+
+    c.bench_function("verify_profile_key_credential_presentation", |b| {
+        b.iter(|| {
+            server_secret_params
+                .verify_profile_key_credential_presentation(group_public_params, &presentation)
+        })
+    });
+}
+
+criterion_group!(benches, benchmark_integration_profile);
+criterion_main!(benches);

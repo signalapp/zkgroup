@@ -54,12 +54,10 @@ public class ServerZkAuthOperations {
   }
 
   public void verifyAuthCredentialPresentation(GroupPublicParams groupPublicParams, AuthCredentialPresentation authCredentialPresentation) throws VerificationFailedException, InvalidRedemptionTimeException {
-    verifyAuthCredentialPresentation(groupPublicParams, authCredentialPresentation, System.currentTimeMillis());
-  }
-
-
+       verifyAuthCredentialPresentation(groupPublicParams, authCredentialPresentation, System.currentTimeMillis());
+     }
+   
   public void verifyAuthCredentialPresentation(GroupPublicParams groupPublicParams, AuthCredentialPresentation authCredentialPresentation, long currentTimeMillis) throws VerificationFailedException, InvalidRedemptionTimeException {
-
     long acceptableStartTime = TimeUnit.MILLISECONDS.convert(authCredentialPresentation.getRedemptionTime()-1, TimeUnit.DAYS);
     long acceptableEndTime = TimeUnit.MILLISECONDS.convert(authCredentialPresentation.getRedemptionTime()+2, TimeUnit.DAYS);
 

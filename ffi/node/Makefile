@@ -2,34 +2,34 @@ ZKGROUP_RUST_DIR=../../rust
 ZKGROUP_TARGET_DIR=../../target
 
 ifeq ($(OS),Windows_NT)
-	detected_OS := Windows
+	DETECTED_OS := Windows
 else
-	detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
+	DETECTED_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
 endif
 
-ifeq ($(detected_OS),Windows)
-	source_lib = zkgroup.dll
-	target_lib = libzkgroup.dll
+ifeq ($(DETECTED_OS),Windows)
+	SOURCE_LIB = zkgroup.dll
+	TARGET_LIB = libzkgroup.dll
 endif
-ifeq ($(detected_OS),Linux)
-	source_lib = libzkgroup.so
-	target_lib = libzkgroup.so
+ifeq ($(DETECTED_OS),Linux)
+	SOURCE_LIB = libzkgroup.so
+	TARGET_LIB = libzkgroup.so
 endif
-ifeq ($(detected_OS),Darwin)
-	source_lib = libzkgroup.dylib
-	target_lib = libzkgroup.dylib
+ifeq ($(DETECTED_OS),Darwin)
+	SOURCE_LIB = libzkgroup.dylib
+	TARGET_LIB = libzkgroup.dylib
 endif
 
 default: libzkgroup
 
 clean:
-	rm libzkgroup.dylib
+	rm $(TARGET_LIB)
 	rm -r node_modules
 
 libzkgroup: FORCE
-	cargo build --manifest-path=$(ZKGROUP_RUST_DIR)/Cargo.toml --release
-	rm -f $(target_lib)
-	mv $(ZKGROUP_TARGET_DIR)/release/$(source_lib) $(target_lib)
+	RUSTFLAGS='-C link-arg=-s' cargo build --manifest-path=$(ZKGROUP_RUST_DIR)/Cargo.toml --release
+	rm -f $(TARGET_LIB)
+	mv $(ZKGROUP_TARGET_DIR)/release/$(SOURCE_LIB) $(TARGET_LIB)
 
 test: FORCE
 	npm install

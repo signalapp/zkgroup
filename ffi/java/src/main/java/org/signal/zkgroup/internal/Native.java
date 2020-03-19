@@ -26,7 +26,7 @@ public final class Native {
 
   static {
     try {
-      String  osName    = System.getProperty("os.name").toLowerCase();
+      String  osName    = System.getProperty("os.name").toLowerCase(java.util.Locale.ROOT);
       boolean isMacOs   = osName.startsWith("mac os x");
       String  extension = isMacOs ? ".dylib" : ".so";
 

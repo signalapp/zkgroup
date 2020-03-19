@@ -30,7 +30,7 @@ pub struct UidStruct {
 impl UidStruct {
     pub fn new(uid_bytes: UidBytes) -> Self {
         let system = credentials::SystemParameters::get_hardcoded();
-        let M1 = RistrettoPoint::lizard_encode::<Sha256>(&uid_bytes).unwrap(); // Swallow Lizard Encode errors; shouldn't happen
+        let M1 = RistrettoPoint::lizard_encode::<Sha256>(&uid_bytes);
         let M2 = RistrettoPoint::hash_from_bytes::<Sha512>(&uid_bytes);
         let m3 = calculate_scalar(b"Signal_ZKGroup_Enc_Uid_m3", &uid_bytes);
         let M3 = m3 * system.G_m3;

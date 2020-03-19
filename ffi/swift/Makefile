@@ -14,7 +14,7 @@ libzkgroup_ios.a: FORCE
 	mv $(ZKGROUP_TARGET_DIR)/universal/release/libzkgroup.a ZKGroup/libzkgroup/libzkgroup_ios.a
 
 install_build_dependencies:
-	cargo install cbindgen
-	cargo install cargo-lipo
+	cargo install --version 0.9.0 cbindgen
+	cargo install --version 3.0.1 cargo-lipo
 
 FORCE:

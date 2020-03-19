@@ -37,7 +37,7 @@ pub struct PublicKey {
     pub(crate) A: RistrettoPoint,
 }
 
-#[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Copy, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct Ciphertext {
     pub(crate) E_A1: RistrettoPoint,
     pub(crate) E_A2: RistrettoPoint,
@@ -81,7 +81,7 @@ impl KeyPair {
     pub fn encrypt(&self, uid: uid_struct::UidStruct) -> Ciphertext {
         let E_A1 = self.calc_E_A1(uid);
         let E_A2 = (self.a * E_A1) + uid.M1;
-        (Ciphertext { E_A1, E_A2 })
+        Ciphertext { E_A1, E_A2 }
     }
 
     // Might return DecryptionFailure

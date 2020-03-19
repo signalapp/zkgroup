@@ -25,6 +25,11 @@ tasks.withType(JavaCompile) {
     compileTask -> compileTask.dependsOn ':makeServer'
 }
 
+tasks.withType(AbstractArchiveTask) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
 jar {
     dependsOn ':makeServer'
 }

@@ -10,24 +10,27 @@
 #![allow(non_snake_case)]
 
 use super::simpleapi;
-use std::{panic, slice};
 use crate::ffi::constants::FFI_RETURN_INTERNAL_ERROR;
+use std::{panic, slice};
 
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKey_getCommitment(
     profileKey: *const u8,
-    profileKeyLen: u64,
+    profileKeyLen: u32,
     uuid: *const u8,
-    uuidLen: u64,
+    uuidLen: u32,
     profileKeyCommitmentOut: *mut u8,
-    profileKeyCommitmentLen: u64,
+    profileKeyCommitmentLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key: &[u8] = unsafe { slice::from_raw_parts(profileKey, profileKeyLen as usize) };
+        let profile_key: &[u8] =
+            unsafe { slice::from_raw_parts(profileKey, profileKeyLen as usize) };
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
-        let profile_key_commitment: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyCommitmentOut, profileKeyCommitmentLen as usize) };
+        let profile_key_commitment: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(profileKeyCommitmentOut, profileKeyCommitmentLen as usize)
+        };
 
-        simpleapi::ProfileKey_getCommitment(profile_key, &uuid,  profile_key_commitment)
+        simpleapi::ProfileKey_getCommitment(profile_key, &uuid, profile_key_commitment)
     });
 
     match result {
@@ -39,18 +42,21 @@ pub extern "C" fn FFI_ProfileKey_getCommitment(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKey_getProfileKeyVersion(
     profileKey: *const u8,
-    profileKeyLen: u64,
+    profileKeyLen: u32,
     uuid: *const u8,
-    uuidLen: u64,
+    uuidLen: u32,
     profileKeyVersionOut: *mut u8,
-    profileKeyVersionLen: u64,
+    profileKeyVersionLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key: &[u8] = unsafe { slice::from_raw_parts(profileKey, profileKeyLen as usize) };
+        let profile_key: &[u8] =
+            unsafe { slice::from_raw_parts(profileKey, profileKeyLen as usize) };
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
-        let profile_key_version: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyVersionOut, profileKeyVersionLen as usize) };
+        let profile_key_version: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(profileKeyVersionOut, profileKeyVersionLen as usize)
+        };
 
-        simpleapi::ProfileKey_getProfileKeyVersion(profile_key, &uuid,  profile_key_version)
+        simpleapi::ProfileKey_getProfileKeyVersion(profile_key, &uuid, profile_key_version)
     });
 
     match result {
@@ -62,12 +68,14 @@ pub extern "C" fn FFI_ProfileKey_getProfileKeyVersion(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCommitment_checkValidContents(
     profileKeyCommitment: *const u8,
-    profileKeyCommitmentLen: u64,
+    profileKeyCommitmentLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_commitment: &[u8] = unsafe { slice::from_raw_parts(profileKeyCommitment, profileKeyCommitmentLen as usize) };
+        let profile_key_commitment: &[u8] = unsafe {
+            slice::from_raw_parts(profileKeyCommitment, profileKeyCommitmentLen as usize)
+        };
 
-        simpleapi::ProfileKeyCommitment_checkValidContents(profile_key_commitment, )
+        simpleapi::ProfileKeyCommitment_checkValidContents(profile_key_commitment)
     });
 
     match result {
@@ -79,15 +87,22 @@ pub extern "C" fn FFI_ProfileKeyCommitment_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCommitment_getProfileKeyVersion(
     profileKeyCommitment: *const u8,
-    profileKeyCommitmentLen: u64,
+    profileKeyCommitmentLen: u32,
     profileKeyVersionOut: *mut u8,
-    profileKeyVersionLen: u64,
+    profileKeyVersionLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_commitment: &[u8] = unsafe { slice::from_raw_parts(profileKeyCommitment, profileKeyCommitmentLen as usize) };
-        let profile_key_version: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyVersionOut, profileKeyVersionLen as usize) };
+        let profile_key_commitment: &[u8] = unsafe {
+            slice::from_raw_parts(profileKeyCommitment, profileKeyCommitmentLen as usize)
+        };
+        let profile_key_version: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(profileKeyVersionOut, profileKeyVersionLen as usize)
+        };
 
-        simpleapi::ProfileKeyCommitment_getProfileKeyVersion(profile_key_commitment,  profile_key_version)
+        simpleapi::ProfileKeyCommitment_getProfileKeyVersion(
+            profile_key_commitment,
+            profile_key_version,
+        )
     });
 
     match result {
@@ -99,15 +114,18 @@ pub extern "C" fn FFI_ProfileKeyCommitment_getProfileKeyVersion(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_generateDeterministic(
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     groupSecretParamsOut: *mut u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
-        let group_secret_params: &mut [u8] = unsafe { slice::from_raw_parts_mut(groupSecretParamsOut, groupSecretParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let group_secret_params: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(groupSecretParamsOut, groupSecretParamsLen as usize)
+        };
 
-        simpleapi::GroupSecretParams_generateDeterministic(&randomness,  group_secret_params)
+        simpleapi::GroupSecretParams_generateDeterministic(&randomness, group_secret_params)
     });
 
     match result {
@@ -119,15 +137,18 @@ pub extern "C" fn FFI_GroupSecretParams_generateDeterministic(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_deriveFromMasterKey(
     groupMasterKey: *const u8,
-    groupMasterKeyLen: u64,
+    groupMasterKeyLen: u32,
     groupSecretParamsOut: *mut u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_master_key: &[u8] = unsafe { slice::from_raw_parts(groupMasterKey, groupMasterKeyLen as usize) };
-        let group_secret_params: &mut [u8] = unsafe { slice::from_raw_parts_mut(groupSecretParamsOut, groupSecretParamsLen as usize) };
+        let group_master_key: &[u8] =
+            unsafe { slice::from_raw_parts(groupMasterKey, groupMasterKeyLen as usize) };
+        let group_secret_params: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(groupSecretParamsOut, groupSecretParamsLen as usize)
+        };
 
-        simpleapi::GroupSecretParams_deriveFromMasterKey(&group_master_key,  group_secret_params)
+        simpleapi::GroupSecretParams_deriveFromMasterKey(&group_master_key, group_secret_params)
     });
 
     match result {
@@ -139,12 +160,13 @@ pub extern "C" fn FFI_GroupSecretParams_deriveFromMasterKey(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_checkValidContents(
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
 
-        simpleapi::GroupSecretParams_checkValidContents(group_secret_params, )
+        simpleapi::GroupSecretParams_checkValidContents(group_secret_params)
     });
 
     match result {
@@ -156,15 +178,17 @@ pub extern "C" fn FFI_GroupSecretParams_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_getMasterKey(
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     groupMasterKeyOut: *mut u8,
-    groupMasterKeyLen: u64,
+    groupMasterKeyLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let group_master_key: &mut [u8] = unsafe { slice::from_raw_parts_mut(groupMasterKeyOut, groupMasterKeyLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let group_master_key: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(groupMasterKeyOut, groupMasterKeyLen as usize) };
 
-        simpleapi::GroupSecretParams_getMasterKey(group_secret_params,  group_master_key)
+        simpleapi::GroupSecretParams_getMasterKey(group_secret_params, group_master_key)
     });
 
     match result {
@@ -176,15 +200,18 @@ pub extern "C" fn FFI_GroupSecretParams_getMasterKey(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_getPublicParams(
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     groupPublicParamsOut: *mut u8,
-    groupPublicParamsLen: u64,
+    groupPublicParamsLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let group_public_params: &mut [u8] = unsafe { slice::from_raw_parts_mut(groupPublicParamsOut, groupPublicParamsLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let group_public_params: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(groupPublicParamsOut, groupPublicParamsLen as usize)
+        };
 
-        simpleapi::GroupSecretParams_getPublicParams(group_secret_params,  group_public_params)
+        simpleapi::GroupSecretParams_getPublicParams(group_secret_params, group_public_params)
     });
 
     match result {
@@ -196,21 +223,29 @@ pub extern "C" fn FFI_GroupSecretParams_getPublicParams(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_signDeterministic(
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     message: *const u8,
-    messageLen: u64,
+    messageLen: u32,
     changeSignatureOut: *mut u8,
-    changeSignatureLen: u64,
+    changeSignatureLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
         let message: &[u8] = unsafe { slice::from_raw_parts(message, messageLen as usize) };
-        let change_signature: &mut [u8] = unsafe { slice::from_raw_parts_mut(changeSignatureOut, changeSignatureLen as usize) };
+        let change_signature: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(changeSignatureOut, changeSignatureLen as usize) };
 
-        simpleapi::GroupSecretParams_signDeterministic(group_secret_params, &randomness, &message,  change_signature)
+        simpleapi::GroupSecretParams_signDeterministic(
+            group_secret_params,
+            &randomness,
+            &message,
+            change_signature,
+        )
     });
 
     match result {
@@ -222,18 +257,20 @@ pub extern "C" fn FFI_GroupSecretParams_signDeterministic(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_encryptUuid(
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     uuid: *const u8,
-    uuidLen: u64,
+    uuidLen: u32,
     uuidCiphertextOut: *mut u8,
-    uuidCiphertextLen: u64,
+    uuidCiphertextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
-        let uuid_ciphertext: &mut [u8] = unsafe { slice::from_raw_parts_mut(uuidCiphertextOut, uuidCiphertextLen as usize) };
+        let uuid_ciphertext: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(uuidCiphertextOut, uuidCiphertextLen as usize) };
 
-        simpleapi::GroupSecretParams_encryptUuid(group_secret_params, &uuid,  uuid_ciphertext)
+        simpleapi::GroupSecretParams_encryptUuid(group_secret_params, &uuid, uuid_ciphertext)
     });
 
     match result {
@@ -245,18 +282,20 @@ pub extern "C" fn FFI_GroupSecretParams_encryptUuid(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_decryptUuid(
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     uuidCiphertext: *const u8,
-    uuidCiphertextLen: u64,
+    uuidCiphertextLen: u32,
     uuidOut: *mut u8,
-    uuidLen: u64,
+    uuidLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let uuid_ciphertext: &[u8] = unsafe { slice::from_raw_parts(uuidCiphertext, uuidCiphertextLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let uuid_ciphertext: &[u8] =
+            unsafe { slice::from_raw_parts(uuidCiphertext, uuidCiphertextLen as usize) };
         let uuid: &mut [u8] = unsafe { slice::from_raw_parts_mut(uuidOut, uuidLen as usize) };
 
-        simpleapi::GroupSecretParams_decryptUuid(group_secret_params, &uuid_ciphertext,  uuid)
+        simpleapi::GroupSecretParams_decryptUuid(group_secret_params, &uuid_ciphertext, uuid)
     });
 
     match result {
@@ -268,24 +307,35 @@ pub extern "C" fn FFI_GroupSecretParams_decryptUuid(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_encryptProfileKeyDeterministic(
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     profileKey: *const u8,
-    profileKeyLen: u64,
+    profileKeyLen: u32,
     uuid: *const u8,
-    uuidLen: u64,
+    uuidLen: u32,
     profileKeyCiphertextOut: *mut u8,
-    profileKeyCiphertextLen: u64,
+    profileKeyCiphertextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
-        let profile_key: &[u8] = unsafe { slice::from_raw_parts(profileKey, profileKeyLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let profile_key: &[u8] =
+            unsafe { slice::from_raw_parts(profileKey, profileKeyLen as usize) };
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
-        let profile_key_ciphertext: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyCiphertextOut, profileKeyCiphertextLen as usize) };
+        let profile_key_ciphertext: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(profileKeyCiphertextOut, profileKeyCiphertextLen as usize)
+        };
 
-        simpleapi::GroupSecretParams_encryptProfileKeyDeterministic(group_secret_params, &randomness, &profile_key, &uuid,  profile_key_ciphertext)
+        simpleapi::GroupSecretParams_encryptProfileKeyDeterministic(
+            group_secret_params,
+            &randomness,
+            &profile_key,
+            &uuid,
+            profile_key_ciphertext,
+        )
     });
 
     match result {
@@ -297,21 +347,30 @@ pub extern "C" fn FFI_GroupSecretParams_encryptProfileKeyDeterministic(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_decryptProfileKey(
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     profileKeyCiphertext: *const u8,
-    profileKeyCiphertextLen: u64,
+    profileKeyCiphertextLen: u32,
     uuid: *const u8,
-    uuidLen: u64,
+    uuidLen: u32,
     profileKeyOut: *mut u8,
-    profileKeyLen: u64,
+    profileKeyLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let profile_key_ciphertext: &[u8] = unsafe { slice::from_raw_parts(profileKeyCiphertext, profileKeyCiphertextLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let profile_key_ciphertext: &[u8] = unsafe {
+            slice::from_raw_parts(profileKeyCiphertext, profileKeyCiphertextLen as usize)
+        };
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
-        let profile_key: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyOut, profileKeyLen as usize) };
+        let profile_key: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(profileKeyOut, profileKeyLen as usize) };
 
-        simpleapi::GroupSecretParams_decryptProfileKey(group_secret_params, &profile_key_ciphertext, &uuid,  profile_key)
+        simpleapi::GroupSecretParams_decryptProfileKey(
+            group_secret_params,
+            &profile_key_ciphertext,
+            &uuid,
+            profile_key,
+        )
     });
 
     match result {
@@ -323,21 +382,29 @@ pub extern "C" fn FFI_GroupSecretParams_decryptProfileKey(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_encryptBlobDeterministic(
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     plaintext: *const u8,
-    plaintextLen: u64,
+    plaintextLen: u32,
     blobCiphertextOut: *mut u8,
-    blobCiphertextLen: u64,
+    blobCiphertextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
         let plaintext: &[u8] = unsafe { slice::from_raw_parts(plaintext, plaintextLen as usize) };
-        let blob_ciphertext: &mut [u8] = unsafe { slice::from_raw_parts_mut(blobCiphertextOut, blobCiphertextLen as usize) };
+        let blob_ciphertext: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(blobCiphertextOut, blobCiphertextLen as usize) };
 
-        simpleapi::GroupSecretParams_encryptBlobDeterministic(group_secret_params, &randomness, &plaintext,  blob_ciphertext)
+        simpleapi::GroupSecretParams_encryptBlobDeterministic(
+            group_secret_params,
+            &randomness,
+            &plaintext,
+            blob_ciphertext,
+        )
     });
 
     match result {
@@ -349,18 +416,21 @@ pub extern "C" fn FFI_GroupSecretParams_encryptBlobDeterministic(
 #[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_decryptBlob(
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     blobCiphertext: *const u8,
-    blobCiphertextLen: u64,
+    blobCiphertextLen: u32,
     plaintextOut: *mut u8,
-    plaintextLen: u64,
+    plaintextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let blob_ciphertext: &[u8] = unsafe { slice::from_raw_parts(blobCiphertext, blobCiphertextLen as usize) };
-        let plaintext: &mut [u8] = unsafe { slice::from_raw_parts_mut(plaintextOut, plaintextLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let blob_ciphertext: &[u8] =
+            unsafe { slice::from_raw_parts(blobCiphertext, blobCiphertextLen as usize) };
+        let plaintext: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(plaintextOut, plaintextLen as usize) };
 
-        simpleapi::GroupSecretParams_decryptBlob(group_secret_params, &blob_ciphertext,  plaintext)
+        simpleapi::GroupSecretParams_decryptBlob(group_secret_params, &blob_ciphertext, plaintext)
     });
 
     match result {
@@ -372,15 +442,18 @@ pub extern "C" fn FFI_GroupSecretParams_decryptBlob(
 #[no_mangle]
 pub extern "C" fn FFI_ServerSecretParams_generateDeterministic(
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     serverSecretParamsOut: *mut u8,
-    serverSecretParamsLen: u64,
+    serverSecretParamsLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
-        let server_secret_params: &mut [u8] = unsafe { slice::from_raw_parts_mut(serverSecretParamsOut, serverSecretParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let server_secret_params: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(serverSecretParamsOut, serverSecretParamsLen as usize)
+        };
 
-        simpleapi::ServerSecretParams_generateDeterministic(&randomness,  server_secret_params)
+        simpleapi::ServerSecretParams_generateDeterministic(&randomness, server_secret_params)
     });
 
     match result {
@@ -392,12 +465,13 @@ pub extern "C" fn FFI_ServerSecretParams_generateDeterministic(
 #[no_mangle]
 pub extern "C" fn FFI_ServerSecretParams_checkValidContents(
     serverSecretParams: *const u8,
-    serverSecretParamsLen: u64,
+    serverSecretParamsLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_secret_params: &[u8] = unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
 
-        simpleapi::ServerSecretParams_checkValidContents(server_secret_params, )
+        simpleapi::ServerSecretParams_checkValidContents(server_secret_params)
     });
 
     match result {
@@ -409,15 +483,18 @@ pub extern "C" fn FFI_ServerSecretParams_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_ServerSecretParams_getPublicParams(
     serverSecretParams: *const u8,
-    serverSecretParamsLen: u64,
+    serverSecretParamsLen: u32,
     serverPublicParamsOut: *mut u8,
-    serverPublicParamsLen: u64,
+    serverPublicParamsLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_secret_params: &[u8] = unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
-        let server_public_params: &mut [u8] = unsafe { slice::from_raw_parts_mut(serverPublicParamsOut, serverPublicParamsLen as usize) };
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let server_public_params: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(serverPublicParamsOut, serverPublicParamsLen as usize)
+        };
 
-        simpleapi::ServerSecretParams_getPublicParams(server_secret_params,  server_public_params)
+        simpleapi::ServerSecretParams_getPublicParams(server_secret_params, server_public_params)
     });
 
     match result {
@@ -429,21 +506,29 @@ pub extern "C" fn FFI_ServerSecretParams_getPublicParams(
 #[no_mangle]
 pub extern "C" fn FFI_ServerSecretParams_signDeterministic(
     serverSecretParams: *const u8,
-    serverSecretParamsLen: u64,
+    serverSecretParamsLen: u32,
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     message: *const u8,
-    messageLen: u64,
+    messageLen: u32,
     notarySignatureOut: *mut u8,
-    notarySignatureLen: u64,
+    notarySignatureLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_secret_params: &[u8] = unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
         let message: &[u8] = unsafe { slice::from_raw_parts(message, messageLen as usize) };
-        let notary_signature: &mut [u8] = unsafe { slice::from_raw_parts_mut(notarySignatureOut, notarySignatureLen as usize) };
+        let notary_signature: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(notarySignatureOut, notarySignatureLen as usize) };
 
-        simpleapi::ServerSecretParams_signDeterministic(server_secret_params, &randomness, &message,  notary_signature)
+        simpleapi::ServerSecretParams_signDeterministic(
+            server_secret_params,
+            &randomness,
+            &message,
+            notary_signature,
+        )
     });
 
     match result {
@@ -455,23 +540,33 @@ pub extern "C" fn FFI_ServerSecretParams_signDeterministic(
 #[no_mangle]
 pub extern "C" fn FFI_ServerPublicParams_receiveAuthCredential(
     serverPublicParams: *const u8,
-    serverPublicParamsLen: u64,
+    serverPublicParamsLen: u32,
     uuid: *const u8,
-    uuidLen: u64,
+    uuidLen: u32,
     redemptionTime: u32,
     authCredentialResponse: *const u8,
-    authCredentialResponseLen: u64,
+    authCredentialResponseLen: u32,
     authCredentialOut: *mut u8,
-    authCredentialLen: u64,
+    authCredentialLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_public_params: &[u8] = unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
         let redemption_time = redemptionTime as u32;
-        let auth_credential_response: &[u8] = unsafe { slice::from_raw_parts(authCredentialResponse, authCredentialResponseLen as usize) };
-        let auth_credential: &mut [u8] = unsafe { slice::from_raw_parts_mut(authCredentialOut, authCredentialLen as usize) };
+        let auth_credential_response: &[u8] = unsafe {
+            slice::from_raw_parts(authCredentialResponse, authCredentialResponseLen as usize)
+        };
+        let auth_credential: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(authCredentialOut, authCredentialLen as usize) };
 
-        simpleapi::ServerPublicParams_receiveAuthCredential(server_public_params, &uuid, redemption_time, &auth_credential_response,  auth_credential)
+        simpleapi::ServerPublicParams_receiveAuthCredential(
+            server_public_params,
+            &uuid,
+            redemption_time,
+            &auth_credential_response,
+            auth_credential,
+        )
     });
 
     match result {
@@ -483,24 +578,39 @@ pub extern "C" fn FFI_ServerPublicParams_receiveAuthCredential(
 #[no_mangle]
 pub extern "C" fn FFI_ServerPublicParams_createAuthCredentialPresentationDeterministic(
     serverPublicParams: *const u8,
-    serverPublicParamsLen: u64,
+    serverPublicParamsLen: u32,
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     authCredential: *const u8,
-    authCredentialLen: u64,
+    authCredentialLen: u32,
     authCredentialPresentationOut: *mut u8,
-    authCredentialPresentationLen: u64,
+    authCredentialPresentationLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_public_params: &[u8] = unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let auth_credential: &[u8] = unsafe { slice::from_raw_parts(authCredential, authCredentialLen as usize) };
-        let auth_credential_presentation: &mut [u8] = unsafe { slice::from_raw_parts_mut(authCredentialPresentationOut, authCredentialPresentationLen as usize) };
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let auth_credential: &[u8] =
+            unsafe { slice::from_raw_parts(authCredential, authCredentialLen as usize) };
+        let auth_credential_presentation: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                authCredentialPresentationOut,
+                authCredentialPresentationLen as usize,
+            )
+        };
 
-        simpleapi::ServerPublicParams_createAuthCredentialPresentationDeterministic(server_public_params, &randomness, &group_secret_params, &auth_credential,  auth_credential_presentation)
+        simpleapi::ServerPublicParams_createAuthCredentialPresentationDeterministic(
+            server_public_params,
+            &randomness,
+            &group_secret_params,
+            &auth_credential,
+            auth_credential_presentation,
+        )
     });
 
     match result {
@@ -512,24 +622,38 @@ pub extern "C" fn FFI_ServerPublicParams_createAuthCredentialPresentationDetermi
 #[no_mangle]
 pub extern "C" fn FFI_ServerPublicParams_createProfileKeyCredentialRequestContextDeterministic(
     serverPublicParams: *const u8,
-    serverPublicParamsLen: u64,
+    serverPublicParamsLen: u32,
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     uuid: *const u8,
-    uuidLen: u64,
+    uuidLen: u32,
     profileKey: *const u8,
-    profileKeyLen: u64,
+    profileKeyLen: u32,
     profileKeyCredentialRequestContextOut: *mut u8,
-    profileKeyCredentialRequestContextLen: u64,
+    profileKeyCredentialRequestContextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_public_params: &[u8] = unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
-        let profile_key: &[u8] = unsafe { slice::from_raw_parts(profileKey, profileKeyLen as usize) };
-        let profile_key_credential_request_context: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyCredentialRequestContextOut, profileKeyCredentialRequestContextLen as usize) };
+        let profile_key: &[u8] =
+            unsafe { slice::from_raw_parts(profileKey, profileKeyLen as usize) };
+        let profile_key_credential_request_context: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                profileKeyCredentialRequestContextOut,
+                profileKeyCredentialRequestContextLen as usize,
+            )
+        };
 
-        simpleapi::ServerPublicParams_createProfileKeyCredentialRequestContextDeterministic(server_public_params, &randomness, &uuid, &profile_key,  profile_key_credential_request_context)
+        simpleapi::ServerPublicParams_createProfileKeyCredentialRequestContextDeterministic(
+            server_public_params,
+            &randomness,
+            &uuid,
+            &profile_key,
+            profile_key_credential_request_context,
+        )
     });
 
     match result {
@@ -541,21 +665,39 @@ pub extern "C" fn FFI_ServerPublicParams_createProfileKeyCredentialRequestContex
 #[no_mangle]
 pub extern "C" fn FFI_ServerPublicParams_receiveProfileKeyCredential(
     serverPublicParams: *const u8,
-    serverPublicParamsLen: u64,
+    serverPublicParamsLen: u32,
     profileKeyCredentialRequestContext: *const u8,
-    profileKeyCredentialRequestContextLen: u64,
+    profileKeyCredentialRequestContextLen: u32,
     profileKeyCredentialResponse: *const u8,
-    profileKeyCredentialResponseLen: u64,
+    profileKeyCredentialResponseLen: u32,
     profileKeyCredentialOut: *mut u8,
-    profileKeyCredentialLen: u64,
+    profileKeyCredentialLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_public_params: &[u8] = unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
-        let profile_key_credential_request_context: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialRequestContext, profileKeyCredentialRequestContextLen as usize) };
-        let profile_key_credential_response: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialResponse, profileKeyCredentialResponseLen as usize) };
-        let profile_key_credential: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyCredentialOut, profileKeyCredentialLen as usize) };
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let profile_key_credential_request_context: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialRequestContext,
+                profileKeyCredentialRequestContextLen as usize,
+            )
+        };
+        let profile_key_credential_response: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialResponse,
+                profileKeyCredentialResponseLen as usize,
+            )
+        };
+        let profile_key_credential: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(profileKeyCredentialOut, profileKeyCredentialLen as usize)
+        };
 
-        simpleapi::ServerPublicParams_receiveProfileKeyCredential(server_public_params, &profile_key_credential_request_context, &profile_key_credential_response,  profile_key_credential)
+        simpleapi::ServerPublicParams_receiveProfileKeyCredential(
+            server_public_params,
+            &profile_key_credential_request_context,
+            &profile_key_credential_response,
+            profile_key_credential,
+        )
     });
 
     match result {
@@ -567,24 +709,40 @@ pub extern "C" fn FFI_ServerPublicParams_receiveProfileKeyCredential(
 #[no_mangle]
 pub extern "C" fn FFI_ServerPublicParams_createProfileKeyCredentialPresentationDeterministic(
     serverPublicParams: *const u8,
-    serverPublicParamsLen: u64,
+    serverPublicParamsLen: u32,
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     groupSecretParams: *const u8,
-    groupSecretParamsLen: u64,
+    groupSecretParamsLen: u32,
     profileKeyCredential: *const u8,
-    profileKeyCredentialLen: u64,
+    profileKeyCredentialLen: u32,
     profileKeyCredentialPresentationOut: *mut u8,
-    profileKeyCredentialPresentationLen: u64,
+    profileKeyCredentialPresentationLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_public_params: &[u8] = unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
-        let group_secret_params: &[u8] = unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let profile_key_credential: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredential, profileKeyCredentialLen as usize) };
-        let profile_key_credential_presentation: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyCredentialPresentationOut, profileKeyCredentialPresentationLen as usize) };
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let profile_key_credential: &[u8] = unsafe {
+            slice::from_raw_parts(profileKeyCredential, profileKeyCredentialLen as usize)
+        };
+        let profile_key_credential_presentation: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                profileKeyCredentialPresentationOut,
+                profileKeyCredentialPresentationLen as usize,
+            )
+        };
 
-        simpleapi::ServerPublicParams_createProfileKeyCredentialPresentationDeterministic(server_public_params, &randomness, &group_secret_params, &profile_key_credential,  profile_key_credential_presentation)
+        simpleapi::ServerPublicParams_createProfileKeyCredentialPresentationDeterministic(
+            server_public_params,
+            &randomness,
+            &group_secret_params,
+            &profile_key_credential,
+            profile_key_credential_presentation,
+        )
     });
 
     match result {
@@ -596,23 +754,36 @@ pub extern "C" fn FFI_ServerPublicParams_createProfileKeyCredentialPresentationD
 #[no_mangle]
 pub extern "C" fn FFI_ServerSecretParams_issueAuthCredentialDeterministic(
     serverSecretParams: *const u8,
-    serverSecretParamsLen: u64,
+    serverSecretParamsLen: u32,
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     uuid: *const u8,
-    uuidLen: u64,
+    uuidLen: u32,
     redemptionTime: u32,
     authCredentialResponseOut: *mut u8,
-    authCredentialResponseLen: u64,
+    authCredentialResponseLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_secret_params: &[u8] = unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
         let redemption_time = redemptionTime as u32;
-        let auth_credential_response: &mut [u8] = unsafe { slice::from_raw_parts_mut(authCredentialResponseOut, authCredentialResponseLen as usize) };
+        let auth_credential_response: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                authCredentialResponseOut,
+                authCredentialResponseLen as usize,
+            )
+        };
 
-        simpleapi::ServerSecretParams_issueAuthCredentialDeterministic(server_secret_params, &randomness, &uuid, redemption_time,  auth_credential_response)
+        simpleapi::ServerSecretParams_issueAuthCredentialDeterministic(
+            server_secret_params,
+            &randomness,
+            &uuid,
+            redemption_time,
+            auth_credential_response,
+        )
     });
 
     match result {
@@ -624,18 +795,29 @@ pub extern "C" fn FFI_ServerSecretParams_issueAuthCredentialDeterministic(
 #[no_mangle]
 pub extern "C" fn FFI_ServerSecretParams_verifyAuthCredentialPresentation(
     serverSecretParams: *const u8,
-    serverSecretParamsLen: u64,
+    serverSecretParamsLen: u32,
     groupPublicParams: *const u8,
-    groupPublicParamsLen: u64,
+    groupPublicParamsLen: u32,
     authCredentialPresentation: *const u8,
-    authCredentialPresentationLen: u64,
+    authCredentialPresentationLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_secret_params: &[u8] = unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
-        let group_public_params: &[u8] = unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
-        let auth_credential_presentation: &[u8] = unsafe { slice::from_raw_parts(authCredentialPresentation, authCredentialPresentationLen as usize) };
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let group_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
+        let auth_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                authCredentialPresentation,
+                authCredentialPresentationLen as usize,
+            )
+        };
 
-        simpleapi::ServerSecretParams_verifyAuthCredentialPresentation(server_secret_params, &group_public_params, &auth_credential_presentation)
+        simpleapi::ServerSecretParams_verifyAuthCredentialPresentation(
+            server_secret_params,
+            &group_public_params,
+            &auth_credential_presentation,
+        )
     });
 
     match result {
@@ -647,27 +829,48 @@ pub extern "C" fn FFI_ServerSecretParams_verifyAuthCredentialPresentation(
 #[no_mangle]
 pub extern "C" fn FFI_ServerSecretParams_issueProfileKeyCredentialDeterministic(
     serverSecretParams: *const u8,
-    serverSecretParamsLen: u64,
+    serverSecretParamsLen: u32,
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
     profileKeyCredentialRequest: *const u8,
-    profileKeyCredentialRequestLen: u64,
+    profileKeyCredentialRequestLen: u32,
     uuid: *const u8,
-    uuidLen: u64,
+    uuidLen: u32,
     profileKeyCommitment: *const u8,
-    profileKeyCommitmentLen: u64,
+    profileKeyCommitmentLen: u32,
     profileKeyCredentialResponseOut: *mut u8,
-    profileKeyCredentialResponseLen: u64,
+    profileKeyCredentialResponseLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_secret_params: &[u8] = unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
-        let profile_key_credential_request: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialRequest, profileKeyCredentialRequestLen as usize) };
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let profile_key_credential_request: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialRequest,
+                profileKeyCredentialRequestLen as usize,
+            )
+        };
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
-        let profile_key_commitment: &[u8] = unsafe { slice::from_raw_parts(profileKeyCommitment, profileKeyCommitmentLen as usize) };
-        let profile_key_credential_response: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyCredentialResponseOut, profileKeyCredentialResponseLen as usize) };
+        let profile_key_commitment: &[u8] = unsafe {
+            slice::from_raw_parts(profileKeyCommitment, profileKeyCommitmentLen as usize)
+        };
+        let profile_key_credential_response: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                profileKeyCredentialResponseOut,
+                profileKeyCredentialResponseLen as usize,
+            )
+        };
 
-        simpleapi::ServerSecretParams_issueProfileKeyCredentialDeterministic(server_secret_params, &randomness, &profile_key_credential_request, &uuid, &profile_key_commitment,  profile_key_credential_response)
+        simpleapi::ServerSecretParams_issueProfileKeyCredentialDeterministic(
+            server_secret_params,
+            &randomness,
+            &profile_key_credential_request,
+            &uuid,
+            &profile_key_commitment,
+            profile_key_credential_response,
+        )
     });
 
     match result {
@@ -679,18 +882,29 @@ pub extern "C" fn FFI_ServerSecretParams_issueProfileKeyCredentialDeterministic(
 #[no_mangle]
 pub extern "C" fn FFI_ServerSecretParams_verifyProfileKeyCredentialPresentation(
     serverSecretParams: *const u8,
-    serverSecretParamsLen: u64,
+    serverSecretParamsLen: u32,
     groupPublicParams: *const u8,
-    groupPublicParamsLen: u64,
+    groupPublicParamsLen: u32,
     profileKeyCredentialPresentation: *const u8,
-    profileKeyCredentialPresentationLen: u64,
+    profileKeyCredentialPresentationLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_secret_params: &[u8] = unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
-        let group_public_params: &[u8] = unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
-        let profile_key_credential_presentation: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialPresentation, profileKeyCredentialPresentationLen as usize) };
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let group_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
+        let profile_key_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialPresentation,
+                profileKeyCredentialPresentationLen as usize,
+            )
+        };
 
-        simpleapi::ServerSecretParams_verifyProfileKeyCredentialPresentation(server_secret_params, &group_public_params, &profile_key_credential_presentation)
+        simpleapi::ServerSecretParams_verifyProfileKeyCredentialPresentation(
+            server_secret_params,
+            &group_public_params,
+            &profile_key_credential_presentation,
+        )
     });
 
     match result {
@@ -702,12 +916,13 @@ pub extern "C" fn FFI_ServerSecretParams_verifyProfileKeyCredentialPresentation(
 #[no_mangle]
 pub extern "C" fn FFI_GroupPublicParams_checkValidContents(
     groupPublicParams: *const u8,
-    groupPublicParamsLen: u64,
+    groupPublicParamsLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_public_params: &[u8] = unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
+        let group_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
 
-        simpleapi::GroupPublicParams_checkValidContents(group_public_params, )
+        simpleapi::GroupPublicParams_checkValidContents(group_public_params)
     });
 
     match result {
@@ -719,15 +934,17 @@ pub extern "C" fn FFI_GroupPublicParams_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_GroupPublicParams_getGroupIdentifier(
     groupPublicParams: *const u8,
-    groupPublicParamsLen: u64,
+    groupPublicParamsLen: u32,
     groupIdentifierOut: *mut u8,
-    groupIdentifierLen: u64,
+    groupIdentifierLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_public_params: &[u8] = unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
-        let group_identifier: &mut [u8] = unsafe { slice::from_raw_parts_mut(groupIdentifierOut, groupIdentifierLen as usize) };
+        let group_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
+        let group_identifier: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(groupIdentifierOut, groupIdentifierLen as usize) };
 
-        simpleapi::GroupPublicParams_getGroupIdentifier(group_public_params,  group_identifier)
+        simpleapi::GroupPublicParams_getGroupIdentifier(group_public_params, group_identifier)
     });
 
     match result {
@@ -739,18 +956,24 @@ pub extern "C" fn FFI_GroupPublicParams_getGroupIdentifier(
 #[no_mangle]
 pub extern "C" fn FFI_GroupPublicParams_verifySignature(
     groupPublicParams: *const u8,
-    groupPublicParamsLen: u64,
+    groupPublicParamsLen: u32,
     message: *const u8,
-    messageLen: u64,
+    messageLen: u32,
     changeSignature: *const u8,
-    changeSignatureLen: u64,
+    changeSignatureLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let group_public_params: &[u8] = unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
+        let group_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
         let message: &[u8] = unsafe { slice::from_raw_parts(message, messageLen as usize) };
-        let change_signature: &[u8] = unsafe { slice::from_raw_parts(changeSignature, changeSignatureLen as usize) };
+        let change_signature: &[u8] =
+            unsafe { slice::from_raw_parts(changeSignature, changeSignatureLen as usize) };
 
-        simpleapi::GroupPublicParams_verifySignature(group_public_params, &message, &change_signature)
+        simpleapi::GroupPublicParams_verifySignature(
+            group_public_params,
+            &message,
+            &change_signature,
+        )
     });
 
     match result {
@@ -762,12 +985,13 @@ pub extern "C" fn FFI_GroupPublicParams_verifySignature(
 #[no_mangle]
 pub extern "C" fn FFI_ServerPublicParams_checkValidContents(
     serverPublicParams: *const u8,
-    serverPublicParamsLen: u64,
+    serverPublicParamsLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_public_params: &[u8] = unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
 
-        simpleapi::ServerPublicParams_checkValidContents(server_public_params, )
+        simpleapi::ServerPublicParams_checkValidContents(server_public_params)
     });
 
     match result {
@@ -779,18 +1003,24 @@ pub extern "C" fn FFI_ServerPublicParams_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_ServerPublicParams_verifySignature(
     serverPublicParams: *const u8,
-    serverPublicParamsLen: u64,
+    serverPublicParamsLen: u32,
     message: *const u8,
-    messageLen: u64,
+    messageLen: u32,
     notarySignature: *const u8,
-    notarySignatureLen: u64,
+    notarySignatureLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let server_public_params: &[u8] = unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
         let message: &[u8] = unsafe { slice::from_raw_parts(message, messageLen as usize) };
-        let notary_signature: &[u8] = unsafe { slice::from_raw_parts(notarySignature, notarySignatureLen as usize) };
+        let notary_signature: &[u8] =
+            unsafe { slice::from_raw_parts(notarySignature, notarySignatureLen as usize) };
 
-        simpleapi::ServerPublicParams_verifySignature(server_public_params, &message, &notary_signature)
+        simpleapi::ServerPublicParams_verifySignature(
+            server_public_params,
+            &message,
+            &notary_signature,
+        )
     });
 
     match result {
@@ -802,12 +1032,14 @@ pub extern "C" fn FFI_ServerPublicParams_verifySignature(
 #[no_mangle]
 pub extern "C" fn FFI_AuthCredentialResponse_checkValidContents(
     authCredentialResponse: *const u8,
-    authCredentialResponseLen: u64,
+    authCredentialResponseLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let auth_credential_response: &[u8] = unsafe { slice::from_raw_parts(authCredentialResponse, authCredentialResponseLen as usize) };
+        let auth_credential_response: &[u8] = unsafe {
+            slice::from_raw_parts(authCredentialResponse, authCredentialResponseLen as usize)
+        };
 
-        simpleapi::AuthCredentialResponse_checkValidContents(auth_credential_response, )
+        simpleapi::AuthCredentialResponse_checkValidContents(auth_credential_response)
     });
 
     match result {
@@ -819,12 +1051,13 @@ pub extern "C" fn FFI_AuthCredentialResponse_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_AuthCredential_checkValidContents(
     authCredential: *const u8,
-    authCredentialLen: u64,
+    authCredentialLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let auth_credential: &[u8] = unsafe { slice::from_raw_parts(authCredential, authCredentialLen as usize) };
+        let auth_credential: &[u8] =
+            unsafe { slice::from_raw_parts(authCredential, authCredentialLen as usize) };
 
-        simpleapi::AuthCredential_checkValidContents(auth_credential, )
+        simpleapi::AuthCredential_checkValidContents(auth_credential)
     });
 
     match result {
@@ -836,12 +1069,17 @@ pub extern "C" fn FFI_AuthCredential_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_AuthCredentialPresentation_checkValidContents(
     authCredentialPresentation: *const u8,
-    authCredentialPresentationLen: u64,
+    authCredentialPresentationLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let auth_credential_presentation: &[u8] = unsafe { slice::from_raw_parts(authCredentialPresentation, authCredentialPresentationLen as usize) };
+        let auth_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                authCredentialPresentation,
+                authCredentialPresentationLen as usize,
+            )
+        };
 
-        simpleapi::AuthCredentialPresentation_checkValidContents(auth_credential_presentation, )
+        simpleapi::AuthCredentialPresentation_checkValidContents(auth_credential_presentation)
     });
 
     match result {
@@ -853,15 +1091,24 @@ pub extern "C" fn FFI_AuthCredentialPresentation_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_AuthCredentialPresentation_getUuidCiphertext(
     authCredentialPresentation: *const u8,
-    authCredentialPresentationLen: u64,
+    authCredentialPresentationLen: u32,
     uuidCiphertextOut: *mut u8,
-    uuidCiphertextLen: u64,
+    uuidCiphertextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let auth_credential_presentation: &[u8] = unsafe { slice::from_raw_parts(authCredentialPresentation, authCredentialPresentationLen as usize) };
-        let uuid_ciphertext: &mut [u8] = unsafe { slice::from_raw_parts_mut(uuidCiphertextOut, uuidCiphertextLen as usize) };
+        let auth_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                authCredentialPresentation,
+                authCredentialPresentationLen as usize,
+            )
+        };
+        let uuid_ciphertext: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(uuidCiphertextOut, uuidCiphertextLen as usize) };
 
-        simpleapi::AuthCredentialPresentation_getUuidCiphertext(auth_credential_presentation,  uuid_ciphertext)
+        simpleapi::AuthCredentialPresentation_getUuidCiphertext(
+            auth_credential_presentation,
+            uuid_ciphertext,
+        )
     });
 
     match result {
@@ -873,15 +1120,24 @@ pub extern "C" fn FFI_AuthCredentialPresentation_getUuidCiphertext(
 #[no_mangle]
 pub extern "C" fn FFI_AuthCredentialPresentation_getRedemptionTime(
     authCredentialPresentation: *const u8,
-    authCredentialPresentationLen: u64,
+    authCredentialPresentationLen: u32,
     redemptionTimeOut: *mut u8,
-    redemptionTimeLen: u64,
+    redemptionTimeLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let auth_credential_presentation: &[u8] = unsafe { slice::from_raw_parts(authCredentialPresentation, authCredentialPresentationLen as usize) };
-        let redemption_time: &mut [u8] = unsafe { slice::from_raw_parts_mut(redemptionTimeOut, redemptionTimeLen as usize) };
+        let auth_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                authCredentialPresentation,
+                authCredentialPresentationLen as usize,
+            )
+        };
+        let redemption_time: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(redemptionTimeOut, redemptionTimeLen as usize) };
 
-        simpleapi::AuthCredentialPresentation_getRedemptionTime(auth_credential_presentation,  redemption_time)
+        simpleapi::AuthCredentialPresentation_getRedemptionTime(
+            auth_credential_presentation,
+            redemption_time,
+        )
     });
 
     match result {
@@ -893,12 +1149,19 @@ pub extern "C" fn FFI_AuthCredentialPresentation_getRedemptionTime(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCredentialRequestContext_checkValidContents(
     profileKeyCredentialRequestContext: *const u8,
-    profileKeyCredentialRequestContextLen: u64,
+    profileKeyCredentialRequestContextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_credential_request_context: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialRequestContext, profileKeyCredentialRequestContextLen as usize) };
+        let profile_key_credential_request_context: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialRequestContext,
+                profileKeyCredentialRequestContextLen as usize,
+            )
+        };
 
-        simpleapi::ProfileKeyCredentialRequestContext_checkValidContents(profile_key_credential_request_context, )
+        simpleapi::ProfileKeyCredentialRequestContext_checkValidContents(
+            profile_key_credential_request_context,
+        )
     });
 
     match result {
@@ -910,15 +1173,28 @@ pub extern "C" fn FFI_ProfileKeyCredentialRequestContext_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCredentialRequestContext_getRequest(
     profileKeyCredentialRequestContext: *const u8,
-    profileKeyCredentialRequestContextLen: u64,
+    profileKeyCredentialRequestContextLen: u32,
     profileKeyCredentialRequestOut: *mut u8,
-    profileKeyCredentialRequestLen: u64,
+    profileKeyCredentialRequestLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_credential_request_context: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialRequestContext, profileKeyCredentialRequestContextLen as usize) };
-        let profile_key_credential_request: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyCredentialRequestOut, profileKeyCredentialRequestLen as usize) };
+        let profile_key_credential_request_context: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialRequestContext,
+                profileKeyCredentialRequestContextLen as usize,
+            )
+        };
+        let profile_key_credential_request: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                profileKeyCredentialRequestOut,
+                profileKeyCredentialRequestLen as usize,
+            )
+        };
 
-        simpleapi::ProfileKeyCredentialRequestContext_getRequest(profile_key_credential_request_context,  profile_key_credential_request)
+        simpleapi::ProfileKeyCredentialRequestContext_getRequest(
+            profile_key_credential_request_context,
+            profile_key_credential_request,
+        )
     });
 
     match result {
@@ -930,12 +1206,17 @@ pub extern "C" fn FFI_ProfileKeyCredentialRequestContext_getRequest(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCredentialRequest_checkValidContents(
     profileKeyCredentialRequest: *const u8,
-    profileKeyCredentialRequestLen: u64,
+    profileKeyCredentialRequestLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_credential_request: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialRequest, profileKeyCredentialRequestLen as usize) };
+        let profile_key_credential_request: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialRequest,
+                profileKeyCredentialRequestLen as usize,
+            )
+        };
 
-        simpleapi::ProfileKeyCredentialRequest_checkValidContents(profile_key_credential_request, )
+        simpleapi::ProfileKeyCredentialRequest_checkValidContents(profile_key_credential_request)
     });
 
     match result {
@@ -947,12 +1228,17 @@ pub extern "C" fn FFI_ProfileKeyCredentialRequest_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCredentialResponse_checkValidContents(
     profileKeyCredentialResponse: *const u8,
-    profileKeyCredentialResponseLen: u64,
+    profileKeyCredentialResponseLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_credential_response: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialResponse, profileKeyCredentialResponseLen as usize) };
+        let profile_key_credential_response: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialResponse,
+                profileKeyCredentialResponseLen as usize,
+            )
+        };
 
-        simpleapi::ProfileKeyCredentialResponse_checkValidContents(profile_key_credential_response, )
+        simpleapi::ProfileKeyCredentialResponse_checkValidContents(profile_key_credential_response)
     });
 
     match result {
@@ -964,12 +1250,14 @@ pub extern "C" fn FFI_ProfileKeyCredentialResponse_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCredential_checkValidContents(
     profileKeyCredential: *const u8,
-    profileKeyCredentialLen: u64,
+    profileKeyCredentialLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_credential: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredential, profileKeyCredentialLen as usize) };
+        let profile_key_credential: &[u8] = unsafe {
+            slice::from_raw_parts(profileKeyCredential, profileKeyCredentialLen as usize)
+        };
 
-        simpleapi::ProfileKeyCredential_checkValidContents(profile_key_credential, )
+        simpleapi::ProfileKeyCredential_checkValidContents(profile_key_credential)
     });
 
     match result {
@@ -981,12 +1269,19 @@ pub extern "C" fn FFI_ProfileKeyCredential_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCredentialPresentation_checkValidContents(
     profileKeyCredentialPresentation: *const u8,
-    profileKeyCredentialPresentationLen: u64,
+    profileKeyCredentialPresentationLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_credential_presentation: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialPresentation, profileKeyCredentialPresentationLen as usize) };
+        let profile_key_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialPresentation,
+                profileKeyCredentialPresentationLen as usize,
+            )
+        };
 
-        simpleapi::ProfileKeyCredentialPresentation_checkValidContents(profile_key_credential_presentation, )
+        simpleapi::ProfileKeyCredentialPresentation_checkValidContents(
+            profile_key_credential_presentation,
+        )
     });
 
     match result {
@@ -998,15 +1293,24 @@ pub extern "C" fn FFI_ProfileKeyCredentialPresentation_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCredentialPresentation_getUuidCiphertext(
     profileKeyCredentialPresentation: *const u8,
-    profileKeyCredentialPresentationLen: u64,
+    profileKeyCredentialPresentationLen: u32,
     uuidCiphertextOut: *mut u8,
-    uuidCiphertextLen: u64,
+    uuidCiphertextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_credential_presentation: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialPresentation, profileKeyCredentialPresentationLen as usize) };
-        let uuid_ciphertext: &mut [u8] = unsafe { slice::from_raw_parts_mut(uuidCiphertextOut, uuidCiphertextLen as usize) };
+        let profile_key_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialPresentation,
+                profileKeyCredentialPresentationLen as usize,
+            )
+        };
+        let uuid_ciphertext: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(uuidCiphertextOut, uuidCiphertextLen as usize) };
 
-        simpleapi::ProfileKeyCredentialPresentation_getUuidCiphertext(profile_key_credential_presentation,  uuid_ciphertext)
+        simpleapi::ProfileKeyCredentialPresentation_getUuidCiphertext(
+            profile_key_credential_presentation,
+            uuid_ciphertext,
+        )
     });
 
     match result {
@@ -1018,15 +1322,25 @@ pub extern "C" fn FFI_ProfileKeyCredentialPresentation_getUuidCiphertext(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCredentialPresentation_getProfileKeyCiphertext(
     profileKeyCredentialPresentation: *const u8,
-    profileKeyCredentialPresentationLen: u64,
+    profileKeyCredentialPresentationLen: u32,
     profileKeyCiphertextOut: *mut u8,
-    profileKeyCiphertextLen: u64,
+    profileKeyCiphertextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_credential_presentation: &[u8] = unsafe { slice::from_raw_parts(profileKeyCredentialPresentation, profileKeyCredentialPresentationLen as usize) };
-        let profile_key_ciphertext: &mut [u8] = unsafe { slice::from_raw_parts_mut(profileKeyCiphertextOut, profileKeyCiphertextLen as usize) };
+        let profile_key_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialPresentation,
+                profileKeyCredentialPresentationLen as usize,
+            )
+        };
+        let profile_key_ciphertext: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(profileKeyCiphertextOut, profileKeyCiphertextLen as usize)
+        };
 
-        simpleapi::ProfileKeyCredentialPresentation_getProfileKeyCiphertext(profile_key_credential_presentation,  profile_key_ciphertext)
+        simpleapi::ProfileKeyCredentialPresentation_getProfileKeyCiphertext(
+            profile_key_credential_presentation,
+            profile_key_ciphertext,
+        )
     });
 
     match result {
@@ -1038,12 +1352,13 @@ pub extern "C" fn FFI_ProfileKeyCredentialPresentation_getProfileKeyCiphertext(
 #[no_mangle]
 pub extern "C" fn FFI_UuidCiphertext_checkValidContents(
     uuidCiphertext: *const u8,
-    uuidCiphertextLen: u64,
+    uuidCiphertextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let uuid_ciphertext: &[u8] = unsafe { slice::from_raw_parts(uuidCiphertext, uuidCiphertextLen as usize) };
+        let uuid_ciphertext: &[u8] =
+            unsafe { slice::from_raw_parts(uuidCiphertext, uuidCiphertextLen as usize) };
 
-        simpleapi::UuidCiphertext_checkValidContents(uuid_ciphertext, )
+        simpleapi::UuidCiphertext_checkValidContents(uuid_ciphertext)
     });
 
     match result {
@@ -1055,12 +1370,14 @@ pub extern "C" fn FFI_UuidCiphertext_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCiphertext_checkValidContents(
     profileKeyCiphertext: *const u8,
-    profileKeyCiphertextLen: u64,
+    profileKeyCiphertextLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let profile_key_ciphertext: &[u8] = unsafe { slice::from_raw_parts(profileKeyCiphertext, profileKeyCiphertextLen as usize) };
+        let profile_key_ciphertext: &[u8] = unsafe {
+            slice::from_raw_parts(profileKeyCiphertext, profileKeyCiphertextLen as usize)
+        };
 
-        simpleapi::ProfileKeyCiphertext_checkValidContents(profile_key_ciphertext, )
+        simpleapi::ProfileKeyCiphertext_checkValidContents(profile_key_ciphertext)
     });
 
     match result {
@@ -1072,12 +1389,13 @@ pub extern "C" fn FFI_ProfileKeyCiphertext_checkValidContents(
 #[no_mangle]
 pub extern "C" fn FFI_Randomness_checkValidContents(
     randomness: *const u8,
-    randomnessLen: u64,
+    randomnessLen: u32,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
-        let randomness: &[u8] = unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
 
-        simpleapi::Randomness_checkValidContents(randomness, )
+        simpleapi::Randomness_checkValidContents(randomness)
     });
 
     match result {
@@ -1087,14 +1405,11 @@ pub extern "C" fn FFI_Randomness_checkValidContents(
 }
 
 #[no_mangle]
-pub extern "C" fn FFI_Uuid_checkValidContents(
-    uuid: *const u8,
-    uuidLen: u64,
-) -> i32 {
+pub extern "C" fn FFI_Uuid_checkValidContents(uuid: *const u8, uuidLen: u32) -> i32 {
     let result = panic::catch_unwind(|| {
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
 
-        simpleapi::Uuid_checkValidContents(uuid, )
+        simpleapi::Uuid_checkValidContents(uuid)
     });
 
     match result {

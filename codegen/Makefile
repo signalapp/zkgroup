@@ -8,13 +8,14 @@ output:
 	mkdir -p java/internal
 	mkdir -p simpleapi
 	mkdir -p swift
-	python ./codegen.py
+	python3 ./codegen.py
 
 install:
-	cp ffiapijava/ffiapijava.rs ../src/ffi/
-	cp ffiapi/ffiapi.rs ../src/ffi/
-	cp simpleapi/simpleapi.rs ../src/ffi/
-	cp -r java/* ../java/src/main/java/org/signal/zkgroup
+	cp ffiapijava/ffiapijava.rs ../rust/src/ffi/
+	cp ffiapi/ffiapi.rs ../rust/src/ffi/
+	cp simpleapi/simpleapi.rs ../rust/src/ffi/
+	cp -r java/* ../ffi/java/src/main/java/org/signal/zkgroup
+	cp -r swift/* ../ffi/swift/ZKGroup
 
 clean:
 	rm -rf ffiapijava

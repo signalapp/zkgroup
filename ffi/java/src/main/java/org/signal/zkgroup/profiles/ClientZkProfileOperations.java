@@ -55,7 +55,7 @@ public class ClientZkProfileOperations {
     if (profileKeyCredentialResponse == null) {
       throw new VerificationFailedException();
     }
-
+    
     byte[] newContents = new byte[ProfileKeyCredential.SIZE];
 
     int ffi_return = Native.serverPublicParamsReceiveProfileKeyCredentialJNI(serverPublicParams.getInternalContentsForJNI(), profileKeyCredentialRequestContext.getInternalContentsForJNI(), profileKeyCredentialResponse.getInternalContentsForJNI(), newContents);

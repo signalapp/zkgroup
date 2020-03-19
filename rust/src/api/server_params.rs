@@ -180,7 +180,7 @@ impl ServerPublicParams {
         Ok(api::auth::AuthCredential {
             credential: response.credential,
             server_public_params: *self,
-            uid: uid,
+            uid,
             redemption_time,
         })
     }

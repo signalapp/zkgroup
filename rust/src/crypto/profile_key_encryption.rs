@@ -15,6 +15,10 @@ use curve25519_dalek::scalar::Scalar;
 use serde::{Deserialize, Serialize};
 use sha2::Sha512;
 
+use curve25519_dalek::subtle::Choice;
+use curve25519_dalek::subtle::ConditionallySelectable;
+use curve25519_dalek::subtle::ConstantTimeEq;
+
 use ZkGroupError::*;
 
 #[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
@@ -37,7 +41,7 @@ pub struct PublicKey {
     pub(crate) B: RistrettoPoint,
 }
 
-#[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Copy, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct Ciphertext {
     pub(crate) E_B1: RistrettoPoint,
     pub(crate) E_B2: RistrettoPoint,
@@ -81,24 +85,55 @@ impl KeyPair {
     pub fn encrypt(&self, profile_key: profile_key_struct::ProfileKeyStruct) -> Ciphertext {
         let E_B1 = self.calc_E_B1(profile_key);
         let E_B2 = (self.b * E_B1) + profile_key.M4;
-        (Ciphertext { E_B1, E_B2 })
+        Ciphertext { E_B1, E_B2 }
     }
 
     // Might return DecryptionFailure
+    #[allow(clippy::needless_range_loop)]
     pub fn decrypt(
         &self,
         ciphertext: Ciphertext,
         uid_bytes: UidBytes,
     ) -> Result<profile_key_struct::ProfileKeyStruct, ZkGroupError> {
         let M4 = ciphertext.E_B2 - (self.b * ciphertext.E_B1);
-        let (_mask, candidates) = profile_key_struct::ProfileKeyStruct::from_M4(M4, uid_bytes);
-        for j in 0..64 {
-            let candidate = candidates[j];
-            if ciphertext.E_B1 == self.calc_E_B1(candidate) {
-                return Ok(candidate);
+        let (mask, candidates) = M4.decode_253_bits();
+
+        let m6 = profile_key_struct::ProfileKeyStruct::calc_m6(M4);
+        let target_M5 = (self.b0 + self.b1 * m6).invert() * ciphertext.E_B1;
+
+        let mut retval: profile_key_struct::ProfileKeyStruct = Default::default();
+        let mut n_found = 0;
+        for i in 0..8 {
+            let is_valid_fe = Choice::from((mask >> i) & 1);
+            let profile_key_bytes: ProfileKeyBytes = candidates[i];
+            for j in 0..8 {
+                let mut pk = profile_key_bytes;
+                if ((j >> 2) & 1) == 1 {
+                    pk[0] |= 0x01;
+                }
+                if ((j >> 1) & 1) == 1 {
+                    pk[31] |= 0x80;
+                }
+                if (j & 1) == 1 {
+                    pk[31] |= 0x40;
+                }
+                let M5 = profile_key_struct::ProfileKeyStruct::calc_M5(pk, uid_bytes);
+                let candidate_retval = profile_key_struct::ProfileKeyStruct {
+                    bytes: pk,
+                    M4,
+                    M5,
+                    m6,
+                };
+                let found = M5.ct_eq(&target_M5) & is_valid_fe;
+                retval.conditional_assign(&candidate_retval, found);
+                n_found += found.unwrap_u8();
             }
         }
-        Err(DecryptionFailure)
+        if n_found == 1 {
+            Ok(retval)
+        } else {
+            Err(DecryptionFailure)
+        }
     }
 
     fn calc_E_B1(&self, profile_key: profile_key_struct::ProfileKeyStruct) -> RistrettoPoint {
@@ -134,7 +169,7 @@ mod tests {
         let key_pair2: KeyPair = bincode::deserialize(&key_pair_bytes).unwrap();
         assert!(key_pair == key_pair2);
 
-        let mut profile_key_bytes = TEST_ARRAY_32_1;
+        let profile_key_bytes = TEST_ARRAY_32_1;
         let uid_bytes = TEST_ARRAY_16_1;
         let profile_key = profile_key_struct::ProfileKeyStruct::new(profile_key_bytes, uid_bytes);
         let ciphertext = key_pair.encrypt(profile_key);
@@ -160,5 +195,25 @@ mod tests {
 
         let plaintext = key_pair.decrypt(ciphertext2, uid_bytes).unwrap();
         assert!(plaintext == profile_key);
+
+        let uid_bytes = TEST_ARRAY_16;
+        let profile_key = profile_key_struct::ProfileKeyStruct::new(TEST_ARRAY_32, TEST_ARRAY_16);
+        let ciphertext = key_pair.encrypt(profile_key);
+        assert!(key_pair.decrypt(ciphertext, uid_bytes).unwrap() == profile_key);
+
+        let uid_bytes = TEST_ARRAY_16;
+        let profile_key = profile_key_struct::ProfileKeyStruct::new(TEST_ARRAY_32_2, TEST_ARRAY_16);
+        let ciphertext = key_pair.encrypt(profile_key);
+        assert!(key_pair.decrypt(ciphertext, uid_bytes).unwrap() == profile_key);
+
+        let uid_bytes = TEST_ARRAY_16;
+        let profile_key = profile_key_struct::ProfileKeyStruct::new(TEST_ARRAY_32_3, TEST_ARRAY_16);
+        let ciphertext = key_pair.encrypt(profile_key);
+        assert!(key_pair.decrypt(ciphertext, uid_bytes).unwrap() == profile_key);
+
+        let uid_bytes = TEST_ARRAY_16;
+        let profile_key = profile_key_struct::ProfileKeyStruct::new(TEST_ARRAY_32_4, TEST_ARRAY_16);
+        let ciphertext = key_pair.encrypt(profile_key);
+        assert!(key_pair.decrypt(ciphertext, uid_bytes).unwrap() == profile_key);
     }
 }

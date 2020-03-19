@@ -10,7 +10,7 @@
 use crate::crypto;
 use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Copy, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct UuidCiphertext {
     pub(crate) ciphertext: crypto::uid_encryption::Ciphertext,
 }

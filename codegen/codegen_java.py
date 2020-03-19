@@ -278,7 +278,7 @@ public final class Native {
 
   static {
     try {
-      String  osName    = System.getProperty("os.name").toLowerCase();
+      String  osName    = System.getProperty("os.name").toLowerCase(java.util.Locale.ROOT);
       boolean isMacOs   = osName.startsWith("mac os x");
       String  extension = isMacOs ? ".dylib" : ".so";
 
@@ -322,6 +322,8 @@ template_native_end = \
   }
 }
 """
+
+native_string = template_native
 
 def add_import(import_strings, class_dir_dict, my_dir_name, class_name):
     dir_name = class_dir_dict[class_name.snake()].snake()
@@ -726,7 +728,6 @@ def print_class(c, runtime_error_on_serialize_dict, class_dir_dict):
                 }
     return class_string
 
-native_string = template_native
 
 def produce_output(classes):
 

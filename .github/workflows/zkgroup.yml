@@ -11,15 +11,15 @@ jobs:
     - name: Set .gitconfig to replace ssh with https
       run: git config --global url."https://github".insteadOf ssh://git@github
     - name: Install nightly toolchain
-      run: rustup toolchain install nightly
+      run: rustup toolchain install nightly-2020-03-19
     - name: Install nightly rustfmt
-      run: rustup component add rustfmt --toolchain nightly
+      run: rustup component add rustfmt --toolchain nightly-2020-03-19
     - name: Check code format
-      run: cargo +nightly fmt -- --check
-#    - name: Install cargo clippy
-#      run: rustup component add clippy
-#    - name: Check rust lint
-#      run: cargo clippy -- -D warnings
+      run: cargo +nightly-2020-03-19 fmt -- --check
+    - name: Install cargo clippy
+      run: rustup component add clippy --toolchain nightly-2020-03-19
+    - name: Check rust lint
+      run: cargo +nightly-2020-03-19 clippy -- -D warnings
 
   tests:
     name: Tests

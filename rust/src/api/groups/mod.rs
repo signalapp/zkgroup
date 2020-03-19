@@ -5,12 +5,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 //
 
-pub mod blob_ciphertext;
 pub mod group_params;
 pub mod profile_key_ciphertext;
 pub mod uuid_ciphertext;
 
-pub use blob_ciphertext::BlobCiphertext;
 pub use group_params::GroupMasterKey;
 pub use group_params::GroupPublicParams;
 pub use group_params::GroupSecretParams;

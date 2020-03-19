@@ -60,7 +60,7 @@ impl Commitment {
         let J1 = (m6 * commitment_system.G_j1) + M4;
         let J2 = (m6 * commitment_system.G_j2) + M5;
         let J3 = m6 * commitment_system.G_j3;
-        (Commitment { J1, J2, J3 })
+        Commitment { J1, J2, J3 }
     }
 }
 

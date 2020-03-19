@@ -18,6 +18,11 @@ tasks.withType(JavaCompile) {
     compileTask -> compileTask.dependsOn ':makeAndroid'
 }
 
+tasks.withType(AbstractArchiveTask) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
 dependencies {
     api project(':ffi:java')
 }

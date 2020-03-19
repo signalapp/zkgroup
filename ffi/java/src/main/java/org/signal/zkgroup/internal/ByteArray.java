@@ -50,6 +50,14 @@ public abstract class ByteArray {
     if (o == null || getClass() != o.getClass()) return false;
 
     ByteArray other = (ByteArray) o;
-    return Arrays.equals(contents, other.contents);
+    if (contents == other.contents) return true;
+
+    if (contents.length != other.contents.length) return false;
+
+    int result = 0;
+    for (int i = 0; i < contents.length; i++) {
+      result |= contents[i] ^ other.contents[i];
+    }
+    return result == 0;
   }
 }

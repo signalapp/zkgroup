@@ -65,16 +65,16 @@ def print_method(c, m, static):
     # decl
     if not static:
         s += "    " + class_name.lower_camel() + ": *const u8,\n"
-        s += "    " + class_name.lower_camel() + "Len: u64,\n"
+        s += "    " + class_name.lower_camel() + "Len: u32,\n"
     for param in m.params:
         if param[0] != "int":
             s += "    " + param[1].lower_camel() + ": *const u8,\n"
-            s += "    " + param[1].lower_camel() + "Len: u64,\n"
+            s += "    " + param[1].lower_camel() + "Len: u32,\n"
         else:
             s += "    " + param[1].lower_camel() + ": u32,\n"
     if m.return_type != "boolean": 
         s += "    " + m.return_name.lower_camel() + "Out: *mut u8,\n" 
-        s += "    " + m.return_name.lower_camel() + "Len: u64,\n" 
+        s += "    " + m.return_name.lower_camel() + "Len: u32,\n" 
     s += template_method_decl_end
 
     # body

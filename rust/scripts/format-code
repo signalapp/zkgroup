@@ -4,3 +4,4 @@
 # $ rustup toolchain install nightly
 
 cargo +nightly fmt "$@"
+cargo +nightly clippy

@@ -29,7 +29,6 @@ public final class ProfileKey extends ByteArray {
     byte[] newContents = new byte[ProfileKeyCommitment.SIZE];
 
     int ffi_return = Native.profileKeyGetCommitmentJNI(contents, UUIDUtil.serialize(uuid), newContents);
-
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw new ZkGroupError("FFI_RETURN!=OK");
     }
@@ -46,7 +45,6 @@ public final class ProfileKey extends ByteArray {
     byte[] newContents = new byte[ProfileKeyVersion.SIZE];
 
     int ffi_return = Native.profileKeyGetProfileKeyVersionJNI(contents, UUIDUtil.serialize(uuid), newContents);
-
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw new ZkGroupError("FFI_RETURN!=OK");
     }

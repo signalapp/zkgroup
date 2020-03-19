@@ -16,7 +16,7 @@ use curve25519_dalek::scalar::Scalar;
 use serde::{Deserialize, Serialize};
 use sha2::Sha512;
 
-#[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Copy, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct SystemParameters {
     pub(crate) G_w: RistrettoPoint,
     pub(crate) G_wprime: RistrettoPoint,
@@ -196,6 +196,10 @@ impl SystemParameters {
 
 impl KeyPair {
     pub fn generate(randomness: RandomnessBytes, num_attributes: usize) -> Self {
+        if num_attributes > 6 || num_attributes < 4 {
+            panic!();
+        }
+
         let system = SystemParameters::get_hardcoded();
         let w = calculate_scalar(b"Signal_ZKGroup_Mac_KeyGen_w", &randomness);
         let W = w * system.G_w;
@@ -217,14 +221,12 @@ impl KeyPair {
             - (y2 * system.G_y2)
             - (y3 * system.G_y3)
             - (y4 * system.G_y4);
+
         if num_attributes > 4 {
             I -= y5 * system.G_y5;
         }
         if num_attributes > 5 {
             I -= y6 * system.G_y6;
-        }
-        if num_attributes > 6 {
-            assert!(false);
         }
 
         KeyPair {
@@ -267,6 +269,9 @@ impl KeyPair {
         M: Vec<RistrettoPoint>,
         randomness: RandomnessBytes,
     ) -> (Scalar, RistrettoPoint, RistrettoPoint) {
+        if M.len() > 6 {
+            panic!();
+        }
         let t = calculate_scalar(b"Signal_ZKGroup_MAC_Random_t", &randomness);
         let U = calculate_scalar(b"Signal_ZKGroup_Mac_Random_U", &randomness)
             * RISTRETTO_BASEPOINT_POINT;
@@ -283,9 +288,6 @@ impl KeyPair {
         }
         if M.len() > 5 {
             V += self.y6 * M[5];
-        }
-        if M.len() > 6 {
-            assert!(false);
         }
         (t, U, V)
     }

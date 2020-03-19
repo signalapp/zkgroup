@@ -39,7 +39,7 @@ export default class AuthCredentialPresentation extends ByteArray {
   }
 
   getRedemptionTime(): number {
-    const newContents = new FFICompatArray(new Buffer(4));
+    const newContents = new FFICompatArray(Buffer.alloc(4));
 
     const ffi_return = Native.FFI_AuthCredentialPresentation_getRedemptionTime(this.contents, this.contents.length, newContents, newContents.length);
 

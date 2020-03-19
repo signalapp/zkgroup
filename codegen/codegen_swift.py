@@ -72,7 +72,7 @@ public class %(class_name)s {
 template_check_valid_contents_constructor = \
 """
     
-    let ffi_return = FFI_%(class_name_camel)s_checkValidContents(self.contents, UInt64(self.contents.count))
+    let ffi_return = FFI_%(class_name_camel)s_checkValidContents(self.contents, UInt32(self.contents.count))
 
     if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
       throw ZkGroupException.InvalidInput
@@ -85,7 +85,7 @@ template_check_valid_contents_constructor = \
 template_check_valid_contents_constructor_runtime_error = \
 """
     
-    let ffi_return = FFI_%(class_name_camel)s_checkValidContents(self.contents, UInt64(self.contents.count))
+    let ffi_return = FFI_%(class_name_camel)s_checkValidContents(self.contents, UInt32(self.contents.count))
 
     if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
       throw ZkGroupException.IllegalArgument
@@ -100,7 +100,7 @@ template_static_method = \
   %(access)s static func %(method_name)s(%(param_decls)s) %(exception_decl)s -> %(return_name)s {
     var newContents: [UInt8] = Array(repeating: 0, count: %(return_name)s.SIZE)%(get_rand)s
 
-    let ffi_return = FFI_%(jni_method_name)s(%(param_args)s&newContents, UInt64(newContents.count))%(exception_check)s
+    let ffi_return = FFI_%(jni_method_name)s(%(param_args)s&newContents, UInt32(newContents.count))%(exception_check)s
 
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw ZkGroupException.ZkGroupError
@@ -119,7 +119,7 @@ template_static_method_retval_runtime_error_on_serialize = \
   public static func %(method_name)s(%(param_decls)s) %(exception_decl)s -> %(return_name)s {
     var newContents: [UInt8] = Array(repeating: 0, count: %(return_name)s.SIZE)%(get_rand)s
 
-    let ffi_return = FFI_%(jni_method_name)s(%(param_args)s&newContents, UInt64(newContents.count))%(exception_check)s
+    let ffi_return = FFI_%(jni_method_name)s(%(param_args)s&newContents, UInt32(newContents.count))%(exception_check)s
 
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw ZkGroupException.ZkGroupError
@@ -151,7 +151,7 @@ template_method = \
   public func %(method_name)s(%(param_decls)s) %(exception_decl)s -> %(return_name)s {
     var newContents: [UInt8] = Array(repeating: 0, count: %(return_len)s)
 
-    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt64(newContents.count))%(exception_check)s
+    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt32(newContents.count))%(exception_check)s
 
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw ZkGroupException.ZkGroupError
@@ -171,7 +171,7 @@ template_method_retval_runtime_error_on_serialize = \
   public func %(method_name)s(%(param_decls)s) %(exception_decl)s -> %(return_name)s {
     var newContents: [UInt8] = Array(repeating: 0, count: Int(%(return_len)s))%(get_rand)s
 
-    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt64(newContents.count))%(exception_check)s
+    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt32(newContents.count))%(exception_check)s
 
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw ZkGroupException.ZkGroupError
@@ -197,7 +197,7 @@ template_method_uuid = \
   public func %(method_name)s(%(param_decls)s) %(exception_decl)s -> %(return_name)s {
     var newContents: [UInt8] = Array(repeating: 0, count: Int(%(return_len)s))
 
-    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt64(newContents.count))%(exception_check)s
+    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt32(newContents.count))%(exception_check)s
 
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw ZkGroupException.ZkGroupError
@@ -212,7 +212,7 @@ template_method_bytearray = \
   public func %(method_name)s(%(param_decls)s) %(exception_decl)s -> [UInt8] {
     var newContents: [UInt8] = Array(repeating: 0, count: Int(%(return_len)s))
 
-    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt64(newContents.count))%(exception_check)s
+    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt32(newContents.count))%(exception_check)s
 
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw ZkGroupException.ZkGroupError
@@ -227,7 +227,7 @@ template_method_int = \
   public func %(method_name)s(%(param_decls)s) %(exception_decl)s -> UInt32 {
     var newContents: [UInt8] = Array(repeating: 0, count: Int(4))
 
-    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt64(newContents.count))%(exception_check)s
+    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt32(newContents.count))%(exception_check)s
 
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw ZkGroupException.ZkGroupError
@@ -321,7 +321,7 @@ def get_args(params, import_strings, commaAtEnd):
             term = param[1].lower_camel() + ".getInternalContentsForFFI()"
 
         if param[0] != "int":
-            s += term + ", UInt64(" + term + ".count), "
+            s += term + ", UInt32(" + term + ".count), "
         else:
             s += term + ", "
 
@@ -383,7 +383,7 @@ def print_class(c, runtime_error_on_serialize_dict, class_dir_dict):
     else:
         contents = c.wrap_class.lower_camel() + ".getInternalContentsForFFI()"
         add_import(import_strings, class_dir_dict, my_dir_name, c.wrap_class)
-    contents += ", UInt64(%s.count)" % contents
+    contents += ", UInt32(%s.count)" % contents
 
     for method in c.static_methods:
 

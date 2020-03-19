@@ -37,8 +37,8 @@ use jni::sys::jbyteArray;
 
 fn u8toi8(input: Vec<u8>) -> Vec<i8> {
     let mut out: Vec<i8> = Default::default();
-    for i in 0..input.len() {
-        out.push(input[i] as i8);
+    for &i in &input {
+        out.push(i as i8);
     }
     out
 }
