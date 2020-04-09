@@ -275,7 +275,7 @@ dependencies = [
 [[package]]
 name = "curve25519-dalek"
 version = "2.0.0"
-source = "git+ssh://git@github.com/signalapp/curve25519-dalek-private.git?branch=lizard2#90e2cf590855ffde095b8dbf938ff9f2636b8a25"
+source = "git+ssh://git@github.com/signalapp/curve25519-dalek.git?branch=lizard2#90e2cf590855ffde095b8dbf938ff9f2636b8a25"
 dependencies = [
  "byteorder 1.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "digest 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -466,10 +466,10 @@ dependencies = [
 
 [[package]]
 name = "poksho"
-version = "0.3.0"
-source = "git+ssh://git@github.com/signalapp/poksho-private.git#c82b2803491d6816754c3eb4eefe15827aee1895"
+version = "0.4.2"
+source = "git+ssh://git@github.com/signalapp/poksho.git?tag=v0.4.2#3581d5d645e2aafe1d8588b70d36c2fbdc40ac27"
 dependencies = [
- "curve25519-dalek 2.0.0 (git+ssh://git@github.com/signalapp/curve25519-dalek-private.git?branch=lizard2)",
+ "curve25519-dalek 2.0.0 (git+ssh://git@github.com/signalapp/curve25519-dalek.git?branch=lizard2)",
  "sha2 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -808,16 +808,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "zkgroup"
-version = "0.4.1"
+version = "0.4.2"
 dependencies = [
  "aead 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "aes-gcm-siv 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "bincode 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "criterion 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "curve25519-dalek 2.0.0 (git+ssh://git@github.com/signalapp/curve25519-dalek-private.git?branch=lizard2)",
+ "curve25519-dalek 2.0.0 (git+ssh://git@github.com/signalapp/curve25519-dalek.git?branch=lizard2)",
  "hex 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "jni 0.12.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "poksho 0.3.0 (git+ssh://git@github.com/signalapp/poksho-private.git)",
+ "poksho 0.4.2 (git+ssh://git@github.com/signalapp/poksho.git?tag=v0.4.2)",
  "serde 1.0.104 (registry+https://github.com/rust-lang/crates.io-index)",
  "sha2 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -853,7 +853,7 @@ dependencies = [
 "checksum crossbeam-utils 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)" = "c3c7c73a2d1e9fc0886a08b93e98eb643461230d5f1925e4036204d5f2e261a8"
 "checksum csv 1.1.3 (registry+https://github.com/rust-lang/crates.io-index)" = "00affe7f6ab566df61b4be3ce8cf16bc2576bca0963ceb0955e45d514bf9a279"
 "checksum csv-core 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)" = "2b2466559f260f48ad25fe6317b3c8dac77b5bdb5763ac7d9d6103530663bc90"
-"checksum curve25519-dalek 2.0.0 (git+ssh://git@github.com/signalapp/curve25519-dalek-private.git?branch=lizard2)" = "<none>"
+"checksum curve25519-dalek 2.0.0 (git+ssh://git@github.com/signalapp/curve25519-dalek.git?branch=lizard2)" = "<none>"
 "checksum digest 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f3d0c8c8752312f9713efd397ff63acb9f85585afbf179282e720e7704954dd5"
 "checksum either 1.5.3 (registry+https://github.com/rust-lang/crates.io-index)" = "bb1f6b1ce1c140482ea30ddd3335fc0024ac7ee112895426e0a629a6c20adfe3"
 "checksum error-chain 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d371106cc88ffdfb1eabd7111e432da544f16f3e2d7bf1dfe8bf575f1df045cd"
@@ -879,7 +879,7 @@ dependencies = [
 "checksum opaque-debug 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "2839e79665f131bdb5782e51f2c6c9599c133c6098982a54c794358bf432529c"
 "checksum packed_simd 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "a85ea9fc0d4ac0deb6fe7911d38786b32fc11119afd9e9d38b84ff691ce64220"
 "checksum plotters 0.2.12 (registry+https://github.com/rust-lang/crates.io-index)" = "4e3bb8da247d27ae212529352020f3e5ee16e83c0c258061d27b08ab92675eeb"
-"checksum poksho 0.3.0 (git+ssh://git@github.com/signalapp/poksho-private.git)" = "<none>"
+"checksum poksho 0.4.2 (git+ssh://git@github.com/signalapp/poksho.git?tag=v0.4.2)" = "<none>"
 "checksum polyval 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "7ec3341498978de3bfd12d1b22f1af1de22818f5473a11e8a6ef997989e3a212"
 "checksum proc-macro2 1.0.9 (registry+https://github.com/rust-lang/crates.io-index)" = "6c09721c6781493a2a492a96b5a5bf19b65917fe6728884e7c44dd0c60ca3435"
 "checksum quote 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)" = "2bdc6c187c65bca4260c9011c9e3132efe4909da44726bad24cf7572ae338d7f"
