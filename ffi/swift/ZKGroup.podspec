@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name         = "ZKGroup"
-  s.version      = "0.4.2"
+  s.version      = "0.5.0"
   s.summary      = "Swift API for the Rust zkgroup crate."
   s.homepage     = "https://signal.org/"
   s.license      = { :type => "GPLv3", :file => "LICENSE" }
