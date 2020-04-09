@@ -12,6 +12,7 @@ use crate::common::constants::*;
 use crate::common::errors::*;
 use crate::common::simple_types::*;
 use crate::crypto;
+use poksho::ShoSha256;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
@@ -29,11 +30,30 @@ pub struct ServerPublicParams {
 }
 
 impl ServerSecretParams {
-    pub fn generate(randomness: [u8; 32]) -> Self {
+    pub fn generate(randomness: RandomnessBytes) -> Self {
+        let mut auth_randomness = [0u8; RANDOMNESS_LEN];
+        let mut profile_key_randomness = [0u8; RANDOMNESS_LEN];
+        auth_randomness.copy_from_slice(
+            &ShoSha256::shohash(
+                b"Signal_ZKGroup_ServerParams_Auth_KeyGen",
+                &randomness,
+                RANDOMNESS_LEN as u64,
+            )[0..RANDOMNESS_LEN],
+        );
+        profile_key_randomness.copy_from_slice(
+            &ShoSha256::shohash(
+                b"Signal_ZKGroup_ServerParams_ProfileKey_KeyGen",
+                &randomness,
+                RANDOMNESS_LEN as u64,
+            )[0..RANDOMNESS_LEN],
+        );
+
         let auth_credentials_key_pair =
-            crypto::credentials::KeyPair::generate(randomness, NUM_AUTH_CRED_ATTRIBUTES);
-        let profile_key_credentials_key_pair =
-            crypto::credentials::KeyPair::generate(randomness, NUM_PROFILE_KEY_CRED_ATTRIBUTES);
+            crypto::credentials::KeyPair::generate(auth_randomness, NUM_AUTH_CRED_ATTRIBUTES);
+        let profile_key_credentials_key_pair = crypto::credentials::KeyPair::generate(
+            profile_key_randomness,
+            NUM_PROFILE_KEY_CRED_ATTRIBUTES,
+        );
         let sig_key_pair = crypto::signature::KeyPair::derive_from(
             &randomness,
             b"Signal_ZKGroup_Sig_Server_KeyGen",
@@ -129,7 +149,7 @@ impl ServerSecretParams {
 
         let uid = crypto::uid_struct::UidStruct::new(uid_bytes);
         let blinded_credential_with_secret_nonce = self
-            .auth_credentials_key_pair
+            .profile_key_credentials_key_pair
             .create_blinded_profile_key_credential(
                 uid,
                 request.public_key,

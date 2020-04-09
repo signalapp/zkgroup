@@ -37,11 +37,40 @@ mac_dylib:
 libzkgroup:
 	RUSTFLAGS='-C link-arg=-s' cargo build --release
 
+DOCKER_IMAGE := zkgroup-builder
+
 docker: DOCKER_EXTRA=$(shell [ -L build ] && P=$$(readlink build) && echo -v $$P/:$$P )
 docker:
 	$(DOCKER) build --build-arg UID=$$(id -u) --build-arg GID=$$(id -g) \
-	  -t zkgroup-builder .
+	  -t $(DOCKER_IMAGE) .
 	$(DOCKER) run --rm --user $$(id -u):$$(id -g) \
 	  --env "MAKEFLAGS=$(MAKEFLAGS)" \
-	  -v `pwd`/:/home/zkgroup/src $(DOCKER_EXTRA) zkgroup-builder \
+	  -v `pwd`/:/home/zkgroup/src $(DOCKER_EXTRA) $(DOCKER_IMAGE) \
 		sh -c "cd src; ./gradlew build"
+
+SONATYPE_USERNAME     ?=
+SONATYPE_PASSWORD     ?=
+KEYRING_FILE          ?=
+SIGNING_KEY           ?=
+SIGNING_KEY_PASSSWORD ?=
+
+publish: DOCKER_EXTRA = $(shell [ -L build ] && P=$$(readlink build) && echo -v $$P/:$$P )
+publish: KEYRING_VOLUME := $(dir $(KEYRING_FILE))
+publish: KEYRING_FILE_ROOT := $(notdir $(KEYRING_FILE))
+publish:
+	@[ -n "$(SONATYPE_USERNAME)" ]    || ( echo "SONATYPE_USERNAME is not set" && false )
+	@[ -n "$(SONATYPE_PASSWORD)" ]    || ( echo "SONATYPE_PASSWORD is not set" && false )
+	@[ -n "$(KEYRING_FILE)" ]         || ( echo "KEYRING_FILE is not set" && false )
+	@[ -n "$(SIGNING_KEY)" ]          || ( echo "SIGNING_KEY is not set" && false )
+	@[ -n "$(SIGNING_KEY_PASSWORD)" ] || ( echo "SIGNING_KEY_PASSWORD is not set" && false )
+	$(DOCKER) run --rm --user $$(id -u):$$(id -g) \
+		--env "MAKEFLAGS=$(MAKEFLAGS)" \
+		-v `pwd`/:/home/zkgroup/src $(DOCKER_EXTRA) \
+		-v $(KEYRING_VOLUME):/home/zkgroup/keyring \
+		$(DOCKER_IMAGE) \
+		sh -c "cd src; ./gradlew uploadArchives \
+			-PwhisperSonatypeUsername='$(SONATYPE_USERNAME)' \
+			-PwhisperSonatypePassword='$(SONATYPE_PASSWORD)' \
+			-Psigning.secretKeyRingFile='/home/zkgroup/keyring/$(KEYRING_FILE_ROOT)' \
+			-Psigning.keyId='$(SIGNING_KEY)' \
+			-Psigning.password='$(SIGNING_KEY_PASSWORD)'"

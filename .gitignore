@@ -10,3 +10,5 @@ ffi/java/src/main/resources
 ffi/node/node_modules
 ffi/node/dist
 .DS_Store
+.project
+.settings
