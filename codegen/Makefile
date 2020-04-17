@@ -9,6 +9,9 @@ output:
 	mkdir -p simpleapi
 	mkdir -p swift
 	python3 ./codegen.py
+	rustfmt ffiapijava/ffiapijava.rs
+	rustfmt ffiapi/ffiapi.rs
+	rustfmt simpleapi/simpleapi.rs
 
 install:
 	cp ffiapijava/ffiapijava.rs ../rust/src/ffi/

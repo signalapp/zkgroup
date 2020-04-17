@@ -134,37 +134,6 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCommitm
 }
 
 #[no_mangle]
-pub extern "system" fn Java_org_signal_zkgroup_internal_Native_profileKeyCommitmentGetProfileKeyVersionJNI(
-    env: JNIEnv,
-    _class: JClass,
-    profileKeyCommitment: jbyteArray,
-    profileKeyVersionOut: jbyteArray,
-) -> i32 {
-    let result = panic::catch_unwind(|| {
-        let profile_key_commitment = env.convert_byte_array(profileKeyCommitment).unwrap();
-        let mut profile_key_version: Vec<u8> =
-            vec![0; env.get_array_length(profileKeyVersionOut).unwrap() as usize];
-
-        let ffi_return = simpleapi::ProfileKeyCommitment_getProfileKeyVersion(
-            &profile_key_commitment,
-            &mut profile_key_version,
-        );
-        if ffi_return != FFI_RETURN_OK {
-            return ffi_return;
-        }
-
-        env.set_byte_array_region(profileKeyVersionOut, 0, &u8toi8(profile_key_version)[..])
-            .unwrap();
-        FFI_RETURN_OK
-    });
-
-    match result {
-        Ok(result) => result,
-        Err(_) => FFI_RETURN_INTERNAL_ERROR,
-    }
-}
-
-#[no_mangle]
 pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParamsGenerateDeterministicJNI(
     env: JNIEnv,
     _class: JClass,
@@ -309,43 +278,6 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
 }
 
 #[no_mangle]
-pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParamsSignDeterministicJNI(
-    env: JNIEnv,
-    _class: JClass,
-    groupSecretParams: jbyteArray,
-    randomness: jbyteArray,
-    message: jbyteArray,
-    changeSignatureOut: jbyteArray,
-) -> i32 {
-    let result = panic::catch_unwind(|| {
-        let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-        let randomness = env.convert_byte_array(randomness).unwrap();
-        let message = env.convert_byte_array(message).unwrap();
-        let mut change_signature: Vec<u8> =
-            vec![0; env.get_array_length(changeSignatureOut).unwrap() as usize];
-
-        let ffi_return = simpleapi::GroupSecretParams_signDeterministic(
-            &group_secret_params,
-            &randomness,
-            &message,
-            &mut change_signature,
-        );
-        if ffi_return != FFI_RETURN_OK {
-            return ffi_return;
-        }
-
-        env.set_byte_array_region(changeSignatureOut, 0, &u8toi8(change_signature)[..])
-            .unwrap();
-        FFI_RETURN_OK
-    });
-
-    match result {
-        Ok(result) => result,
-        Err(_) => FFI_RETURN_INTERNAL_ERROR,
-    }
-}
-
-#[no_mangle]
 pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParamsEncryptUuidJNI(
     env: JNIEnv,
     _class: JClass,
@@ -413,26 +345,23 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParams
 }
 
 #[no_mangle]
-pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParamsEncryptProfileKeyDeterministicJNI(
+pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupSecretParamsEncryptProfileKeyJNI(
     env: JNIEnv,
     _class: JClass,
     groupSecretParams: jbyteArray,
-    randomness: jbyteArray,
     profileKey: jbyteArray,
     uuid: jbyteArray,
     profileKeyCiphertextOut: jbyteArray,
 ) -> i32 {
     let result = panic::catch_unwind(|| {
         let group_secret_params = env.convert_byte_array(groupSecretParams).unwrap();
-        let randomness = env.convert_byte_array(randomness).unwrap();
         let profile_key = env.convert_byte_array(profileKey).unwrap();
         let uuid = env.convert_byte_array(uuid).unwrap();
         let mut profile_key_ciphertext: Vec<u8> =
             vec![0; env.get_array_length(profileKeyCiphertextOut).unwrap() as usize];
 
-        let ffi_return = simpleapi::GroupSecretParams_encryptProfileKeyDeterministic(
+        let ffi_return = simpleapi::GroupSecretParams_encryptProfileKey(
             &group_secret_params,
-            &randomness,
             &profile_key,
             &uuid,
             &mut profile_key_ciphertext,
@@ -1114,36 +1043,6 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupPublicParams
 
         env.set_byte_array_region(groupIdentifierOut, 0, &u8toi8(group_identifier)[..])
             .unwrap();
-        FFI_RETURN_OK
-    });
-
-    match result {
-        Ok(result) => result,
-        Err(_) => FFI_RETURN_INTERNAL_ERROR,
-    }
-}
-
-#[no_mangle]
-pub extern "system" fn Java_org_signal_zkgroup_internal_Native_groupPublicParamsVerifySignatureJNI(
-    env: JNIEnv,
-    _class: JClass,
-    groupPublicParams: jbyteArray,
-    message: jbyteArray,
-    changeSignature: jbyteArray,
-) -> i32 {
-    let result = panic::catch_unwind(|| {
-        let group_public_params = env.convert_byte_array(groupPublicParams).unwrap();
-        let message = env.convert_byte_array(message).unwrap();
-        let change_signature = env.convert_byte_array(changeSignature).unwrap();
-
-        let ffi_return = simpleapi::GroupPublicParams_verifySignature(
-            &group_public_params,
-            &message,
-            &change_signature,
-        );
-        if ffi_return != FFI_RETURN_OK {
-            return ffi_return;
-        }
         FFI_RETURN_OK
     });
 

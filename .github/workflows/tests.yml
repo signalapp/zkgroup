@@ -1,0 +1,90 @@
+name: Tests
+
+on: [push]
+
+jobs:
+
+  test_misc:
+    name: Rust + Java + Node
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure git to use HTTPS
+        run: git config --global url."https://${{ secrets.REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com".insteadOf ssh://git@github.com
+
+      - name: Cache cargo registry
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo index
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo build
+        uses: actions/cache@v1
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Run clippy
+        run: |
+          rustup toolchain install ${{ env.NIGHTLY_VERSION }}
+          rustup component add clippy --toolchain ${{ env.NIGHTLY_VERSION }}
+          cargo +${{ env.NIGHTLY_VERSION }} clippy -- -D warnings
+        env:
+          NIGHTLY_VERSION: nightly-2020-04-14       
+
+      - name: Test Rust
+        run: cargo test
+
+      - name: Test Java
+        run: |
+          cargo install cargo-ndk
+          rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android
+          ./gradlew test
+        env:
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk/
+          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk-bundle/
+
+      - name: Test Node
+        working-directory: ffi/node
+        run: |
+          make libzkgroup
+          make test
+
+  test_ios:
+    name: iOS
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure git to use HTTPS
+        run: git config --global url."https://${{ secrets.REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com".insteadOf ssh://git@github.com
+
+      - name: Cache cargo registry
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo index
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo build
+        uses: actions/cache@v1
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install iOS Rust targets
+        run: rustup target add aarch64-apple-ios x86_64-apple-ios armv7-apple-ios armv7s-apple-ios
+      - name: Build zkgroup library
+        working-directory: ffi/swift
+        run: |
+          make install_build_dependencies
+          make default
+      - name: Test XCode project
+        working-directory: ffi/swift
+        run: xcodebuild test -project ZKGroup.xcodeproj -scheme ZKGroup -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 8'

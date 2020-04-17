@@ -10,14 +10,13 @@
 package org.signal.zkgroup.groups;
 
 import org.signal.zkgroup.InvalidInputException;
-import org.signal.zkgroup.VerificationFailedException;
 import org.signal.zkgroup.ZkGroupError;
 import org.signal.zkgroup.internal.ByteArray;
 import org.signal.zkgroup.internal.Native;
 
 public final class GroupPublicParams extends ByteArray {
 
-  public static final int SIZE = 128;
+  public static final int SIZE = 96;
 
   public GroupPublicParams(byte[] contents) throws InvalidInputException {
     super(contents, SIZE);
@@ -48,17 +47,6 @@ public final class GroupPublicParams extends ByteArray {
       throw new AssertionError(e);
     }
 
-  }
-
-  public void verifySignature(byte[] message, ChangeSignature changeSignature) throws VerificationFailedException {
-    int ffi_return = Native.groupPublicParamsVerifySignatureJNI(contents, message, changeSignature.getInternalContentsForJNI());
-    if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
-      throw new VerificationFailedException();
-    }
-
-    if (ffi_return != Native.FFI_RETURN_OK) {
-      throw new ZkGroupError("FFI_RETURN!=OK");
-    }
   }
 
   public byte[] serialize() {

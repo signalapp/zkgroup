@@ -17,7 +17,7 @@ import org.signal.zkgroup.internal.Native;
 
 public final class GroupSecretParams extends ByteArray {
 
-  public static final int SIZE = 384;
+  public static final int SIZE = 352;
 
   public static GroupSecretParams generate() {
     return generate(new SecureRandom());
@@ -100,30 +100,6 @@ public final class GroupSecretParams extends ByteArray {
 
     try {
       return new GroupPublicParams(newContents);
-    } catch (InvalidInputException e) {
-      throw new AssertionError(e);
-    }
-
-  }
-
-  public ChangeSignature sign(byte[] message) {
-    return sign(new SecureRandom(), message);
-  }
-
-  public ChangeSignature sign(SecureRandom secureRandom, byte[] message) {
-    byte[] newContents = new byte[ChangeSignature.SIZE];
-    byte[] random      = new byte[Native.RANDOM_LENGTH];
-
-    secureRandom.nextBytes(random);
-
-    int ffi_return = Native.groupSecretParamsSignDeterministicJNI(contents, random, message, newContents);
-
-    if (ffi_return != Native.FFI_RETURN_OK) {
-      throw new ZkGroupError("FFI_RETURN!=OK");
-    }
-
-    try {
-      return new ChangeSignature(newContents);
     } catch (InvalidInputException e) {
       throw new AssertionError(e);
     }

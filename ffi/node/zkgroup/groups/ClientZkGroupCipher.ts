@@ -58,19 +58,13 @@ export default class ClientZkGroupCipher {
   }
 
   encryptProfileKey(profileKey: ProfileKey, uuid: UUIDType): ProfileKeyCiphertext {
-    const random = new FFICompatArray(randomBytes(RANDOM_LENGTH));
-
-    return this.encryptProfileKeyWithRandom(random, profileKey, uuid);
-  }
-
-  encryptProfileKeyWithRandom(random: FFICompatArrayType, profileKey: ProfileKey, uuid: UUIDType): ProfileKeyCiphertext {
     const newContents = new FFICompatArray(ProfileKeyCiphertext.SIZE);
 
     const groupSecretParamsContents = this.groupSecretParams.getContents();
     const profileKeyContents = profileKey.getContents();
     const uuidContents = fromUUID(uuid);
 
-    const ffi_return = Native.FFI_GroupSecretParams_encryptProfileKeyDeterministic(groupSecretParamsContents, groupSecretParamsContents.length, random, random.length, profileKeyContents, profileKeyContents.length, uuidContents, uuidContents.length, newContents, newContents.length);
+    const ffi_return = Native.FFI_GroupSecretParams_encryptProfileKey(groupSecretParamsContents, groupSecretParamsContents.length, profileKeyContents, profileKeyContents.length, uuidContents, uuidContents.length, newContents, newContents.length);
 
     if (ffi_return != FFI_RETURN_OK) {
       throw new ZkGroupError('FFI_RETURN!=OK');
@@ -98,6 +92,10 @@ export default class ClientZkGroupCipher {
     return new ProfileKey(newContents);
   }
 
+  myArrayCopy(src: FFICompatArrayType, srcStart: number, dst: FFICompatArrayType, dstStart: number, len: number) {
+    src.buffer.copy(dst.buffer, dstStart, srcStart, srcStart + len);
+  }
+
   encryptBlob(plaintext: FFICompatArrayType): FFICompatArrayType {
     const random = new FFICompatArray(randomBytes(RANDOM_LENGTH));
 
@@ -105,11 +103,15 @@ export default class ClientZkGroupCipher {
   }
 
   encryptBlobWithRandom(random: FFICompatArrayType, plaintext: FFICompatArrayType): FFICompatArrayType {
-    const newContents = FFICompatArray(plaintext.length+28);
+
+    let paddedPlaintext = new FFICompatArray(plaintext.length+4);
+    this.myArrayCopy(plaintext, 0, paddedPlaintext, 4, plaintext.length);
+
+    const newContents = FFICompatArray(paddedPlaintext.length+28);
 
     const groupSecretParamsContents = this.groupSecretParams.getContents();
 
-    const ffi_return = Native.FFI_GroupSecretParams_encryptBlobDeterministic(groupSecretParamsContents, groupSecretParamsContents.length, random, random.length, plaintext, plaintext.length, newContents, newContents.length);
+    const ffi_return = Native.FFI_GroupSecretParams_encryptBlobDeterministic(groupSecretParamsContents, groupSecretParamsContents.length, random, random.length, paddedPlaintext, paddedPlaintext.length, newContents, newContents.length);
 
     if (ffi_return != FFI_RETURN_OK) {
       throw new ZkGroupError('FFI_RETURN!=OK');
@@ -132,7 +134,19 @@ export default class ClientZkGroupCipher {
       throw new ZkGroupError('FFI_RETURN!=OK');
     }
 
-    return newContents;
+    if (newContents.length < 4) {
+        throw new VerificationFailedException('BAD LENGTH');
+    }
+
+    const padLen = newContents.buffer.readInt32BE(0);
+    if (newContents.length < (4 + padLen)) {
+        throw new VerificationFailedException('BAD LENGTH');
+    }
+
+    let depaddedContents = new FFICompatArray(newContents.length - (4 + padLen));
+    this.myArrayCopy(newContents, 4, depaddedContents, 0, newContents.length - (4 + padLen));
+
+    return depaddedContents;
   }
 
 }

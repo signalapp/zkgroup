@@ -1,77 +1,115 @@
-name: zkgroup build artifacts
+name: Release artifacts
 on:
   push:
     tags:
       - v*
+
 jobs:
-    build_linux:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v1
-        - name: Set .gitconfig to replace ssh with https
-          run: git config --global url."https://github".insteadOf ssh://git@github
-        - name: Build Library
-          run: make libzkgroup
-        - name: Upload Artifact
-          uses: svenstaro/upload-release-action@v1-release
-          with:
-            repo_token: ${{ secrets.GITHUB_TOKEN }}
-            file: target/release/libzkgroup.so
-            asset_name: libzkgroup.so
-            tag: ${{ github.ref }}
-            overwrite: true
-    build_mac:
-      runs-on: macOS-latest
-      steps:
-        - uses: actions/checkout@v1
-        - name: Set .gitconfig to replace ssh with https
-          run: git config --global url."https://github".insteadOf ssh://git@github
-        - name: Build Library
-          run: make libzkgroup
-        - name: Upload Artifact
-          uses: svenstaro/upload-release-action@v1-release
-          with:
-            repo_token: ${{ secrets.GITHUB_TOKEN }}
-            file: target/release/libzkgroup.dylib
-            asset_name: libzkgroup.dylib
-            tag: ${{ github.ref }}
-            overwrite: true
-    build_windows:
-      runs-on: windows-latest
-      steps:
-        - uses: actions/checkout@v1
-        - name: Set .gitconfig to replace ssh with https
-          run: git config --global url."https://github".insteadOf ssh://git@github
-        - name: Build Library
-          run: make libzkgroup
-        - name: Upload Artifact
-          uses: svenstaro/upload-release-action@v1-release
-          with:
-            repo_token: ${{ secrets.GITHUB_TOKEN }}
-            file: target/release/zkgroup.dll
-            asset_name: libzkgroup.dll
-            tag: ${{ github.ref }}
-            overwrite: true
-    build_ios:
-      runs-on: macOS-latest
-      steps:
-        - uses: actions/checkout@v1
-        - name: Set .gitconfig to replace ssh with https
-          run: git config --global url."https://github".insteadOf ssh://git@github
-        - name: Install iOS Targets
-          run: rustup target add aarch64-apple-ios x86_64-apple-ios armv7-apple-ios armv7s-apple-ios
-        - name: Build Artifacts
-          run: |
-            cd ffi/swift
-            make install_build_dependencies
-            make
-            cd ZKGroup
-            zip -r libzkgroup-ios.zip libzkgroup
-        - name: Upload Artifact
-          uses: svenstaro/upload-release-action@v1-release
-          with:
-            repo_token: ${{ secrets.GITHUB_TOKEN }}
-            file: ffi/swift/ZKGroup/libzkgroup-ios.zip
-            asset_name: libzkgroup-ios.zip
-            tag: ${{ github.ref }}
-            overwrite: true
+  build_linux_android:
+    name: Build Linux + Android
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure git to use HTTPS
+        run: git config --global url."https://${{ secrets.REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com".insteadOf ssh://git@github.com
+
+      - name: Install pre-requisites
+        run: |
+          cargo install cargo-ndk
+          rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android
+
+      - name: Build Android
+        run: |
+          cargo ndk --target aarch64-linux-android --platform 21 -- build --release
+          cargo ndk --target armv7-linux-androideabi --platform 19 -- build --release
+          cargo ndk --target i686-linux-android --platform 19 -- build --release
+          cargo ndk --target x86_64-linux-android --platform 21 -- build --release
+          find ./target -name libzkgroup.so | xargs zip libzkgroup-android.zip
+        env:
+          RUSTFLAGS: -C link-arg=-s
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk/
+          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk-bundle/
+        
+      - name: Build Linux
+        run: make libzkgroup
+
+      - name: Upload Android
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: libzkgroup-android.zip
+          asset_name: libzkgroup-android.zip
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload Linux
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/release/libzkgroup.so
+          asset_name: libzkgroup.so
+          tag: ${{ github.ref }}
+          overwrite: true
+
+  build_windows:
+    name: Build Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure git to use HTTPS
+        run: git config --global url."https://${{ secrets.REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com".insteadOf ssh://git@github.com
+
+      - name: Build
+        run: make libzkgroup
+      
+      - name: Upload
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/release/zkgroup.dll
+          asset_name: libzkgroup.dll
+          tag: ${{ github.ref }}
+          overwrite: true
+
+  build_macOS_iOS:
+    name: Build macOS + iOS
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure git to use HTTPS
+        run: git config --global url."https://${{ secrets.REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com".insteadOf ssh://git@github.com
+
+      - name: Install pre-requisites
+        run: |
+          rustup target add aarch64-apple-ios x86_64-apple-ios armv7-apple-ios armv7s-apple-ios
+          cd ffi/swift
+          make install_build_dependencies
+
+      - name: Build
+        run: |
+          make libzkgroup
+          cd ffi/swift
+          make
+          cd ZKGroup
+          zip -r libzkgroup-ios.zip libzkgroup
+      
+      - name: Upload macOS
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/release/libzkgroup.dylib
+          asset_name: libzkgroup.dylib
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload iOS
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ffi/swift/ZKGroup/libzkgroup-ios.zip
+          asset_name: libzkgroup-ios.zip
+          tag: ${{ github.ref }}
+          overwrite: true

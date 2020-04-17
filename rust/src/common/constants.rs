@@ -10,9 +10,12 @@
 pub const NUM_AUTH_CRED_ATTRIBUTES: usize = 4;
 pub const NUM_PROFILE_KEY_CRED_ATTRIBUTES: usize = 6;
 
+pub const AES_KEY_LEN: usize = 32;
+pub const AESGCM_NONCE_LEN: usize = 12;
+pub const AESGCM_TAG_LEN: usize = 12;
 pub const GROUP_MASTER_KEY_LEN: usize = 32;
-pub const GROUP_SECRET_PARAMS_LEN: usize = 384;
-pub const GROUP_PUBLIC_PARAMS_LEN: usize = 128;
+pub const GROUP_SECRET_PARAMS_LEN: usize = 352;
+pub const GROUP_PUBLIC_PARAMS_LEN: usize = 96;
 pub const GROUP_IDENTIFIER_LEN: usize = 32;
 pub const AUTH_CREDENTIAL_LEN: usize = 404;
 pub const AUTH_CREDENTIAL_PRESENTATION_LEN: usize = 620;

@@ -62,20 +62,6 @@ pub fn ProfileKeyCommitment_checkValidContents(profileKeyCommitmentIn: &[u8]) ->
     FFI_RETURN_OK
 }
 
-pub fn ProfileKeyCommitment_getProfileKeyVersion(
-    profileKeyCommitmentIn: &[u8],
-    profileKeyVersionOut: &mut [u8],
-) -> i32 {
-    let profile_key_commitment: api::profiles::ProfileKeyCommitment =
-        match bincode::deserialize(profileKeyCommitmentIn) {
-            Ok(result) => result,
-            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
-        };
-    let profile_key_version = profile_key_commitment.get_profile_key_version();
-    profileKeyVersionOut.copy_from_slice(&bincode::serialize(&profile_key_version).unwrap());
-    FFI_RETURN_OK
-}
-
 pub fn GroupSecretParams_generateDeterministic(
     randomnessIn: &[u8],
     groupSecretParamsOut: &mut [u8],
@@ -141,31 +127,6 @@ pub fn GroupSecretParams_getPublicParams(
     FFI_RETURN_OK
 }
 
-pub fn GroupSecretParams_signDeterministic(
-    groupSecretParamsIn: &[u8],
-    randomnessIn: &[u8],
-    messageIn: &[u8],
-    changeSignatureOut: &mut [u8],
-) -> i32 {
-    let group_secret_params: api::groups::GroupSecretParams =
-        match bincode::deserialize(groupSecretParamsIn) {
-            Ok(result) => result,
-            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
-        };
-
-    let randomness: simple_types::RandomnessBytes = match bincode::deserialize(randomnessIn) {
-        Ok(result) => result,
-        Err(_) => return FFI_RETURN_INPUT_ERROR,
-    };
-    let message = messageIn;
-    let change_signature = match group_secret_params.sign(randomness, message) {
-        Ok(result) => result,
-        Err(_) => return FFI_RETURN_INPUT_ERROR,
-    };
-    changeSignatureOut.copy_from_slice(&change_signature);
-    FFI_RETURN_OK
-}
-
 pub fn GroupSecretParams_encryptUuid(
     groupSecretParamsIn: &[u8],
     uuidIn: &[u8],
@@ -210,9 +171,8 @@ pub fn GroupSecretParams_decryptUuid(
     FFI_RETURN_OK
 }
 
-pub fn GroupSecretParams_encryptProfileKeyDeterministic(
+pub fn GroupSecretParams_encryptProfileKey(
     groupSecretParamsIn: &[u8],
-    randomnessIn: &[u8],
     profileKeyIn: &[u8],
     uuidIn: &[u8],
     profileKeyCiphertextOut: &mut [u8],
@@ -223,11 +183,6 @@ pub fn GroupSecretParams_encryptProfileKeyDeterministic(
             Err(_) => return FFI_RETURN_INTERNAL_ERROR,
         };
 
-    let randomness: simple_types::RandomnessBytes = match bincode::deserialize(randomnessIn) {
-        Ok(result) => result,
-        Err(_) => return FFI_RETURN_INPUT_ERROR,
-    };
-
     let profile_key: api::profiles::ProfileKey = match bincode::deserialize(profileKeyIn) {
         Ok(result) => result,
         Err(_) => return FFI_RETURN_INPUT_ERROR,
@@ -237,8 +192,7 @@ pub fn GroupSecretParams_encryptProfileKeyDeterministic(
         Ok(result) => result,
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     };
-    let profile_key_ciphertext =
-        group_secret_params.encrypt_profile_key(randomness, profile_key, uuid);
+    let profile_key_ciphertext = group_secret_params.encrypt_profile_key(profile_key, uuid);
     profileKeyCiphertextOut.copy_from_slice(&bincode::serialize(&profile_key_ciphertext).unwrap());
     FFI_RETURN_OK
 }
@@ -722,26 +676,6 @@ pub fn GroupPublicParams_getGroupIdentifier(
         };
     let group_identifier = group_public_params.get_group_identifier();
     groupIdentifierOut.copy_from_slice(&bincode::serialize(&group_identifier).unwrap());
-    FFI_RETURN_OK
-}
-
-pub fn GroupPublicParams_verifySignature(
-    groupPublicParamsIn: &[u8],
-    messageIn: &[u8],
-    changeSignatureIn: &[u8],
-) -> i32 {
-    let group_public_params: api::groups::GroupPublicParams =
-        match bincode::deserialize(groupPublicParamsIn) {
-            Ok(result) => result,
-            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
-        };
-    let message = messageIn;
-    let mut change_signature: simple_types::ChangeSignatureBytes = [0u8; SIGNATURE_LEN];
-    change_signature.copy_from_slice(changeSignatureIn);
-    match group_public_params.verify_signature(message, change_signature) {
-        Ok(_) => (),
-        _ => return FFI_RETURN_INPUT_ERROR,
-    };
     FFI_RETURN_OK
 }
 

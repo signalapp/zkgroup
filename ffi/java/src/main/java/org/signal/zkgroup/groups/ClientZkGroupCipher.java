@@ -9,6 +9,7 @@
 
 package org.signal.zkgroup.groups;
 
+import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.util.UUID;
 import org.signal.zkgroup.InvalidInputException;
@@ -59,16 +60,9 @@ public class ClientZkGroupCipher {
   }
 
   public ProfileKeyCiphertext encryptProfileKey(ProfileKey profileKey, UUID uuid) {
-    return encryptProfileKey(new SecureRandom(), profileKey, uuid);
-  }
-
-  public ProfileKeyCiphertext encryptProfileKey(SecureRandom secureRandom, ProfileKey profileKey, UUID uuid) {
     byte[] newContents = new byte[ProfileKeyCiphertext.SIZE];
-    byte[] random      = new byte[Native.RANDOM_LENGTH];
 
-    secureRandom.nextBytes(random);
-
-    int ffi_return = Native.groupSecretParamsEncryptProfileKeyDeterministicJNI(groupSecretParams.getInternalContentsForJNI(), random, profileKey.getInternalContentsForJNI(), UUIDUtil.serialize(uuid), newContents);
+    int ffi_return = Native.groupSecretParamsEncryptProfileKeyJNI(groupSecretParams.getInternalContentsForJNI(), profileKey.getInternalContentsForJNI(), UUIDUtil.serialize(uuid), newContents);
 
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw new ZkGroupError("FFI_RETURN!=OK");
@@ -107,12 +101,16 @@ public class ClientZkGroupCipher {
   }
 
   public byte[] encryptBlob(SecureRandom secureRandom, byte[] plaintext) throws VerificationFailedException {
-    byte[] newContents = new byte[plaintext.length+28];
+
+    byte[] paddedPlaintext = new byte[plaintext.length + 4];
+    System.arraycopy(plaintext, 0, paddedPlaintext, 4, plaintext.length);
+
+    byte[] newContents = new byte[paddedPlaintext.length+28];
     byte[] random      = new byte[Native.RANDOM_LENGTH];
 
     secureRandom.nextBytes(random);
 
-    int ffi_return = Native.groupSecretParamsEncryptBlobDeterministicJNI(groupSecretParams.getInternalContentsForJNI(), random, plaintext, newContents);
+    int ffi_return = Native.groupSecretParamsEncryptBlobDeterministicJNI(groupSecretParams.getInternalContentsForJNI(), random, paddedPlaintext, newContents);
     if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
       throw new VerificationFailedException();
     }
@@ -136,7 +134,21 @@ public class ClientZkGroupCipher {
       throw new ZkGroupError("FFI_RETURN!=OK");
     }
 
-    return newContents;
+    if (newContents.length < 4) {
+        throw new VerificationFailedException();
+    }
+
+    byte[] padLenBytes = new byte[4];
+    System.arraycopy(newContents, 0, padLenBytes, 0, 4);
+    int padLen = ByteBuffer.wrap(newContents).getInt();
+    if (newContents.length < (4 + padLen))  {
+        throw new VerificationFailedException();
+    }
+   
+    byte[] depaddedContents = new byte[newContents.length - (4 + padLen)];
+    System.arraycopy(newContents, 4, depaddedContents, 0, newContents.length - (4 + padLen));
+
+    return depaddedContents;
   }
 
 }

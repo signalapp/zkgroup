@@ -26,16 +26,4 @@ export default class ProfileKeyCommitment extends ByteArray {
     }
   }
 
-  getProfileKeyVersion(): ProfileKeyVersion {
-    const newContents = new FFICompatArray(ProfileKeyVersion.SIZE);
-
-    const ffi_return = Native.FFI_ProfileKeyCommitment_getProfileKeyVersion(this.contents, this.contents.length, newContents, newContents.length);
-
-    if (ffi_return != FFI_RETURN_OK) {
-      throw new ZkGroupError("FFI_RETURN!=OK");
-    }
-
-    return new ProfileKeyVersion(newContents);
-  }
-
 }

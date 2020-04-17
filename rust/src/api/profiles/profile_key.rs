@@ -9,9 +9,9 @@
 
 use crate::api;
 use crate::common::constants::*;
+use crate::common::sho::*;
 use crate::common::simple_types::*;
 use crate::crypto;
-use poksho::ShoSha256;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
@@ -21,14 +21,12 @@ pub struct ProfileKey {
 
 impl ProfileKey {
     pub fn generate(randomness: RandomnessBytes) -> Self {
-        let mut bytes = [0u8; PROFILE_KEY_LEN];
-        bytes.copy_from_slice(
-            &ShoSha256::shohash(
-                b"Signal_ZKGroup_ProfileKey_KeyGen",
-                &randomness,
-                PROFILE_KEY_LEN as u64,
-            )[0..PROFILE_KEY_LEN],
+        let mut sho = Sho::new(
+            b"Signal_ZKGroup_20200416_Random_ProfileKey_Generate",
+            &randomness,
         );
+        let mut bytes = [0u8; PROFILE_KEY_LEN];
+        bytes.copy_from_slice(&sho.squeeze(PROFILE_KEY_LEN)[..]);
         Self { bytes }
     }
 
@@ -47,6 +45,20 @@ impl ProfileKey {
     }
 
     pub fn get_profile_key_version(&self, uid_bytes: UidBytes) -> api::profiles::ProfileKeyVersion {
-        self.get_commitment(uid_bytes).get_profile_key_version()
+        let mut combined_array = [0u8; PROFILE_KEY_LEN + UUID_LEN];
+        combined_array[..PROFILE_KEY_LEN].copy_from_slice(&self.bytes);
+        combined_array[PROFILE_KEY_LEN..].copy_from_slice(&uid_bytes);
+        let mut sho = Sho::new(
+            b"Signal_ZKGroup_20200416_ProfileKeyAndUid_ProfileKey_GetProfileKeyVersion",
+            &combined_array,
+        );
+
+        let pkv_hex_string = hex::encode(&sho.squeeze(PROFILE_KEY_VERSION_LEN)[..]);
+        let mut pkv_hex_array: [u8; PROFILE_KEY_VERSION_ENCODED_LEN] =
+            [0u8; PROFILE_KEY_VERSION_ENCODED_LEN];
+        pkv_hex_array.copy_from_slice(pkv_hex_string.as_bytes());
+        api::profiles::ProfileKeyVersion {
+            bytes: pkv_hex_array,
+        }
     }
 }

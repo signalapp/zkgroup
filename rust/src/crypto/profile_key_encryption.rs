@@ -8,12 +8,12 @@
 #![allow(non_snake_case)]
 
 use crate::common::errors::*;
+use crate::common::sho::*;
 use crate::common::simple_types::*;
 use crate::crypto::profile_key_struct;
 use curve25519_dalek::ristretto::RistrettoPoint;
 use curve25519_dalek::scalar::Scalar;
 use serde::{Deserialize, Serialize};
-use sha2::Sha512;
 
 use curve25519_dalek::subtle::Choice;
 use curve25519_dalek::subtle::ConditionallySelectable;
@@ -22,7 +22,7 @@ use curve25519_dalek::subtle::ConstantTimeEq;
 use ZkGroupError::*;
 
 #[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
-pub struct SystemParameters {
+pub struct SystemParams {
     pub(crate) G_b: RistrettoPoint,
     pub(crate) G_b0: RistrettoPoint,
     pub(crate) G_b1: RistrettoPoint,
@@ -47,36 +47,40 @@ pub struct Ciphertext {
     pub(crate) E_B2: RistrettoPoint,
 }
 
-impl SystemParameters {
+impl SystemParams {
     pub fn generate() -> Self {
-        let G_b = RistrettoPoint::hash_from_bytes::<Sha512>(b"Signal_ZKGroup_Enc_Const_G_b");
-        let G_b0 = RistrettoPoint::hash_from_bytes::<Sha512>(b"Signal_ZKGroup_Enc_Const_G_b0");
-        let G_b1 = RistrettoPoint::hash_from_bytes::<Sha512>(b"Signal_ZKGroup_Enc_Const_G_b1");
-        SystemParameters { G_b, G_b0, G_b1 }
+        let mut sho = Sho::new(
+            b"Signal_ZKGroup_20200416_Constant_ProfileKeyEncryption_SystemParams_Generate",
+            b"",
+        );
+        let G_b = sho.get_point();
+        let G_b0 = sho.get_point();
+        let G_b1 = sho.get_point();
+        SystemParams { G_b, G_b0, G_b1 }
     }
 
-    pub fn get_hardcoded() -> SystemParameters {
-        bincode::deserialize::<SystemParameters>(&SystemParameters::SYSTEM_HARDCODED).unwrap()
+    pub fn get_hardcoded() -> SystemParams {
+        bincode::deserialize::<SystemParams>(&SystemParams::SYSTEM_HARDCODED).unwrap()
     }
 
     const SYSTEM_HARDCODED: [u8; 96] = [
-        0x6a, 0x28, 0x66, 0xf8, 0xd, 0xbf, 0xc9, 0xba, 0xec, 0xf4, 0xec, 0x86, 0x5c, 0xf1, 0x3a,
-        0xda, 0xd1, 0x7d, 0x93, 0x32, 0x30, 0x5d, 0xfa, 0xfd, 0xd8, 0x1a, 0x47, 0x82, 0x50, 0x87,
-        0x9b, 0x7d, 0x9a, 0x56, 0xd7, 0xcb, 0x9c, 0xed, 0x5d, 0xd2, 0x44, 0xa5, 0x6e, 0x89, 0x6c,
-        0x14, 0x2c, 0xa6, 0x9c, 0xa6, 0xde, 0x99, 0x4c, 0x55, 0xaf, 0x35, 0x8e, 0xc6, 0x93, 0xa0,
-        0x7b, 0x9, 0x37, 0x6d, 0x84, 0xd3, 0x1e, 0xb, 0x2f, 0x13, 0x1f, 0x7b, 0xc4, 0xf4, 0x31,
-        0xe3, 0xb, 0x0, 0xa9, 0x9d, 0x37, 0x3d, 0x95, 0x88, 0x9f, 0xa2, 0x39, 0xee, 0x16, 0xa9,
-        0x3f, 0x5e, 0x97, 0x75, 0x98, 0x4c,
+        0xd6, 0xcf, 0x95, 0x95, 0xd2, 0xe3, 0x20, 0x31, 0xa9, 0x78, 0x6a, 0x78, 0xc2, 0xa2, 0x8c,
+        0xc6, 0x95, 0x60, 0xca, 0xa1, 0x30, 0xee, 0x5e, 0xfc, 0x1e, 0x94, 0xae, 0x2c, 0x73, 0x77,
+        0x9b, 0x58, 0xc0, 0x19, 0x1c, 0x72, 0xf3, 0x34, 0xd4, 0xef, 0x31, 0x55, 0xba, 0x1f, 0x8d,
+        0x39, 0x9f, 0x64, 0xcb, 0x83, 0x4c, 0xf5, 0x89, 0xf0, 0xd0, 0x8f, 0x4e, 0xe6, 0x81, 0x96,
+        0x36, 0xa2, 0xd, 0x68, 0x2a, 0x18, 0x77, 0xa5, 0x4d, 0x24, 0x3f, 0x7e, 0x89, 0xd9, 0x8c,
+        0xa4, 0xae, 0xde, 0xfa, 0x22, 0xe9, 0x1b, 0x49, 0x34, 0x1f, 0x60, 0x8d, 0x6, 0x78, 0xa3,
+        0x44, 0x34, 0x5f, 0xd6, 0x26, 0x76,
     ];
 }
 
 impl KeyPair {
-    pub fn derive_from(master_key: GroupMasterKeyBytes) -> Self {
-        let system = SystemParameters::get_hardcoded();
+    pub fn derive_from(sho: &mut Sho) -> Self {
+        let system = SystemParams::get_hardcoded();
 
-        let b = calculate_scalar(b"Signal_ZKGroup_Enc_KeyDerive_b", &master_key);
-        let b0 = calculate_scalar(b"Signal_ZKGroup_Enc_KeyDerive_b0", &master_key);
-        let b1 = calculate_scalar(b"Signal_ZKGroup_Enc_KeyDerive_b1", &master_key);
+        let b = sho.get_scalar();
+        let b0 = sho.get_scalar();
+        let b1 = sho.get_scalar();
 
         let B = b * system.G_b + b0 * system.G_b0 + b1 * system.G_b1;
         KeyPair { b, b0, b1, B }
@@ -153,11 +157,13 @@ mod tests {
     #[test]
     fn test_profile_key_encryption() {
         let master_key = TEST_ARRAY_32_1;
-        //let system = SystemParameters::generate();
-        //println!("PARAMS = {:#x?}", bincode::serialize(&system));
-        assert!(SystemParameters::generate() == SystemParameters::get_hardcoded());
+        let mut sho = Sho::new(b"Test_Profile_Key_Encryption", &master_key);
 
-        let key_pair = KeyPair::derive_from(master_key);
+        //let system = SystemParams::generate();
+        //println!("PARAMS = {:#x?}", bincode::serialize(&system));
+        assert!(SystemParams::generate() == SystemParams::get_hardcoded());
+
+        let key_pair = KeyPair::derive_from(&mut sho);
 
         // Test serialize of key_pair
         let key_pair_bytes = bincode::serialize(&key_pair).unwrap();
@@ -180,21 +186,33 @@ mod tests {
         let ciphertext2: Ciphertext = bincode::deserialize(&ciphertext_bytes).unwrap();
         assert!(ciphertext == ciphertext2);
         //println!("ciphertext_bytes = {:#x?}", ciphertext_bytes);
-        /* TODOFIX
         assert!(
             ciphertext_bytes
                 == vec![
-                    0x38, 0xa9, 0xe2, 0xf1, 0x85, 0x8d, 0xc4, 0x4f, 0x82, 0x8d, 0xf5, 0xd4, 0x47,
-                    0xe4, 0x5, 0x83, 0xf1, 0x8d, 0x7f, 0xe3, 0xa6, 0x3e, 0x31, 0x42, 0x78, 0x54,
-                    0xf1, 0x11, 0xb2, 0x1c, 0xe9, 0x47, 0xf2, 0x6, 0x35, 0x54, 0xde, 0xf9, 0x2d,
-                    0x18, 0xe7, 0x27, 0xeb, 0x3e, 0x26, 0x23, 0xf7, 0xba, 0xad, 0x95, 0x2c, 0x8d,
-                    0x41, 0xe9, 0xd3, 0xd5, 0xbc, 0x70, 0xc3, 0xe5, 0xb2, 0xe8, 0x14, 0x2,
+                    0x6e, 0x62, 0x9e, 0xa, 0x43, 0x8e, 0x13, 0xfc, 0x2e, 0x43, 0xf9, 0x35, 0xd8,
+                    0x58, 0xcf, 0xd8, 0xac, 0x11, 0x5, 0xe0, 0x4f, 0xb5, 0x95, 0xff, 0x62, 0xd2,
+                    0x59, 0xe3, 0x7a, 0xb2, 0x76, 0x49, 0x58, 0xa5, 0x49, 0xd8, 0x6c, 0xbd, 0x2c,
+                    0xc4, 0x9e, 0xcb, 0x2c, 0xa4, 0x8e, 0xc4, 0xa3, 0x4b, 0x6, 0xd3, 0x94, 0xd2,
+                    0xaf, 0x49, 0x27, 0x93, 0x67, 0x18, 0x63, 0x9, 0xa8, 0x53, 0x7a, 0x6c,
                 ]
         );
-        */
 
         let plaintext = key_pair.decrypt(ciphertext2, uid_bytes).unwrap();
         assert!(plaintext == profile_key);
+
+        let mut sho = Sho::new(b"Test_Repeated_ProfileKeyEnc/Dec", b"seed");
+        for _ in 0..100 {
+            let mut uid_bytes: UidBytes = Default::default();
+            let mut profile_key_bytes: ProfileKeyBytes = Default::default();
+
+            uid_bytes.copy_from_slice(&sho.squeeze(UUID_LEN)[..]);
+            profile_key_bytes.copy_from_slice(&sho.squeeze(PROFILE_KEY_LEN)[..]);
+
+            let profile_key =
+                profile_key_struct::ProfileKeyStruct::new(profile_key_bytes, uid_bytes);
+            let ciphertext = key_pair.encrypt(profile_key);
+            assert!(key_pair.decrypt(ciphertext, uid_bytes).unwrap() == profile_key);
+        }
 
         let uid_bytes = TEST_ARRAY_16;
         let profile_key = profile_key_struct::ProfileKeyStruct::new(TEST_ARRAY_32, TEST_ARRAY_16);

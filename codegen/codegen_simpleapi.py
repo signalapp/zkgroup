@@ -94,8 +94,6 @@ def print_method(c, m, rustClasses, static):
     for param in m.params:
         if param[0] == "int" or param[0] == "byte[]":
             s += "    let %s = %sIn;\n" % (param[1].snake(), param[1].lower_camel())
-        elif param[1].snake() == "change_signature":
-            s += """    let mut change_signature: simple_types::ChangeSignatureBytes = [0u8; SIGNATURE_LEN];
     change_signature.copy_from_slice(changeSignatureIn);\n""";
         elif param[1].snake() == "notary_signature":
             s += """    let mut notary_signature: simple_types::NotarySignatureBytes = [0u8; SIGNATURE_LEN];

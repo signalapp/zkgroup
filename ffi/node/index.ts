@@ -15,7 +15,6 @@ export { default as AuthCredentialPresentation } from './zkgroup/auth/AuthCreden
 // Groups
 export { default as ClientZkGroupCipher } from './zkgroup/groups/ClientZkGroupCipher';
 
-export { default as ChangeSignature } from './zkgroup/groups/ChangeSignature';
 export { default as GroupIdentifier } from './zkgroup/groups/GroupIdentifier';
 export { default as GroupMasterKey } from './zkgroup/groups/GroupMasterKey';
 export { default as GroupPublicParams } from './zkgroup/groups/GroupPublicParams';

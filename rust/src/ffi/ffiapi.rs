@@ -85,33 +85,6 @@ pub extern "C" fn FFI_ProfileKeyCommitment_checkValidContents(
 }
 
 #[no_mangle]
-pub extern "C" fn FFI_ProfileKeyCommitment_getProfileKeyVersion(
-    profileKeyCommitment: *const u8,
-    profileKeyCommitmentLen: u32,
-    profileKeyVersionOut: *mut u8,
-    profileKeyVersionLen: u32,
-) -> i32 {
-    let result = panic::catch_unwind(|| {
-        let profile_key_commitment: &[u8] = unsafe {
-            slice::from_raw_parts(profileKeyCommitment, profileKeyCommitmentLen as usize)
-        };
-        let profile_key_version: &mut [u8] = unsafe {
-            slice::from_raw_parts_mut(profileKeyVersionOut, profileKeyVersionLen as usize)
-        };
-
-        simpleapi::ProfileKeyCommitment_getProfileKeyVersion(
-            profile_key_commitment,
-            profile_key_version,
-        )
-    });
-
-    match result {
-        Ok(result) => result,
-        Err(_) => FFI_RETURN_INTERNAL_ERROR,
-    }
-}
-
-#[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_generateDeterministic(
     randomness: *const u8,
     randomnessLen: u32,
@@ -221,40 +194,6 @@ pub extern "C" fn FFI_GroupSecretParams_getPublicParams(
 }
 
 #[no_mangle]
-pub extern "C" fn FFI_GroupSecretParams_signDeterministic(
-    groupSecretParams: *const u8,
-    groupSecretParamsLen: u32,
-    randomness: *const u8,
-    randomnessLen: u32,
-    message: *const u8,
-    messageLen: u32,
-    changeSignatureOut: *mut u8,
-    changeSignatureLen: u32,
-) -> i32 {
-    let result = panic::catch_unwind(|| {
-        let group_secret_params: &[u8] =
-            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let randomness: &[u8] =
-            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
-        let message: &[u8] = unsafe { slice::from_raw_parts(message, messageLen as usize) };
-        let change_signature: &mut [u8] =
-            unsafe { slice::from_raw_parts_mut(changeSignatureOut, changeSignatureLen as usize) };
-
-        simpleapi::GroupSecretParams_signDeterministic(
-            group_secret_params,
-            &randomness,
-            &message,
-            change_signature,
-        )
-    });
-
-    match result {
-        Ok(result) => result,
-        Err(_) => FFI_RETURN_INTERNAL_ERROR,
-    }
-}
-
-#[no_mangle]
 pub extern "C" fn FFI_GroupSecretParams_encryptUuid(
     groupSecretParams: *const u8,
     groupSecretParamsLen: u32,
@@ -305,11 +244,9 @@ pub extern "C" fn FFI_GroupSecretParams_decryptUuid(
 }
 
 #[no_mangle]
-pub extern "C" fn FFI_GroupSecretParams_encryptProfileKeyDeterministic(
+pub extern "C" fn FFI_GroupSecretParams_encryptProfileKey(
     groupSecretParams: *const u8,
     groupSecretParamsLen: u32,
-    randomness: *const u8,
-    randomnessLen: u32,
     profileKey: *const u8,
     profileKeyLen: u32,
     uuid: *const u8,
@@ -320,8 +257,6 @@ pub extern "C" fn FFI_GroupSecretParams_encryptProfileKeyDeterministic(
     let result = panic::catch_unwind(|| {
         let group_secret_params: &[u8] =
             unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
-        let randomness: &[u8] =
-            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
         let profile_key: &[u8] =
             unsafe { slice::from_raw_parts(profileKey, profileKeyLen as usize) };
         let uuid: &[u8] = unsafe { slice::from_raw_parts(uuid, uuidLen as usize) };
@@ -329,9 +264,8 @@ pub extern "C" fn FFI_GroupSecretParams_encryptProfileKeyDeterministic(
             slice::from_raw_parts_mut(profileKeyCiphertextOut, profileKeyCiphertextLen as usize)
         };
 
-        simpleapi::GroupSecretParams_encryptProfileKeyDeterministic(
+        simpleapi::GroupSecretParams_encryptProfileKey(
             group_secret_params,
-            &randomness,
             &profile_key,
             &uuid,
             profile_key_ciphertext,
@@ -945,35 +879,6 @@ pub extern "C" fn FFI_GroupPublicParams_getGroupIdentifier(
             unsafe { slice::from_raw_parts_mut(groupIdentifierOut, groupIdentifierLen as usize) };
 
         simpleapi::GroupPublicParams_getGroupIdentifier(group_public_params, group_identifier)
-    });
-
-    match result {
-        Ok(result) => result,
-        Err(_) => FFI_RETURN_INTERNAL_ERROR,
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn FFI_GroupPublicParams_verifySignature(
-    groupPublicParams: *const u8,
-    groupPublicParamsLen: u32,
-    message: *const u8,
-    messageLen: u32,
-    changeSignature: *const u8,
-    changeSignatureLen: u32,
-) -> i32 {
-    let result = panic::catch_unwind(|| {
-        let group_public_params: &[u8] =
-            unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
-        let message: &[u8] = unsafe { slice::from_raw_parts(message, messageLen as usize) };
-        let change_signature: &[u8] =
-            unsafe { slice::from_raw_parts(changeSignature, changeSignatureLen as usize) };
-
-        simpleapi::GroupPublicParams_verifySignature(
-            group_public_params,
-            &message,
-            &change_signature,
-        )
     });
 
     match result {

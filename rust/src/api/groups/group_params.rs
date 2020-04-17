@@ -10,11 +10,11 @@
 use crate::api;
 use crate::common::constants::*;
 use crate::common::errors::*;
+use crate::common::sho::*;
 use crate::common::simple_types::*;
 use crate::crypto;
 use aead::{generic_array::GenericArray, Aead, NewAead};
 use aes_gcm_siv::Aes256GcmSiv;
-use poksho::ShoSha256;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Serialize, Deserialize, Default)]
@@ -24,19 +24,18 @@ pub struct GroupMasterKey {
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct GroupSecretParams {
-    pub(crate) uid_enc_key_pair: crypto::uid_encryption::KeyPair,
-    pub(crate) profile_key_enc_key_pair: crypto::profile_key_encryption::KeyPair,
-    sig_key_pair: crypto::signature::KeyPair,
     master_key: GroupMasterKey,
     group_id: GroupIdentifierBytes,
+    blob_key: AesKeyBytes,
+    pub(crate) uid_enc_key_pair: crypto::uid_encryption::KeyPair,
+    pub(crate) profile_key_enc_key_pair: crypto::profile_key_encryption::KeyPair,
 }
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct GroupPublicParams {
+    group_id: GroupIdentifierBytes,
     pub(crate) uid_enc_public_key: crypto::uid_encryption::PublicKey,
     pub(crate) profile_key_enc_public_key: crypto::profile_key_encryption::PublicKey,
-    sig_public_key: crypto::signature::PublicKey,
-    group_id: GroupIdentifierBytes,
 }
 
 impl GroupMasterKey {
@@ -47,41 +46,36 @@ impl GroupMasterKey {
 
 impl GroupSecretParams {
     pub fn generate(randomness: RandomnessBytes) -> Self {
-        let mut master_key: GroupMasterKey = Default::default();
-        master_key.bytes.copy_from_slice(
-            &ShoSha256::shohash(
-                b"Signal_ZKGroup_Master_Random",
-                &randomness,
-                GROUP_MASTER_KEY_LEN as u64,
-            )[0..GROUP_MASTER_KEY_LEN],
+        let mut sho = Sho::new(
+            b"Signal_ZKGroup_20200416_Random_GroupSecretParams_Generate",
+            &randomness,
         );
+        let mut master_key: GroupMasterKey = Default::default();
+        master_key
+            .bytes
+            .copy_from_slice(&sho.squeeze(GROUP_MASTER_KEY_LEN)[..]);
         GroupSecretParams::derive_from_master_key(master_key)
     }
 
     pub fn derive_from_master_key(master_key: GroupMasterKey) -> Self {
-        let uid_enc_key_pair = crypto::uid_encryption::KeyPair::derive_from(master_key.bytes);
-        let profile_key_enc_key_pair =
-            crypto::profile_key_encryption::KeyPair::derive_from(master_key.bytes);
-        let sig_key_pair = crypto::signature::KeyPair::derive_from(
+        let mut sho = Sho::new(
+            b"Signal_ZKGroup_20200416_GroupMasterKey_GroupSecretParams_DeriveFromMasterKey",
             &master_key.bytes,
-            b"Signal_ZKGroup_Sig_Client_KeyDerive",
         );
-
         let mut group_id: GroupIdentifierBytes = Default::default();
-        group_id.copy_from_slice(
-            &ShoSha256::shohash(
-                b"Signal_ZKGroup_GroupId",
-                &master_key.bytes,
-                GROUP_IDENTIFIER_LEN as u64,
-            )[0..GROUP_IDENTIFIER_LEN],
-        );
+        let mut blob_key: AesKeyBytes = Default::default();
+        group_id.copy_from_slice(&sho.squeeze(GROUP_IDENTIFIER_LEN)[..]);
+        blob_key.copy_from_slice(&sho.squeeze(AES_KEY_LEN)[..]);
+        let uid_enc_key_pair = crypto::uid_encryption::KeyPair::derive_from(&mut sho);
+        let profile_key_enc_key_pair =
+            crypto::profile_key_encryption::KeyPair::derive_from(&mut sho);
 
         Self {
-            uid_enc_key_pair,
-            profile_key_enc_key_pair,
-            sig_key_pair,
             master_key,
             group_id,
+            blob_key,
+            uid_enc_key_pair,
+            profile_key_enc_key_pair,
         }
     }
 
@@ -97,17 +91,8 @@ impl GroupSecretParams {
         GroupPublicParams {
             uid_enc_public_key: self.uid_enc_key_pair.get_public_key(),
             profile_key_enc_public_key: self.profile_key_enc_key_pair.get_public_key(),
-            sig_public_key: self.sig_key_pair.get_public_key(),
             group_id: self.group_id,
         }
-    }
-
-    pub fn sign(
-        &self,
-        randomness: RandomnessBytes,
-        message: &[u8],
-    ) -> Result<ChangeSignatureBytes, ZkGroupError> {
-        self.sig_key_pair.sign(message, randomness)
     }
 
     pub fn encrypt_uuid(&self, uid_bytes: UidBytes) -> api::groups::UuidCiphertext {
@@ -133,16 +118,14 @@ impl GroupSecretParams {
 
     pub fn encrypt_profile_key(
         &self,
-        randomness: RandomnessBytes,
         profile_key: api::profiles::ProfileKey,
         uid_bytes: UidBytes,
     ) -> api::groups::ProfileKeyCiphertext {
-        self.encrypt_profile_key_bytes(randomness, profile_key.bytes, uid_bytes)
+        self.encrypt_profile_key_bytes(profile_key.bytes, uid_bytes)
     }
 
     pub fn encrypt_profile_key_bytes(
         &self,
-        _randomness: RandomnessBytes,
         profile_key_bytes: ProfileKeyBytes,
         uid_bytes: UidBytes,
     ) -> api::groups::ProfileKeyCiphertext {
@@ -170,13 +153,12 @@ impl GroupSecretParams {
         randomness: RandomnessBytes,
         plaintext: &[u8],
     ) -> Result<Vec<u8>, ZkGroupError> {
-        let key_vec = ShoSha256::shohash(
-            b"Signal_ZKGroup_BlobEnc_KeyDerive",
-            &self.master_key.bytes,
-            32,
+        let mut sho = Sho::new(
+            b"Signal_ZKGroup_20200416_Random_GroupSecretParams_EncryptBlob",
+            &randomness,
         );
-        let nonce_vec = ShoSha256::shohash(b"Signal_ZKGroup_BlobEnc_Nonce", &randomness, 12);
-        match self.encrypt_blob_aesgcmsiv(&key_vec, &nonce_vec, plaintext) {
+        let nonce_vec = sho.squeeze(AESGCM_NONCE_LEN);
+        match self.encrypt_blob_aesgcmsiv(&self.blob_key, &nonce_vec[..], plaintext) {
             Ok(mut ciphertext_vec) => {
                 ciphertext_vec.extend(nonce_vec);
                 Ok(ciphertext_vec)
@@ -186,18 +168,13 @@ impl GroupSecretParams {
     }
 
     pub fn decrypt_blob(self, ciphertext: &[u8]) -> Result<Vec<u8>, ZkGroupError> {
-        let key_vec = ShoSha256::shohash(
-            b"Signal_ZKGroup_BlobEnc_KeyDerive",
-            &self.master_key.bytes,
-            32,
-        );
-        if ciphertext.len() < 12 {
-            // 12 bytes for IV
+        if ciphertext.len() < AESGCM_NONCE_LEN {
+            // AESGCM_NONCE_LEN = 12 bytes for IV
             return Err(ZkGroupError::DecryptionFailure);
         }
-        let nonce = &ciphertext[ciphertext.len() - 12..];
-        let ciphertext = &ciphertext[..ciphertext.len() - 12];
-        self.decrypt_blob_aesgcmsiv(&key_vec, nonce, ciphertext)
+        let nonce = &ciphertext[ciphertext.len() - AESGCM_NONCE_LEN..];
+        let ciphertext = &ciphertext[..ciphertext.len() - AESGCM_NONCE_LEN];
+        self.decrypt_blob_aesgcmsiv(&self.blob_key, nonce, ciphertext)
     }
 
     fn encrypt_blob_aesgcmsiv(
@@ -221,8 +198,8 @@ impl GroupSecretParams {
         nonce: &[u8],
         ciphertext: &[u8],
     ) -> Result<Vec<u8>, ZkGroupError> {
-        if ciphertext.len() < 16 {
-            // 16 bytes for tag
+        if ciphertext.len() < AESGCM_TAG_LEN {
+            // AESGCM_TAG_LEN = 16 bytes for tag
             return Err(ZkGroupError::DecryptionFailure);
         }
         let key = GenericArray::from_slice(key);
@@ -239,14 +216,6 @@ impl GroupPublicParams {
     pub fn get_group_identifier(&self) -> GroupIdentifierBytes {
         self.group_id
     }
-
-    pub fn verify_signature(
-        &self,
-        message: &[u8],
-        signature: ChangeSignatureBytes,
-    ) -> Result<(), ZkGroupError> {
-        self.sig_public_key.verify(message, signature)
-    }
 }
 
 #[cfg(test)]
@@ -257,7 +226,7 @@ mod tests {
     fn test_aesgcmsiv_vec1() {
         // https://tools.ietf.org/html/rfc8452#appendix-C
 
-        let group_secret_params = GroupSecretParams::generate([0u8; 32]);
+        let group_secret_params = GroupSecretParams::generate([0u8; RANDOMNESS_LEN]);
 
         let plaintext_vec = vec![
             0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -298,7 +267,7 @@ mod tests {
     fn test_aesgcmsiv_vec2() {
         // https://tools.ietf.org/html/rfc8452#appendix-C
 
-        let group_secret_params = GroupSecretParams::generate([0u8; 32]);
+        let group_secret_params = GroupSecretParams::generate([0u8; RANDOMNESS_LEN]);
 
         let plaintext_vec = vec![
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

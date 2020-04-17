@@ -14,7 +14,6 @@
 		20A67AB42374813600CB56A1 /* AuthCredentialResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A67AB12374813600CB56A1 /* AuthCredentialResponse.swift */; };
 		20A67AB52374813600CB56A1 /* AuthCredentialPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A67AB22374813600CB56A1 /* AuthCredentialPresentation.swift */; };
 		20A67ABA2374814A00CB56A1 /* ClientZkProfileOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A67AB62374814A00CB56A1 /* ClientZkProfileOperations.swift */; };
-		20A67ABB2374814A00CB56A1 /* ChangeSignature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A67AB72374814A00CB56A1 /* ChangeSignature.swift */; };
 		20A67ABC2374814A00CB56A1 /* ClientZkGroupCipher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A67AB82374814A00CB56A1 /* ClientZkGroupCipher.swift */; };
 		20A67ABD2374814A00CB56A1 /* ClientZkAuthOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A67AB92374814A00CB56A1 /* ClientZkAuthOperations.swift */; };
 		20A67AC12374819000CB56A1 /* GroupMasterKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A67ABE2374819000CB56A1 /* GroupMasterKey.swift */; };
@@ -62,7 +61,6 @@
 		20A67AB12374813600CB56A1 /* AuthCredentialResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthCredentialResponse.swift; sourceTree = "<group>"; };
 		20A67AB22374813600CB56A1 /* AuthCredentialPresentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthCredentialPresentation.swift; sourceTree = "<group>"; };
 		20A67AB62374814A00CB56A1 /* ClientZkProfileOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClientZkProfileOperations.swift; sourceTree = "<group>"; };
-		20A67AB72374814A00CB56A1 /* ChangeSignature.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeSignature.swift; sourceTree = "<group>"; };
 		20A67AB82374814A00CB56A1 /* ClientZkGroupCipher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClientZkGroupCipher.swift; sourceTree = "<group>"; };
 		20A67AB92374814A00CB56A1 /* ClientZkAuthOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClientZkAuthOperations.swift; sourceTree = "<group>"; };
 		20A67ABE2374819000CB56A1 /* GroupMasterKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupMasterKey.swift; sourceTree = "<group>"; };
@@ -159,7 +157,6 @@
 				20A67ABF2374819000CB56A1 /* GroupIdentifier.swift */,
 				20A67ABE2374819000CB56A1 /* GroupMasterKey.swift */,
 				20A67AC02374819000CB56A1 /* GroupPublicParams.swift */,
-				20A67AB72374814A00CB56A1 /* ChangeSignature.swift */,
 				20A67AB92374814A00CB56A1 /* ClientZkAuthOperations.swift */,
 				20A67AB82374814A00CB56A1 /* ClientZkGroupCipher.swift */,
 				20A67AB62374814A00CB56A1 /* ClientZkProfileOperations.swift */,
@@ -317,7 +314,6 @@
 				20A67AD6237481AD00CB56A1 /* Native.swift in Sources */,
 				20A67AE5237481AD00CB56A1 /* ProfileKeyCredentialRequestContext.swift in Sources */,
 				20A67ADC237481AD00CB56A1 /* ServerPublicParams.swift in Sources */,
-				20A67ABB2374814A00CB56A1 /* ChangeSignature.swift in Sources */,
 				20A67AB32374813600CB56A1 /* AuthCredential.swift in Sources */,
 				20A67ABA2374814A00CB56A1 /* ClientZkProfileOperations.swift in Sources */,
 				20A67AD5237481AD00CB56A1 /* ServerZkProfileOperations.swift in Sources */,

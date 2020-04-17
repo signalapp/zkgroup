@@ -28,6 +28,9 @@ server_so:
 	mkdir -p ffi/java/src/main/resources/
 	cp target/x86_64-unknown-linux-gnu/release/libzkgroup.so ffi/java/src/main/resources/
 
+server_so_simd:
+	cd rust && RUSTFLAGS='-C link-arg=-s -C target_feature=+avx512ifma' cargo +nightly build --target x86_64-unknown-linux-gnu --release --no-default-features --features "simd_backend"
+
 # @deprecated build
 mac_dylib:
 	RUSTFLAGS='-C link-arg=-s' cargo build --target x86_64-apple-darwin --release
@@ -39,14 +42,23 @@ libzkgroup:
 
 DOCKER_IMAGE := zkgroup-builder
 
-docker: DOCKER_EXTRA=$(shell [ -L build ] && P=$$(readlink build) && echo -v $$P/:$$P )
-docker:
+docker_build:
 	$(DOCKER) build --build-arg UID=$$(id -u) --build-arg GID=$$(id -g) \
 	  -t $(DOCKER_IMAGE) .
+
+docker: DOCKER_EXTRA=$(shell [ -L build ] && P=$$(readlink build) && echo -v $$P/:$$P )
+docker: docker_build
 	$(DOCKER) run --rm --user $$(id -u):$$(id -g) \
 	  --env "MAKEFLAGS=$(MAKEFLAGS)" \
 	  -v `pwd`/:/home/zkgroup/src $(DOCKER_EXTRA) $(DOCKER_IMAGE) \
 		sh -c "cd src; ./gradlew build"
+
+docker_test: docker_build
+	$(DOCKER) run --rm --user $$(id -u):$$(id -g) \
+	  --env "MAKEFLAGS=$(MAKEFLAGS)" \
+	  -v `pwd`/:/home/zkgroup/src $(DOCKER_EXTRA) $(DOCKER_IMAGE) \
+		sh -c "cd src; ./gradlew test"
+
 
 SONATYPE_USERNAME     ?=
 SONATYPE_PASSWORD     ?=

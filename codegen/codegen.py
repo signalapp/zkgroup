@@ -103,9 +103,6 @@ def define_classes():
     c = ClassDescriptor("profile_key_version", "profiles", "api::profiles::ProfileKeyVersion", 64, check_valid_contents=False, string_contents=True)
     classes.append(c)
 
-    c = ClassDescriptor("change_signature", "groups", "simple_types::ChangeSignatureBytes", 64, check_valid_contents=False)
-    classes.append(c)
-
     c = ClassDescriptor("notary_signature", "", "simple_types::NotarySignatureBytes", 64, check_valid_contents=False)
     classes.append(c)
 
@@ -118,15 +115,12 @@ def define_classes():
 
     c = ClassDescriptor("profile_key_commitment", "profiles", "api::profiles::ProfileKeyCommitment", 96)
 
-    c.add_method("get_profile_key_version", "class", "profile_key_version", [],
-            """    let profile_key_version = profile_key_commitment.get_profile_key_version();""")
-
     classes.append(c)
 
     c = ClassDescriptor("group_master_key", "groups", "api::groups::GroupMasterKey", 32, check_valid_contents=False)
     classes.append(c)
 
-    c = ClassDescriptor("group_secret_params", "groups", "api::groups::GroupSecretParams", 384, runtime_error_on_serialize=True)
+    c = ClassDescriptor("group_secret_params", "groups", "api::groups::GroupSecretParams", 352, runtime_error_on_serialize=True)
 
     c.add_static_method("generate_deterministic", "class", "group_secret_params", [("class", "randomness")],
             """    let group_secret_params = api::groups::GroupSecretParams::generate(randomness);""" )   
@@ -139,12 +133,6 @@ def define_classes():
 
     c.add_method("get_public_params", "class", "group_public_params", [],
             """    let group_public_params = group_secret_params.get_public_params();""")
-
-    c.add_method("sign_deterministic", "class", "change_signature", [("class", "randomness"), ("byte[]", "message")],
-            """    let change_signature = match group_secret_params.sign(randomness, message) {
-        Ok(result) => result,
-        Err(_) => return FFI_RETURN_INPUT_ERROR,
-    };""", runtime_error=True)
 
     classes.append(c)
 
@@ -159,8 +147,8 @@ def define_classes():
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     };""")
 
-    c.add_method("encrypt_profile_key_deterministic", "class", "profile_key_ciphertext", [("class", "randomness"),  ("class", "profile_key"), ("UUID", "uuid")], 
-            """    let profile_key_ciphertext = group_secret_params.encrypt_profile_key(randomness, profile_key, uuid);""", runtime_error=True)
+    c.add_method("encrypt_profile_key", "class", "profile_key_ciphertext", [("class", "profile_key"), ("UUID", "uuid")], 
+            """    let profile_key_ciphertext = group_secret_params.encrypt_profile_key(profile_key, uuid);""", runtime_error=True)
 
     c.add_method("decrypt_profile_key", "class", "profile_key", [("class", "profile_key_ciphertext"), ("UUID", "uuid")], 
             """    let profile_key = match group_secret_params.decrypt_profile_key(profile_key_ciphertext, uuid) {
@@ -260,15 +248,9 @@ def define_classes():
 
     classes.append(c)
 
-    c = ClassDescriptor("group_public_params", "groups", "api::groups::GroupPublicParams", 128)
+    c = ClassDescriptor("group_public_params", "groups", "api::groups::GroupPublicParams", 96)
     c.add_method("get_group_identifier", "class", "group_identifier", [],
             """    let group_identifier = group_public_params.get_group_identifier();""")
-
-    c.add_method("verify_signature", "boolean", "None", [("byte[]", "message"), ("class", "change_signature")],
-            """    match group_public_params.verify_signature(message, change_signature) {
-        Ok(_) => (),
-        _ => return FFI_RETURN_INPUT_ERROR,
-    };""")
 
     classes.append(c)
 

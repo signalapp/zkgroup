@@ -12,13 +12,12 @@ import Native, { FFI_RETURN_OK, FFI_RETURN_INPUT_ERROR } from '../internal/Nativ
 
 import { RANDOM_LENGTH } from '../internal/Constants';
 import GroupIdentifier from './GroupIdentifier';
-import ChangeSignature from './ChangeSignature';
 import GroupMasterKey from './GroupMasterKey';
 import GroupPublicParams from './GroupPublicParams';
 
 export default class GroupSecretParams extends ByteArray {
 
-  static SIZE = 384;
+  static SIZE = 352;
 
   static generate(): GroupSecretParams {
     const random = new FFICompatArray(randomBytes(RANDOM_LENGTH));
@@ -88,24 +87,6 @@ export default class GroupSecretParams extends ByteArray {
     }
 
     return new GroupPublicParams(newContents);
-  }
-
-  sign(message: FFICompatArrayType): ChangeSignature {
-    const random = new FFICompatArray(randomBytes(RANDOM_LENGTH));
-
-    return this.signWithRandom(random, message);
-  }
-
-  signWithRandom(random: FFICompatArrayType, message: FFICompatArrayType): ChangeSignature {
-    const newContents = new FFICompatArray(ChangeSignature.SIZE);
-
-    const ffi_return = Native.FFI_GroupSecretParams_signDeterministic(this.contents, this.contents.length, random, random.length, message, message.length, newContents, newContents.length);
-
-    if (ffi_return != FFI_RETURN_OK) {
-      throw new ZkGroupError("FFI_RETURN!=OK");
-    }
-
-    return new ChangeSignature(newContents);
   }
 
 }

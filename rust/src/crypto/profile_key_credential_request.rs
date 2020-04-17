@@ -7,7 +7,7 @@
 
 #![allow(non_snake_case)]
 
-use crate::common::simple_types::*;
+use crate::common::sho::*;
 use crate::crypto::credentials::{BlindedProfileKeyCredential, ProfileKeyCredential};
 use crate::crypto::profile_key_struct;
 use curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT;
@@ -53,11 +53,8 @@ pub struct Ciphertext {
 }
 
 impl KeyPair {
-    pub fn generate(randomness: RandomnessBytes) -> Self {
-        let y = calculate_scalar(
-            b"Signal_ZKGroup_ProfileKey_BlindIssue_KeyGen_y",
-            &randomness,
-        );
+    pub fn generate(sho: &mut Sho) -> Self {
+        let y = sho.get_scalar();
         let Y = y * RISTRETTO_BASEPOINT_POINT;
         KeyPair { y, Y }
     }
@@ -69,20 +66,11 @@ impl KeyPair {
     pub fn encrypt(
         &self,
         profile_key_struct: profile_key_struct::ProfileKeyStruct,
-        randomness: RandomnessBytes,
+        sho: &mut Sho,
     ) -> CiphertextWithSecretNonce {
-        let r1 = calculate_scalar(
-            b"Signal_ZKGroup_ProfileKey_BlindIssue_KeyGen_r1",
-            &randomness,
-        );
-        let r2 = calculate_scalar(
-            b"Signal_ZKGroup_ProfileKey_BlindIssue_KeyGen_r2",
-            &randomness,
-        );
-        let r3 = calculate_scalar(
-            b"Signal_ZKGroup_ProfileKey_BlindIssue_KeyGen_r3",
-            &randomness,
-        );
+        let r1 = sho.get_scalar();
+        let r2 = sho.get_scalar();
+        let r3 = sho.get_scalar();
         let D1 = r1 * RISTRETTO_BASEPOINT_POINT;
         let E1 = r2 * RISTRETTO_BASEPOINT_POINT;
         let F1 = r3 * RISTRETTO_BASEPOINT_POINT;
@@ -135,12 +123,13 @@ mod tests {
     use super::*;
     use crate::common::constants::*;
     use crate::crypto::profile_key_commitment;
-    //use sha2::Sha512;
 
     #[test]
     fn test_request_response() {
+        let mut sho = Sho::new(b"Test_Profile_Key_Credential_Request", b"");
+
         // client
-        let blind_key_pair = KeyPair::generate(TEST_ARRAY_32_1);
+        let blind_key_pair = KeyPair::generate(&mut sho);
 
         // server and client
         let profile_key_struct =
@@ -148,7 +137,7 @@ mod tests {
         let _ = profile_key_commitment::Commitment::new(profile_key_struct);
 
         // client
-        let _ = blind_key_pair.encrypt(profile_key_struct, TEST_ARRAY_32_1);
+        let _ = blind_key_pair.encrypt(profile_key_struct, &mut sho);
 
         // server
         /*TODO request_ciphertext.verify(c).unwrap();

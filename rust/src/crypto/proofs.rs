@@ -6,8 +6,10 @@
 //
 
 #![allow(non_snake_case)]
+use crate::common::constants::*;
 use crate::common::errors::ZkGroupError::*;
 use crate::common::errors::*;
+use crate::common::sho::*;
 use crate::common::simple_types::*;
 use crate::crypto::credentials;
 use crate::crypto::profile_key_commitment;
@@ -17,7 +19,6 @@ use crate::crypto::profile_key_struct;
 use crate::crypto::uid_encryption;
 use crate::crypto::uid_struct;
 use curve25519_dalek::ristretto::RistrettoPoint;
-use poksho::ShoSha256;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -99,9 +100,9 @@ impl AuthCredentialIssuanceProof {
         credential: credentials::AuthCredential,
         uid: uid_struct::UidStruct,
         redemption_time: RedemptionTime,
-        randomness: RandomnessBytes,
+        sho: &mut Sho,
     ) -> Self {
-        let system = credentials::SystemParameters::get_hardcoded();
+        let system = credentials::SystemParams::get_hardcoded();
 
         let M = credentials::convert_to_points_uid_struct(uid, redemption_time);
 
@@ -134,9 +135,13 @@ impl AuthCredentialIssuanceProof {
         point_args.add("M3", M[2]);
         point_args.add("M4", M[3]);
 
-        let proof_randomness = ShoSha256::shohash(b"Signal_ZKGroup_Mac_Proof", &randomness, 32);
         let poksho_proof = Self::get_poksho_statement()
-            .prove(&scalar_args, &point_args, &[], &proof_randomness[..])
+            .prove(
+                &scalar_args,
+                &point_args,
+                &[],
+                &sho.squeeze(RANDOMNESS_LEN)[..],
+            )
             .unwrap();
         Self { poksho_proof }
     }
@@ -148,7 +153,7 @@ impl AuthCredentialIssuanceProof {
         uid_struct: uid_struct::UidStruct,
         redemption_time: RedemptionTime,
     ) -> Result<(), ZkGroupError> {
-        let system = credentials::SystemParameters::get_hardcoded();
+        let system = credentials::SystemParams::get_hardcoded();
 
         let M = credentials::convert_to_points_uid_struct(uid_struct, redemption_time);
 
@@ -197,10 +202,10 @@ impl ProfileKeyCredentialRequestProof {
         profile_key: profile_key_struct::ProfileKeyStruct,
         ciphertext: profile_key_credential_request::CiphertextWithSecretNonce,
         commitment: profile_key_commitment::Commitment,
-        randomness: RandomnessBytes,
+        sho: &mut Sho,
     ) -> ProfileKeyCredentialRequestProof {
-        let commitment_system = profile_key_commitment::SystemParameters::get_hardcoded();
-        let credentials_system = credentials::SystemParameters::get_hardcoded();
+        let commitment_system = profile_key_commitment::SystemParams::get_hardcoded();
+        let credentials_system = credentials::SystemParams::get_hardcoded();
 
         let mut scalar_args = poksho::ScalarArgs::new();
         scalar_args.add("y", key_pair.y);
@@ -223,13 +228,13 @@ impl ProfileKeyCredentialRequestProof {
         point_args.add("F2", ciphertext.F2);
         point_args.add("G_m6", credentials_system.G_m6);
 
-        let proof_randomness = ShoSha256::shohash(
-            b"Signal_ZKGroup_ProfileKey_BlindIssue_Proof",
-            &randomness,
-            32,
-        );
         let poksho_proof = Self::get_poksho_statement()
-            .prove(&scalar_args, &point_args, &[], &proof_randomness[..])
+            .prove(
+                &scalar_args,
+                &point_args,
+                &[],
+                &sho.squeeze(RANDOMNESS_LEN)[..],
+            )
             .unwrap();
         ProfileKeyCredentialRequestProof { poksho_proof }
     }
@@ -240,8 +245,8 @@ impl ProfileKeyCredentialRequestProof {
         ciphertext: profile_key_credential_request::Ciphertext,
         commitment: profile_key_commitment::Commitment,
     ) -> Result<(), ZkGroupError> {
-        let commitment_system = profile_key_commitment::SystemParameters::get_hardcoded();
-        let credentials_system = credentials::SystemParameters::get_hardcoded();
+        let commitment_system = profile_key_commitment::SystemParams::get_hardcoded();
+        let credentials_system = credentials::SystemParams::get_hardcoded();
 
         let mut point_args = poksho::PointArgs::new();
         point_args.add("Y", public_key.Y);
@@ -309,9 +314,9 @@ impl ProfileKeyCredentialIssuanceProof {
         request: profile_key_credential_request::Ciphertext,
         blinded_credential: credentials::BlindedProfileKeyCredentialWithSecretNonce,
         uid: uid_struct::UidStruct,
-        randomness: RandomnessBytes,
+        sho: &mut Sho,
     ) -> ProfileKeyCredentialIssuanceProof {
-        let credentials_system = credentials::SystemParameters::get_hardcoded();
+        let credentials_system = credentials::SystemParams::get_hardcoded();
 
         let mut scalar_args = poksho::ScalarArgs::new();
         scalar_args.add("w", key_pair.w);
@@ -354,10 +359,13 @@ impl ProfileKeyCredentialIssuanceProof {
         point_args.add("M2", uid.M2);
         point_args.add("M3", uid.M3);
 
-        let proof_randomness =
-            ShoSha256::shohash(b"Signal_ZKGroup_BlindIssueMac_Proof", &randomness, 32);
         let poksho_proof = Self::get_poksho_statement()
-            .prove(&scalar_args, &point_args, &[], &proof_randomness[..])
+            .prove(
+                &scalar_args,
+                &point_args,
+                &[],
+                &sho.squeeze(RANDOMNESS_LEN)[..],
+            )
             .unwrap();
         ProfileKeyCredentialIssuanceProof { poksho_proof }
     }
@@ -370,7 +378,7 @@ impl ProfileKeyCredentialIssuanceProof {
         request: profile_key_credential_request::Ciphertext,
         blinded_credential: credentials::BlindedProfileKeyCredential,
     ) -> Result<(), ZkGroupError> {
-        let credentials_system = credentials::SystemParameters::get_hardcoded();
+        let credentials_system = credentials::SystemParams::get_hardcoded();
         let uid = uid_struct::UidStruct::new(uid_bytes);
 
         let mut point_args = poksho::PointArgs::new();
@@ -433,13 +441,13 @@ impl AuthCredentialPresentationProof {
         uid: uid_struct::UidStruct,
         uid_ciphertext: uid_encryption::Ciphertext,
         redemption_time: RedemptionTime,
-        randomness: RandomnessBytes,
+        sho: &mut Sho,
     ) -> Self {
-        let credentials_system = credentials::SystemParameters::get_hardcoded();
-        let uid_system = uid_encryption::SystemParameters::get_hardcoded();
+        let credentials_system = credentials::SystemParams::get_hardcoded();
+        let uid_system = uid_encryption::SystemParams::get_hardcoded();
         let M = credentials::convert_to_points_uid_struct(uid, redemption_time);
 
-        let z = calculate_scalar(b"Signal_ZKGroup_Present_Auth_z", &randomness);
+        let z = sho.get_scalar();
 
         let C_y1 = z * credentials_system.G_y1 + M[0];
         let C_y2 = z * credentials_system.G_y2 + M[1];
@@ -493,10 +501,13 @@ impl AuthCredentialPresentationProof {
         point_args.add("C_y4", C_y4);
         point_args.add("G_y4", credentials_system.G_y4);
 
-        let proof_randomness = ShoSha256::shohash(b"Signal_ZKGroup_Present_Proof", &randomness, 32);
-
         let poksho_proof = Self::get_poksho_statement()
-            .prove(&scalar_args, &point_args, &[], &proof_randomness[..])
+            .prove(
+                &scalar_args,
+                &point_args,
+                &[],
+                &sho.squeeze(RANDOMNESS_LEN)[..],
+            )
             .unwrap();
 
         Self {
@@ -519,8 +530,8 @@ impl AuthCredentialPresentationProof {
         uid_ciphertext: uid_encryption::Ciphertext,
         redemption_time: RedemptionTime,
     ) -> Result<(), ZkGroupError> {
-        let enc_system = uid_encryption::SystemParameters::get_hardcoded();
-        let credentials_system = credentials::SystemParameters::get_hardcoded();
+        let enc_system = uid_encryption::SystemParams::get_hardcoded();
+        let credentials_system = credentials::SystemParams::get_hardcoded();
 
         let Self {
             C_x0,
@@ -620,15 +631,15 @@ impl ProfileKeyCredentialPresentationProof {
         profile_key_ciphertext: profile_key_encryption::Ciphertext,
         uid_bytes: UidBytes,
         profile_key_bytes: ProfileKeyBytes,
-        randomness: RandomnessBytes,
+        sho: &mut Sho,
     ) -> Self {
-        let credentials_system = credentials::SystemParameters::get_hardcoded();
-        let uid_system = uid_encryption::SystemParameters::get_hardcoded();
-        let profile_key_system = profile_key_encryption::SystemParameters::get_hardcoded();
+        let credentials_system = credentials::SystemParams::get_hardcoded();
+        let uid_system = uid_encryption::SystemParams::get_hardcoded();
+        let profile_key_system = profile_key_encryption::SystemParams::get_hardcoded();
         let uid = uid_struct::UidStruct::new(uid_bytes);
         let profile_key = profile_key_struct::ProfileKeyStruct::new(profile_key_bytes, uid_bytes);
 
-        let z = calculate_scalar(b"Signal_ZKGroup_Present_Profile_Key_z", &randomness);
+        let z = sho.get_scalar();
 
         let C_y1 = z * credentials_system.G_y1 + uid.M1;
         let C_y2 = z * credentials_system.G_y2 + uid.M2;
@@ -703,10 +714,13 @@ impl ProfileKeyCredentialPresentationProof {
         point_args.add("G_y6", credentials_system.G_y6);
         point_args.add("G_m6", credentials_system.G_m6);
 
-        let proof_randomness = ShoSha256::shohash(b"Signal_ZKGroup_Present_Proof", &randomness, 32);
-
         let poksho_proof = Self::get_poksho_statement()
-            .prove(&scalar_args, &point_args, &[], &proof_randomness[..])
+            .prove(
+                &scalar_args,
+                &point_args,
+                &[],
+                &sho.squeeze(RANDOMNESS_LEN)[..],
+            )
             .unwrap();
 
         ProfileKeyCredentialPresentationProof {
@@ -733,9 +747,9 @@ impl ProfileKeyCredentialPresentationProof {
         profile_key_ciphertext: profile_key_encryption::Ciphertext,
         profile_key_enc_public_key: profile_key_encryption::PublicKey,
     ) -> Result<(), ZkGroupError> {
-        let uid_enc_system = uid_encryption::SystemParameters::get_hardcoded();
-        let profile_key_enc_system = profile_key_encryption::SystemParameters::get_hardcoded();
-        let credentials_system = credentials::SystemParameters::get_hardcoded();
+        let uid_enc_system = uid_encryption::SystemParams::get_hardcoded();
+        let profile_key_enc_system = profile_key_encryption::SystemParams::get_hardcoded();
+        let credentials_system = credentials::SystemParams::get_hardcoded();
 
         let Self {
             C_x0,

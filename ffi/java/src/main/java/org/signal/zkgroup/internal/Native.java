@@ -58,17 +58,15 @@ public final class Native {
 
   public static native int profileKeyGetCommitmentJNI(byte[] self, byte[] uuid, byte[] output);
   public static native int profileKeyGetProfileKeyVersionJNI(byte[] self, byte[] uuid, byte[] output);
-  public static native int profileKeyCommitmentGetProfileKeyVersionJNI(byte[] self, byte[] output);
   public static native int profileKeyCommitmentCheckValidContentsJNI(byte[] self);
   public static native int groupSecretParamsGenerateDeterministicJNI(byte[] randomness, byte[] output);
   public static native int groupSecretParamsDeriveFromMasterKeyJNI(byte[] groupMasterKey, byte[] output);
   public static native int groupSecretParamsGetMasterKeyJNI(byte[] self, byte[] output);
   public static native int groupSecretParamsGetPublicParamsJNI(byte[] self, byte[] output);
-  public static native int groupSecretParamsSignDeterministicJNI(byte[] self, byte[] randomness, byte[] message, byte[] output);
   public static native int groupSecretParamsCheckValidContentsJNI(byte[] self);
   public static native int groupSecretParamsEncryptUuidJNI(byte[] self, byte[] uuid, byte[] output);
   public static native int groupSecretParamsDecryptUuidJNI(byte[] self, byte[] uuidCiphertext, byte[] output);
-  public static native int groupSecretParamsEncryptProfileKeyDeterministicJNI(byte[] self, byte[] randomness, byte[] profileKey, byte[] uuid, byte[] output);
+  public static native int groupSecretParamsEncryptProfileKeyJNI(byte[] self, byte[] profileKey, byte[] uuid, byte[] output);
   public static native int groupSecretParamsDecryptProfileKeyJNI(byte[] self, byte[] profileKeyCiphertext, byte[] uuid, byte[] output);
   public static native int groupSecretParamsEncryptBlobDeterministicJNI(byte[] self, byte[] randomness, byte[] plaintext, byte[] output);
   public static native int groupSecretParamsDecryptBlobJNI(byte[] self, byte[] blobCiphertext, byte[] output);
@@ -86,7 +84,6 @@ public final class Native {
   public static native int serverSecretParamsIssueProfileKeyCredentialDeterministicJNI(byte[] self, byte[] randomness, byte[] profileKeyCredentialRequest, byte[] uuid, byte[] profileKeyCommitment, byte[] output);
   public static native int serverSecretParamsVerifyProfileKeyCredentialPresentationJNI(byte[] self, byte[] groupPublicParams, byte[] profileKeyCredentialPresentation);
   public static native int groupPublicParamsGetGroupIdentifierJNI(byte[] self, byte[] output);
-  public static native int groupPublicParamsVerifySignatureJNI(byte[] self, byte[] message, byte[] changeSignature);
   public static native int groupPublicParamsCheckValidContentsJNI(byte[] self);
   public static native int serverPublicParamsVerifySignatureJNI(byte[] self, byte[] message, byte[] notarySignature);
   public static native int serverPublicParamsCheckValidContentsJNI(byte[] self);
