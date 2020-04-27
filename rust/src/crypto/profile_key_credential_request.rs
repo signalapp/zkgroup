@@ -33,13 +33,10 @@ pub struct PublicKey {
 pub struct CiphertextWithSecretNonce {
     pub(crate) r1: Scalar,
     pub(crate) r2: Scalar,
-    pub(crate) r3: Scalar,
     pub(crate) D1: RistrettoPoint,
     pub(crate) D2: RistrettoPoint,
     pub(crate) E1: RistrettoPoint,
     pub(crate) E2: RistrettoPoint,
-    pub(crate) F1: RistrettoPoint,
-    pub(crate) F2: RistrettoPoint,
 }
 
 #[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
@@ -48,8 +45,6 @@ pub struct Ciphertext {
     pub(crate) D2: RistrettoPoint,
     pub(crate) E1: RistrettoPoint,
     pub(crate) E2: RistrettoPoint,
-    pub(crate) F1: RistrettoPoint,
-    pub(crate) F2: RistrettoPoint,
 }
 
 impl KeyPair {
@@ -70,25 +65,19 @@ impl KeyPair {
     ) -> CiphertextWithSecretNonce {
         let r1 = sho.get_scalar();
         let r2 = sho.get_scalar();
-        let r3 = sho.get_scalar();
         let D1 = r1 * RISTRETTO_BASEPOINT_POINT;
         let E1 = r2 * RISTRETTO_BASEPOINT_POINT;
-        let F1 = r3 * RISTRETTO_BASEPOINT_POINT;
 
-        let D2 = r1 * (self.Y) + profile_key_struct.M4;
-        let E2 = r2 * (self.Y) + profile_key_struct.M5;
-        let F2 = r3 * (self.Y) + profile_key_struct.M6();
+        let D2 = r1 * (self.Y) + profile_key_struct.M3;
+        let E2 = r2 * (self.Y) + profile_key_struct.M4;
 
         CiphertextWithSecretNonce {
             r1,
             r2,
-            r3,
             D1,
             D2,
             E1,
             E2,
-            F1,
-            F2,
         }
     }
 
@@ -112,8 +101,6 @@ impl CiphertextWithSecretNonce {
             D2: self.D2,
             E1: self.E1,
             E2: self.E2,
-            F1: self.F1,
-            F2: self.F2,
         }
     }
 }
@@ -134,7 +121,10 @@ mod tests {
         // server and client
         let profile_key_struct =
             profile_key_struct::ProfileKeyStruct::new(TEST_ARRAY_32, TEST_ARRAY_16);
-        let _ = profile_key_commitment::Commitment::new(profile_key_struct);
+        let _ = profile_key_commitment::CommitmentWithSecretNonce::new(
+            profile_key_struct,
+            TEST_ARRAY_16,
+        );
 
         // client
         let _ = blind_key_pair.encrypt(profile_key_struct, &mut sho);

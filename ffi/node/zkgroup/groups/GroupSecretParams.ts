@@ -17,7 +17,7 @@ import GroupPublicParams from './GroupPublicParams';
 
 export default class GroupSecretParams extends ByteArray {
 
-  static SIZE = 352;
+  static SIZE = 289;
 
   static generate(): GroupSecretParams {
     const random = new FFICompatArray(randomBytes(RANDOM_LENGTH));

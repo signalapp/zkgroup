@@ -82,11 +82,10 @@ pub fn benchmark_integration_profile(c: &mut Criterion) {
 
     assert!(plaintext == uid);
 
-    let profile_key_ciphertext =
-        group_secret_params.encrypt_profile_key(randomness, profile_key, uid);
+    let profile_key_ciphertext = group_secret_params.encrypt_profile_key(profile_key, uid);
 
     c.bench_function("encrypt_profile_key", |b| {
-        b.iter(|| group_secret_params.encrypt_profile_key(randomness, profile_key, uid))
+        b.iter(|| group_secret_params.encrypt_profile_key(profile_key, uid))
     });
 
     let decrypted_profile_key = group_secret_params

@@ -16,7 +16,7 @@ import org.signal.zkgroup.internal.Native;
 
 public final class ProfileKeyCredentialResponse extends ByteArray {
 
-  public static final int SIZE = 520;
+  public static final int SIZE = 457;
 
   public ProfileKeyCredentialResponse(byte[] contents) throws InvalidInputException {
     super(contents, SIZE);

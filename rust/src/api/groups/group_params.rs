@@ -24,6 +24,7 @@ pub struct GroupMasterKey {
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct GroupSecretParams {
+    reserved: ReservedBytes,
     master_key: GroupMasterKey,
     group_id: GroupIdentifierBytes,
     blob_key: AesKeyBytes,
@@ -33,6 +34,7 @@ pub struct GroupSecretParams {
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct GroupPublicParams {
+    reserved: ReservedBytes,
     group_id: GroupIdentifierBytes,
     pub(crate) uid_enc_public_key: crypto::uid_encryption::PublicKey,
     pub(crate) profile_key_enc_public_key: crypto::profile_key_encryption::PublicKey,
@@ -47,7 +49,7 @@ impl GroupMasterKey {
 impl GroupSecretParams {
     pub fn generate(randomness: RandomnessBytes) -> Self {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Random_GroupSecretParams_Generate",
+            b"Signal_ZKGroup_20200424_Random_GroupSecretParams_Generate",
             &randomness,
         );
         let mut master_key: GroupMasterKey = Default::default();
@@ -59,7 +61,7 @@ impl GroupSecretParams {
 
     pub fn derive_from_master_key(master_key: GroupMasterKey) -> Self {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_GroupMasterKey_GroupSecretParams_DeriveFromMasterKey",
+            b"Signal_ZKGroup_20200424_GroupMasterKey_GroupSecretParams_DeriveFromMasterKey",
             &master_key.bytes,
         );
         let mut group_id: GroupIdentifierBytes = Default::default();
@@ -71,6 +73,7 @@ impl GroupSecretParams {
             crypto::profile_key_encryption::KeyPair::derive_from(&mut sho);
 
         Self {
+            reserved: Default::default(),
             master_key,
             group_id,
             blob_key,
@@ -89,6 +92,7 @@ impl GroupSecretParams {
 
     pub fn get_public_params(&self) -> GroupPublicParams {
         GroupPublicParams {
+            reserved: Default::default(),
             uid_enc_public_key: self.uid_enc_key_pair.get_public_key(),
             profile_key_enc_public_key: self.profile_key_enc_key_pair.get_public_key(),
             group_id: self.group_id,
@@ -105,7 +109,10 @@ impl GroupSecretParams {
         uid: crypto::uid_struct::UidStruct,
     ) -> api::groups::UuidCiphertext {
         let ciphertext = self.uid_enc_key_pair.encrypt(uid);
-        api::groups::UuidCiphertext { ciphertext }
+        api::groups::UuidCiphertext {
+            reserved: Default::default(),
+            ciphertext,
+        }
     }
 
     pub fn decrypt_uuid(
@@ -132,7 +139,10 @@ impl GroupSecretParams {
         let profile_key =
             crypto::profile_key_struct::ProfileKeyStruct::new(profile_key_bytes, uid_bytes);
         let ciphertext = self.profile_key_enc_key_pair.encrypt(profile_key);
-        api::groups::ProfileKeyCiphertext { ciphertext }
+        api::groups::ProfileKeyCiphertext {
+            reserved: Default::default(),
+            ciphertext,
+        }
     }
 
     pub fn decrypt_profile_key(
@@ -154,13 +164,14 @@ impl GroupSecretParams {
         plaintext: &[u8],
     ) -> Result<Vec<u8>, ZkGroupError> {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Random_GroupSecretParams_EncryptBlob",
+            b"Signal_ZKGroup_20200424_Random_GroupSecretParams_EncryptBlob",
             &randomness,
         );
         let nonce_vec = sho.squeeze(AESGCM_NONCE_LEN);
         match self.encrypt_blob_aesgcmsiv(&self.blob_key, &nonce_vec[..], plaintext) {
             Ok(mut ciphertext_vec) => {
                 ciphertext_vec.extend(nonce_vec);
+                ciphertext_vec.extend(&[0u8]); // reserved byte
                 Ok(ciphertext_vec)
             }
             Err(e) => Err(e),
@@ -168,12 +179,13 @@ impl GroupSecretParams {
     }
 
     pub fn decrypt_blob(self, ciphertext: &[u8]) -> Result<Vec<u8>, ZkGroupError> {
-        if ciphertext.len() < AESGCM_NONCE_LEN {
+        if ciphertext.len() < AESGCM_NONCE_LEN + 1 {
             // AESGCM_NONCE_LEN = 12 bytes for IV
             return Err(ZkGroupError::DecryptionFailure);
         }
-        let nonce = &ciphertext[ciphertext.len() - AESGCM_NONCE_LEN..];
-        let ciphertext = &ciphertext[..ciphertext.len() - AESGCM_NONCE_LEN];
+        let unreserved_len = ciphertext.len() - 1;
+        let nonce = &ciphertext[unreserved_len - AESGCM_NONCE_LEN..unreserved_len];
+        let ciphertext = &ciphertext[..unreserved_len - AESGCM_NONCE_LEN];
         self.decrypt_blob_aesgcmsiv(&self.blob_key, nonce, ciphertext)
     }
 

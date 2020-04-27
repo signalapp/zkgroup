@@ -107,7 +107,7 @@ export default class ClientZkGroupCipher {
     let paddedPlaintext = new FFICompatArray(plaintext.length+4);
     this.myArrayCopy(plaintext, 0, paddedPlaintext, 4, plaintext.length);
 
-    const newContents = FFICompatArray(paddedPlaintext.length+28);
+    const newContents = FFICompatArray(paddedPlaintext.length+29);
 
     const groupSecretParamsContents = this.groupSecretParams.getContents();
 
@@ -121,7 +121,7 @@ export default class ClientZkGroupCipher {
   }
 
   decryptBlob(blobCiphertext: FFICompatArrayType): FFICompatArrayType {
-    const newContents = new FFICompatArray(blobCiphertext.length-28);
+    const newContents = new FFICompatArray(blobCiphertext.length-29);
 
     const groupSecretParamsContents = this.groupSecretParams.getContents()
 

@@ -1,4 +1,3 @@
-
 import codegen_java
 import codegen_ffiapi
 import codegen_ffiapijava
@@ -113,14 +112,14 @@ def define_classes():
             """    let profile_key_version = profile_key.get_profile_key_version(uuid);""")
     classes.append(c)
 
-    c = ClassDescriptor("profile_key_commitment", "profiles", "api::profiles::ProfileKeyCommitment", 96)
+    c = ClassDescriptor("profile_key_commitment", "profiles", "api::profiles::ProfileKeyCommitment", 97)
 
     classes.append(c)
 
     c = ClassDescriptor("group_master_key", "groups", "api::groups::GroupMasterKey", 32, check_valid_contents=False)
     classes.append(c)
 
-    c = ClassDescriptor("group_secret_params", "groups", "api::groups::GroupSecretParams", 352, runtime_error_on_serialize=True)
+    c = ClassDescriptor("group_secret_params", "groups", "api::groups::GroupSecretParams", 289, runtime_error_on_serialize=True)
 
     c.add_static_method("generate_deterministic", "class", "group_secret_params", [("class", "randomness")],
             """    let group_secret_params = api::groups::GroupSecretParams::generate(randomness);""" )   
@@ -160,17 +159,17 @@ def define_classes():
              """    let blob_ciphertext = match group_secret_params.encrypt_blob(randomness, plaintext) {
          Ok(result) => result,
          Err(_) => return FFI_RETURN_INPUT_ERROR,
-     };""", return_size_increment=+28)
+     };""", return_size_increment=+29)
 
     c.add_method("decrypt_blob", "byte[]", "plaintext", [("byte[]", "blob_ciphertext")], 
             """    let plaintext = match group_secret_params.decrypt_blob(blob_ciphertext) {
         Ok(result) => result,
         Err(_) => return FFI_RETURN_INPUT_ERROR,
-    };""", return_size_increment=-28)
+    };""", return_size_increment=-29)
 
     classes.append(c)
 
-    c = ClassDescriptor("server_secret_params", "", "api::ServerSecretParams", 896, runtime_error_on_serialize=True)
+    c = ClassDescriptor("server_secret_params", "", "api::ServerSecretParams", 769, runtime_error_on_serialize=True)
     c.add_static_method("generate_deterministic", "class", "server_secret_params", [("class", "randomness")],
             """    let server_secret_params = api::ServerSecretParams::generate(randomness);""")
 
@@ -248,13 +247,13 @@ def define_classes():
 
     classes.append(c)
 
-    c = ClassDescriptor("group_public_params", "groups", "api::groups::GroupPublicParams", 96)
+    c = ClassDescriptor("group_public_params", "groups", "api::groups::GroupPublicParams", 97)
     c.add_method("get_group_identifier", "class", "group_identifier", [],
             """    let group_identifier = group_public_params.get_group_identifier();""")
 
     classes.append(c)
 
-    c = ClassDescriptor("server_public_params", "", "api::ServerPublicParams", 160, runtime_error_on_serialize=True)
+    c = ClassDescriptor("server_public_params", "", "api::ServerPublicParams", 161, runtime_error_on_serialize=True)
 
     c.add_method("verify_signature", "boolean", "None", [("byte[]", "message"), ("class", "notary_signature")],
             """    match server_public_params.verify_signature(message, notary_signature) {
@@ -264,34 +263,34 @@ def define_classes():
 
     classes.append(c)
 
-    c = ClassDescriptor("auth_credential_response", "auth", "api::auth::AuthCredentialResponse", 392)
+    c = ClassDescriptor("auth_credential_response", "auth", "api::auth::AuthCredentialResponse", 361)
     classes.append(c)
 
-    c = ClassDescriptor("auth_credential", "auth", "api::auth::AuthCredential", 404)
+    c = ClassDescriptor("auth_credential", "auth", "api::auth::AuthCredential", 342)
     classes.append(c)
 
-    c = ClassDescriptor("auth_credential_presentation", "auth", "api::auth::AuthCredentialPresentation", 620)
+    c = ClassDescriptor("auth_credential_presentation", "auth", "api::auth::AuthCredentialPresentation", 493)
     c.add_method("get_uuid_ciphertext", "class", "uuid_ciphertext", [],
             """    let uuid_ciphertext = auth_credential_presentation.get_uuid_ciphertext();""");
     c.add_method("get_redemption_time", "int", "redemption_time", [],
             """    let redemption_time = auth_credential_presentation.get_redemption_time();""");
     classes.append(c)
 
-    c = ClassDescriptor("profile_key_credential_request_context", "profiles", "api::profiles::ProfileKeyCredentialRequestContext", 600)
+    c = ClassDescriptor("profile_key_credential_request_context", "profiles", "api::profiles::ProfileKeyCredentialRequestContext", 473)
     c.add_method("get_request", "class", "profile_key_credential_request", [],
             """    let profile_key_credential_request = profile_key_credential_request_context.get_request();""" )
 
     classes.append(c)
-    c = ClassDescriptor("profile_key_credential_request", "profiles", "api::profiles::ProfileKeyCredentialRequest", 424)
+    c = ClassDescriptor("profile_key_credential_request", "profiles", "api::profiles::ProfileKeyCredentialRequest", 329)
     classes.append(c)
 
-    c = ClassDescriptor("profile_key_credential_response", "profiles", "api::profiles::ProfileKeyCredentialResponse", 520)
+    c = ClassDescriptor("profile_key_credential_response", "profiles", "api::profiles::ProfileKeyCredentialResponse", 457)
     classes.append(c)
 
-    c = ClassDescriptor("profile_key_credential", "profiles", "api::profiles::ProfileKeyCredential", 144)
+    c = ClassDescriptor("profile_key_credential", "profiles", "api::profiles::ProfileKeyCredential", 145)
     classes.append(c)
 
-    c = ClassDescriptor("profile_key_credential_presentation", "profiles", "api::profiles::ProfileKeyCredentialPresentation", 936)
+    c = ClassDescriptor("profile_key_credential_presentation", "profiles", "api::profiles::ProfileKeyCredentialPresentation", 713)
     c.add_method("get_uuid_ciphertext", "class", "uuid_ciphertext", [],
             """    let uuid_ciphertext = profile_key_credential_presentation.get_uuid_ciphertext();""");
     c.add_method("get_profile_key_ciphertext", "class", "profile_key_ciphertext", [],
@@ -299,10 +298,10 @@ def define_classes():
 
     classes.append(c)
 
-    c = ClassDescriptor("uuid_ciphertext", "groups", "api::groups::UuidCiphertext", 64)
+    c = ClassDescriptor("uuid_ciphertext", "groups", "api::groups::UuidCiphertext", 65)
     classes.append(c)
 
-    c = ClassDescriptor("profile_key_ciphertext", "groups", "api::groups::ProfileKeyCiphertext", 64)
+    c = ClassDescriptor("profile_key_ciphertext", "groups", "api::groups::ProfileKeyCiphertext", 65)
     classes.append(c)
 
     c = ClassDescriptor("randomness", "", "simple_types::RandomnessBytes", 32, no_class=True)

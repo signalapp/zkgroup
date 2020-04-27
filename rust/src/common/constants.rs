@@ -7,33 +7,33 @@
 
 #![allow(non_snake_case)]
 
-pub const NUM_AUTH_CRED_ATTRIBUTES: usize = 4;
-pub const NUM_PROFILE_KEY_CRED_ATTRIBUTES: usize = 6;
+pub const NUM_AUTH_CRED_ATTRIBUTES: usize = 3;
+pub const NUM_PROFILE_KEY_CRED_ATTRIBUTES: usize = 4;
 
 pub const AES_KEY_LEN: usize = 32;
 pub const AESGCM_NONCE_LEN: usize = 12;
-pub const AESGCM_TAG_LEN: usize = 12;
+pub const AESGCM_TAG_LEN: usize = 16;
 pub const GROUP_MASTER_KEY_LEN: usize = 32;
-pub const GROUP_SECRET_PARAMS_LEN: usize = 352;
-pub const GROUP_PUBLIC_PARAMS_LEN: usize = 96;
+pub const GROUP_SECRET_PARAMS_LEN: usize = 289;
+pub const GROUP_PUBLIC_PARAMS_LEN: usize = 97;
 pub const GROUP_IDENTIFIER_LEN: usize = 32;
-pub const AUTH_CREDENTIAL_LEN: usize = 404;
-pub const AUTH_CREDENTIAL_PRESENTATION_LEN: usize = 620;
-pub const AUTH_CREDENTIAL_RESPONSE_LEN: usize = 392;
-pub const CLIENT_CREDENTIAL_MANAGER_LEN: usize = 256;
+pub const AUTH_CREDENTIAL_LEN: usize = 342;
+pub const AUTH_CREDENTIAL_PRESENTATION_LEN: usize = 493;
+pub const AUTH_CREDENTIAL_RESPONSE_LEN: usize = 361;
 pub const PROFILE_KEY_LEN: usize = 32;
-pub const PROFILE_KEY_CIPHERTEXT_LEN: usize = 64;
-pub const PROFILE_KEY_COMMITMENT_LEN: usize = 96;
-pub const PROFILE_KEY_CREDENTIAL_LEN: usize = 144;
-pub const PROFILE_KEY_CREDENTIAL_PRESENTATION_LEN: usize = 936;
-pub const PROFILE_KEY_CREDENTIAL_REQUEST_LEN: usize = 424;
-pub const PROFILE_KEY_CREDENTIAL_REQUEST_CONTEXT_LEN: usize = 600;
-pub const PROFILE_KEY_CREDENTIAL_RESPONSE_LEN: usize = 520;
+pub const PROFILE_KEY_CIPHERTEXT_LEN: usize = 65;
+pub const PROFILE_KEY_COMMITMENT_LEN: usize = 97;
+pub const PROFILE_KEY_CREDENTIAL_LEN: usize = 145;
+pub const PROFILE_KEY_CREDENTIAL_PRESENTATION_LEN: usize = 713;
+pub const PROFILE_KEY_CREDENTIAL_REQUEST_LEN: usize = 329;
+pub const PROFILE_KEY_CREDENTIAL_REQUEST_CONTEXT_LEN: usize = 473;
+pub const PROFILE_KEY_CREDENTIAL_RESPONSE_LEN: usize = 457;
 pub const PROFILE_KEY_VERSION_LEN: usize = 32;
 pub const PROFILE_KEY_VERSION_ENCODED_LEN: usize = 64;
-pub const SERVER_SECRET_PARAMS_LEN: usize = 896;
-pub const SERVER_PUBLIC_PARAMS_LEN: usize = 160;
-pub const UUID_CIPHERTEXT_LEN: usize = 64;
+pub const RESERVED_LEN: usize = 1;
+pub const SERVER_SECRET_PARAMS_LEN: usize = 769;
+pub const SERVER_PUBLIC_PARAMS_LEN: usize = 161;
+pub const UUID_CIPHERTEXT_LEN: usize = 65;
 pub const RANDOMNESS_LEN: usize = 32;
 pub const SIGNATURE_LEN: usize = 64;
 pub const UUID_LEN: usize = 16;

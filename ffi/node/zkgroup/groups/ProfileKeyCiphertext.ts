@@ -8,7 +8,7 @@ import Native, { FFI_RETURN_OK, FFI_RETURN_INPUT_ERROR } from '../internal/Nativ
 
 export default class ProfileKeyCiphertext extends ByteArray {
 
-  static SIZE = 64;
+  static SIZE = 65;
 
   constructor(contents: FFICompatArrayType) {
     super(contents, ProfileKeyCiphertext.SIZE, true);

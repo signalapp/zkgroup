@@ -16,7 +16,7 @@ import org.signal.zkgroup.internal.Native;
 
 public final class AuthCredentialResponse extends ByteArray {
 
-  public static final int SIZE = 392;
+  public static final int SIZE = 361;
 
   public AuthCredentialResponse(byte[] contents) throws InvalidInputException {
     super(contents, SIZE);

@@ -7,10 +7,12 @@
 
 #![allow(non_snake_case)]
 
+use crate::common::simple_types::*;
 use crate::crypto;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct ProfileKeyCiphertext {
+    pub(crate) reserved: ReservedBytes,
     pub(crate) ciphertext: crypto::profile_key_encryption::Ciphertext,
 }

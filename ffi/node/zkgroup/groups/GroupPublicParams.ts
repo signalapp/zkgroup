@@ -12,7 +12,7 @@ import GroupIdentifier from './GroupIdentifier';
 
 export default class GroupPublicParams extends ByteArray {
 
-  static SIZE = 96;
+  static SIZE = 97;
 
   constructor(contents: FFICompatArrayType) {
     super(contents, GroupPublicParams.SIZE, true);

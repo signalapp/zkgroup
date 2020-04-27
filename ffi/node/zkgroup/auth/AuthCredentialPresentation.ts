@@ -10,7 +10,7 @@ import UuidCiphertext from '../groups/UuidCiphertext';
 
 export default class AuthCredentialPresentation extends ByteArray {
 
-  static SIZE = 620;
+  static SIZE = 493;
 
   constructor(contents: FFICompatArrayType) {
     super(contents, AuthCredentialPresentation.SIZE, true);

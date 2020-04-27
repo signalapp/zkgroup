@@ -16,7 +16,7 @@ import org.signal.zkgroup.internal.Native;
 
 public final class GroupPublicParams extends ByteArray {
 
-  public static final int SIZE = 96;
+  public static final int SIZE = 97;
 
   public GroupPublicParams(byte[] contents) throws InvalidInputException {
     super(contents, SIZE);

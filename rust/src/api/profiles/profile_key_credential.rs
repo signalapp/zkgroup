@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct ProfileKeyCredential {
+    pub(crate) reserved: ReservedBytes,
     pub(crate) credential: crypto::credentials::ProfileKeyCredential,
     pub(crate) uid_bytes: UidBytes,
     pub(crate) profile_key_bytes: ProfileKeyBytes,

@@ -17,6 +17,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct ServerSecretParams {
+    pub(crate) reserved: ReservedBytes,
     pub(crate) auth_credentials_key_pair: crypto::credentials::KeyPair,
     pub(crate) profile_key_credentials_key_pair: crypto::credentials::KeyPair,
     sig_key_pair: crypto::signature::KeyPair,
@@ -24,6 +25,7 @@ pub struct ServerSecretParams {
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct ServerPublicParams {
+    pub(crate) reserved: ReservedBytes,
     pub(crate) auth_credentials_public_key: crypto::credentials::PublicKey,
     pub(crate) profile_key_credentials_public_key: crypto::credentials::PublicKey,
     sig_public_key: crypto::signature::PublicKey,
@@ -32,7 +34,7 @@ pub struct ServerPublicParams {
 impl ServerSecretParams {
     pub fn generate(randomness: RandomnessBytes) -> Self {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Random_ServerSecretParams_Generate",
+            b"Signal_ZKGroup_20200424_Random_ServerSecretParams_Generate",
             &randomness,
         );
 
@@ -43,6 +45,7 @@ impl ServerSecretParams {
         let sig_key_pair = crypto::signature::KeyPair::generate(&mut sho);
 
         Self {
+            reserved: Default::default(),
             auth_credentials_key_pair,
             profile_key_credentials_key_pair,
             sig_key_pair,
@@ -51,6 +54,7 @@ impl ServerSecretParams {
 
     pub fn get_public_params(&self) -> ServerPublicParams {
         ServerPublicParams {
+            reserved: Default::default(),
             auth_credentials_public_key: self.auth_credentials_key_pair.get_public_key(),
             profile_key_credentials_public_key: self
                 .profile_key_credentials_key_pair
@@ -65,7 +69,7 @@ impl ServerSecretParams {
         message: &[u8],
     ) -> Result<NotarySignatureBytes, ZkGroupError> {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Random_ServerSecretParams_Sign",
+            b"Signal_ZKGroup_20200424_Random_ServerSecretParams_Sign",
             &randomness,
         );
         self.sig_key_pair.sign(message, &mut sho)
@@ -78,7 +82,7 @@ impl ServerSecretParams {
         redemption_time: RedemptionTime,
     ) -> api::auth::AuthCredentialResponse {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Random_ServerSecretParams_IssueAuthCredential",
+            b"Signal_ZKGroup_20200424_Random_ServerSecretParams_IssueAuthCredential",
             &randomness,
         );
 
@@ -93,7 +97,11 @@ impl ServerSecretParams {
             redemption_time,
             &mut sho,
         );
-        api::auth::AuthCredentialResponse { credential, proof }
+        api::auth::AuthCredentialResponse {
+            reserved: Default::default(),
+            credential,
+            proof,
+        }
     }
 
     pub fn verify_auth_credential_presentation(
@@ -135,7 +143,7 @@ impl ServerSecretParams {
         commitment: api::profiles::ProfileKeyCommitment,
     ) -> Result<api::profiles::ProfileKeyCredentialResponse, ZkGroupError> {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Random_ServerSecretParams_IssueProfileKeyCredential",
+            b"Signal_ZKGroup_20200424_Random_ServerSecretParams_IssueProfileKeyCredential",
             &randomness,
         );
 
@@ -165,6 +173,7 @@ impl ServerSecretParams {
         );
 
         Ok(api::profiles::ProfileKeyCredentialResponse {
+            reserved: Default::default(),
             blinded_credential: blinded_credential_with_secret_nonce
                 .get_blinded_profile_key_credential(),
             proof,
@@ -196,6 +205,7 @@ impl ServerPublicParams {
         )?;
 
         Ok(api::auth::AuthCredential {
+            reserved: Default::default(),
             credential: response.credential,
             server_public_params: *self,
             uid,
@@ -210,7 +220,7 @@ impl ServerPublicParams {
         auth_credential: api::auth::AuthCredential,
     ) -> api::auth::AuthCredentialPresentation {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Random_ServerPublicParams_CreateAuthCredentialPresentation",
+            b"Signal_ZKGroup_20200424_Random_ServerPublicParams_CreateAuthCredentialPresentation",
             &randomness,
         );
 
@@ -227,6 +237,7 @@ impl ServerPublicParams {
         );
 
         api::auth::AuthCredentialPresentation {
+            reserved: Default::default(),
             proof,
             ciphertext: uuid_ciphertext.ciphertext,
             redemption_time: auth_credential.redemption_time,
@@ -240,26 +251,30 @@ impl ServerPublicParams {
         profile_key: api::profiles::ProfileKey,
     ) -> api::profiles::ProfileKeyCredentialRequestContext {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Random_ServerPublicParams_CreateProfileKeyCredentialRequestContext",
+            b"Signal_ZKGroup_20200424_Random_ServerPublicParams_CreateProfileKeyCredentialRequestContext",
             &randomness,
         );
         let profile_key_struct =
             crypto::profile_key_struct::ProfileKeyStruct::new(profile_key.bytes, uid_bytes);
 
-        let commitment = crypto::profile_key_commitment::Commitment::new(profile_key_struct);
+        let commitment_with_secret_nonce =
+            crypto::profile_key_commitment::CommitmentWithSecretNonce::new(
+                profile_key_struct,
+                uid_bytes,
+            );
 
         let key_pair = crypto::profile_key_credential_request::KeyPair::generate(&mut sho);
         let ciphertext_with_secret_nonce = key_pair.encrypt(profile_key_struct, &mut sho);
 
         let proof = crypto::proofs::ProfileKeyCredentialRequestProof::new(
             key_pair,
-            profile_key_struct,
             ciphertext_with_secret_nonce,
-            commitment,
+            commitment_with_secret_nonce,
             &mut sho,
         );
 
         api::profiles::ProfileKeyCredentialRequestContext {
+            reserved: Default::default(),
             uid_bytes,
             profile_key_bytes: profile_key_struct.bytes,
             key_pair,
@@ -286,6 +301,7 @@ impl ServerPublicParams {
             .decrypt_blinded_profile_key_credential(response.blinded_credential);
 
         Ok(api::profiles::ProfileKeyCredential {
+            reserved: Default::default(),
             credential,
             uid_bytes: context.uid_bytes,
             profile_key_bytes: context.profile_key_bytes,
@@ -299,7 +315,7 @@ impl ServerPublicParams {
         profile_key_credential: api::profiles::ProfileKeyCredential,
     ) -> api::profiles::ProfileKeyCredentialPresentation {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Random_ServerPublicParams_CreateProfileKeyCredentialPresentation",
+            b"Signal_ZKGroup_20200424_Random_ServerPublicParams_CreateProfileKeyCredentialPresentation",
             &randomness,
         );
 
@@ -326,6 +342,7 @@ impl ServerPublicParams {
         );
 
         api::profiles::ProfileKeyCredentialPresentation {
+            reserved: Default::default(),
             proof,
             uid_enc_ciphertext: uuid_ciphertext.ciphertext,
             profile_key_enc_ciphertext: profile_key_ciphertext.ciphertext,

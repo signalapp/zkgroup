@@ -18,7 +18,7 @@ import org.signal.zkgroup.internal.Native;
 
 public final class AuthCredentialPresentation extends ByteArray {
 
-  public static final int SIZE = 620;
+  public static final int SIZE = 493;
 
   public AuthCredentialPresentation(byte[] contents) throws InvalidInputException {
     super(contents, SIZE);

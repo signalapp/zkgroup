@@ -16,7 +16,7 @@ import org.signal.zkgroup.internal.Native;
 
 public final class ProfileKeyCiphertext extends ByteArray {
 
-  public static final int SIZE = 64;
+  public static final int SIZE = 65;
 
   public ProfileKeyCiphertext(byte[] contents) throws InvalidInputException {
     super(contents, SIZE);

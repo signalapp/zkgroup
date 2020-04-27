@@ -11,6 +11,7 @@ use crate::common::errors::*;
 use crate::common::sho::*;
 use crate::common::simple_types::*;
 use crate::crypto::profile_key_struct;
+use curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT;
 use curve25519_dalek::ristretto::RistrettoPoint;
 use curve25519_dalek::scalar::Scalar;
 use serde::{Deserialize, Serialize};
@@ -23,16 +24,14 @@ use ZkGroupError::*;
 
 #[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SystemParams {
-    pub(crate) G_b: RistrettoPoint,
-    pub(crate) G_b0: RistrettoPoint,
     pub(crate) G_b1: RistrettoPoint,
+    pub(crate) G_b2: RistrettoPoint,
 }
 
 #[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct KeyPair {
-    pub(crate) b: Scalar,
-    pub(crate) b0: Scalar,
     pub(crate) b1: Scalar,
+    pub(crate) b2: Scalar,
     pub(crate) B: RistrettoPoint,
 }
 
@@ -50,27 +49,24 @@ pub struct Ciphertext {
 impl SystemParams {
     pub fn generate() -> Self {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Constant_ProfileKeyEncryption_SystemParams_Generate",
+            b"Signal_ZKGroup_20200424_Constant_ProfileKeyEncryption_SystemParams_Generate",
             b"",
         );
-        let G_b = sho.get_point();
-        let G_b0 = sho.get_point();
         let G_b1 = sho.get_point();
-        SystemParams { G_b, G_b0, G_b1 }
+        let G_b2 = sho.get_point();
+        SystemParams { G_b1, G_b2 }
     }
 
     pub fn get_hardcoded() -> SystemParams {
         bincode::deserialize::<SystemParams>(&SystemParams::SYSTEM_HARDCODED).unwrap()
     }
 
-    const SYSTEM_HARDCODED: [u8; 96] = [
-        0xd6, 0xcf, 0x95, 0x95, 0xd2, 0xe3, 0x20, 0x31, 0xa9, 0x78, 0x6a, 0x78, 0xc2, 0xa2, 0x8c,
-        0xc6, 0x95, 0x60, 0xca, 0xa1, 0x30, 0xee, 0x5e, 0xfc, 0x1e, 0x94, 0xae, 0x2c, 0x73, 0x77,
-        0x9b, 0x58, 0xc0, 0x19, 0x1c, 0x72, 0xf3, 0x34, 0xd4, 0xef, 0x31, 0x55, 0xba, 0x1f, 0x8d,
-        0x39, 0x9f, 0x64, 0xcb, 0x83, 0x4c, 0xf5, 0x89, 0xf0, 0xd0, 0x8f, 0x4e, 0xe6, 0x81, 0x96,
-        0x36, 0xa2, 0xd, 0x68, 0x2a, 0x18, 0x77, 0xa5, 0x4d, 0x24, 0x3f, 0x7e, 0x89, 0xd9, 0x8c,
-        0xa4, 0xae, 0xde, 0xfa, 0x22, 0xe9, 0x1b, 0x49, 0x34, 0x1f, 0x60, 0x8d, 0x6, 0x78, 0xa3,
-        0x44, 0x34, 0x5f, 0xd6, 0x26, 0x76,
+    const SYSTEM_HARDCODED: [u8; 64] = [
+        0xf6, 0xba, 0xa3, 0x17, 0xce, 0x18, 0x39, 0xc9, 0x3d, 0x61, 0x7e, 0xc, 0xd8, 0x37, 0xd1,
+        0x9d, 0xa9, 0xc8, 0xa4, 0xc5, 0x20, 0xbf, 0x7c, 0x51, 0xb1, 0xe6, 0xc2, 0xcb, 0x2a, 0x4,
+        0x9c, 0x61, 0x2e, 0x1, 0x75, 0x89, 0x4c, 0x87, 0x30, 0xb2, 0x3, 0xab, 0x3b, 0xd9, 0x8e,
+        0xcb, 0x2d, 0x81, 0xab, 0xac, 0xb6, 0x5f, 0x8a, 0x61, 0x24, 0xf4, 0x97, 0x71, 0xd1, 0x4a,
+        0x98, 0x52, 0x12, 0xc,
     ];
 }
 
@@ -78,17 +74,16 @@ impl KeyPair {
     pub fn derive_from(sho: &mut Sho) -> Self {
         let system = SystemParams::get_hardcoded();
 
-        let b = sho.get_scalar();
-        let b0 = sho.get_scalar();
         let b1 = sho.get_scalar();
+        let b2 = sho.get_scalar();
 
-        let B = b * system.G_b + b0 * system.G_b0 + b1 * system.G_b1;
-        KeyPair { b, b0, b1, B }
+        let B = b1 * system.G_b1 + b2 * system.G_b2;
+        KeyPair { b1, b2, B }
     }
 
     pub fn encrypt(&self, profile_key: profile_key_struct::ProfileKeyStruct) -> Ciphertext {
         let E_B1 = self.calc_E_B1(profile_key);
-        let E_B2 = (self.b * E_B1) + profile_key.M4;
+        let E_B2 = (self.b2 * E_B1) + profile_key.M4;
         Ciphertext { E_B1, E_B2 }
     }
 
@@ -99,11 +94,13 @@ impl KeyPair {
         ciphertext: Ciphertext,
         uid_bytes: UidBytes,
     ) -> Result<profile_key_struct::ProfileKeyStruct, ZkGroupError> {
-        let M4 = ciphertext.E_B2 - (self.b * ciphertext.E_B1);
+        if ciphertext.E_B1 == RISTRETTO_BASEPOINT_POINT {
+            return Err(DecryptionFailure);
+        }
+        let M4 = ciphertext.E_B2 - (self.b2 * ciphertext.E_B1);
         let (mask, candidates) = M4.decode_253_bits();
 
-        let m6 = profile_key_struct::ProfileKeyStruct::calc_m6(M4);
-        let target_M5 = (self.b0 + self.b1 * m6).invert() * ciphertext.E_B1;
+        let target_M3 = self.b1.invert() * ciphertext.E_B1;
 
         let mut retval: profile_key_struct::ProfileKeyStruct = Default::default();
         let mut n_found = 0;
@@ -121,14 +118,9 @@ impl KeyPair {
                 if (j & 1) == 1 {
                     pk[31] |= 0x40;
                 }
-                let M5 = profile_key_struct::ProfileKeyStruct::calc_M5(pk, uid_bytes);
-                let candidate_retval = profile_key_struct::ProfileKeyStruct {
-                    bytes: pk,
-                    M4,
-                    M5,
-                    m6,
-                };
-                let found = M5.ct_eq(&target_M5) & is_valid_fe;
+                let M3 = profile_key_struct::ProfileKeyStruct::calc_M3(pk, uid_bytes);
+                let candidate_retval = profile_key_struct::ProfileKeyStruct { bytes: pk, M3, M4 };
+                let found = M3.ct_eq(&target_M3) & is_valid_fe;
                 retval.conditional_assign(&candidate_retval, found);
                 n_found += found.unwrap_u8();
             }
@@ -141,7 +133,7 @@ impl KeyPair {
     }
 
     fn calc_E_B1(&self, profile_key: profile_key_struct::ProfileKeyStruct) -> RistrettoPoint {
-        (self.b0 + self.b1 * profile_key.m6) * profile_key.M5
+        self.b1 * profile_key.M3
     }
 
     pub fn get_public_key(&self) -> PublicKey {
@@ -167,7 +159,6 @@ mod tests {
 
         // Test serialize of key_pair
         let key_pair_bytes = bincode::serialize(&key_pair).unwrap();
-        assert!(key_pair_bytes.len() == 128);
         match bincode::deserialize::<KeyPair>(&key_pair_bytes[0..key_pair_bytes.len() - 1]) {
             Err(_) => (),
             _ => assert!(false),
@@ -185,15 +176,15 @@ mod tests {
         assert!(ciphertext_bytes.len() == 64);
         let ciphertext2: Ciphertext = bincode::deserialize(&ciphertext_bytes).unwrap();
         assert!(ciphertext == ciphertext2);
-        //println!("ciphertext_bytes = {:#x?}", ciphertext_bytes);
+        println!("ciphertext_bytes = {:#x?}", ciphertext_bytes);
         assert!(
             ciphertext_bytes
                 == vec![
-                    0x6e, 0x62, 0x9e, 0xa, 0x43, 0x8e, 0x13, 0xfc, 0x2e, 0x43, 0xf9, 0x35, 0xd8,
-                    0x58, 0xcf, 0xd8, 0xac, 0x11, 0x5, 0xe0, 0x4f, 0xb5, 0x95, 0xff, 0x62, 0xd2,
-                    0x59, 0xe3, 0x7a, 0xb2, 0x76, 0x49, 0x58, 0xa5, 0x49, 0xd8, 0x6c, 0xbd, 0x2c,
-                    0xc4, 0x9e, 0xcb, 0x2c, 0xa4, 0x8e, 0xc4, 0xa3, 0x4b, 0x6, 0xd3, 0x94, 0xd2,
-                    0xaf, 0x49, 0x27, 0x93, 0x67, 0x18, 0x63, 0x9, 0xa8, 0x53, 0x7a, 0x6c,
+                    0x56, 0x18, 0xcb, 0x4c, 0x7d, 0x72, 0x1e, 0x1, 0x2b, 0x22, 0xf0, 0x77, 0xef,
+                    0x12, 0x64, 0xf6, 0xb1, 0x43, 0xbb, 0x59, 0x7a, 0x1d, 0x66, 0x5a, 0x70, 0xaa,
+                    0x84, 0x24, 0x5f, 0x24, 0x6d, 0x20, 0xba, 0xdb, 0x97, 0x47, 0x4a, 0x56, 0xf4,
+                    0xb5, 0x36, 0x1a, 0xec, 0xa9, 0xd1, 0x18, 0xb7, 0x0, 0x4e, 0x14, 0x9, 0x71,
+                    0x99, 0xa, 0xab, 0x2a, 0xf2, 0x43, 0x2d, 0x3f, 0x8f, 0x7d, 0x21, 0x3a,
                 ]
         );
 

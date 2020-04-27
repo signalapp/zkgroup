@@ -22,7 +22,7 @@ pub struct ProfileKey {
 impl ProfileKey {
     pub fn generate(randomness: RandomnessBytes) -> Self {
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_Random_ProfileKey_Generate",
+            b"Signal_ZKGroup_20200424_Random_ProfileKey_Generate",
             &randomness,
         );
         let mut bytes = [0u8; PROFILE_KEY_LEN];
@@ -40,8 +40,12 @@ impl ProfileKey {
 
     pub fn get_commitment(&self, uid_bytes: UidBytes) -> api::profiles::ProfileKeyCommitment {
         let profile_key = crypto::profile_key_struct::ProfileKeyStruct::new(self.bytes, uid_bytes);
-        let commitment = crypto::profile_key_commitment::Commitment::new(profile_key);
-        api::profiles::ProfileKeyCommitment { commitment }
+        let commitment =
+            crypto::profile_key_commitment::CommitmentWithSecretNonce::new(profile_key, uid_bytes);
+        api::profiles::ProfileKeyCommitment {
+            reserved: Default::default(),
+            commitment: commitment.get_profile_key_commitment(),
+        }
     }
 
     pub fn get_profile_key_version(&self, uid_bytes: UidBytes) -> api::profiles::ProfileKeyVersion {
@@ -49,7 +53,7 @@ impl ProfileKey {
         combined_array[..PROFILE_KEY_LEN].copy_from_slice(&self.bytes);
         combined_array[PROFILE_KEY_LEN..].copy_from_slice(&uid_bytes);
         let mut sho = Sho::new(
-            b"Signal_ZKGroup_20200416_ProfileKeyAndUid_ProfileKey_GetProfileKeyVersion",
+            b"Signal_ZKGroup_20200424_ProfileKeyAndUid_ProfileKey_GetProfileKeyVersion",
             &combined_array,
         );
 

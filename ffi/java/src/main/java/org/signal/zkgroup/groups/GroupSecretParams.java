@@ -17,7 +17,7 @@ import org.signal.zkgroup.internal.Native;
 
 public final class GroupSecretParams extends ByteArray {
 
-  public static final int SIZE = 352;
+  public static final int SIZE = 289;
 
   public static GroupSecretParams generate() {
     return generate(new SecureRandom());

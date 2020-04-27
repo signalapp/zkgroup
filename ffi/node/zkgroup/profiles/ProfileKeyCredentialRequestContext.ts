@@ -11,7 +11,7 @@ import ProfileKeyCredentialRequest from './ProfileKeyCredentialRequest';
 
 export default class ProfileKeyCredentialRequestContext extends ByteArray {
 
-  static SIZE = 600;
+  static SIZE = 473;
 
   constructor(contents: FFICompatArrayType) {
     super(contents, ProfileKeyCredentialRequestContext.SIZE, true);
