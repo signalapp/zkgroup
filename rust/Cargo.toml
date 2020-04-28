@@ -7,7 +7,7 @@
 
 [package]
 name = "zkgroup"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Trevor Perrin <trevp@signal.org>"]
 edition = "2018"
 description = "A zero-knowledge group library"

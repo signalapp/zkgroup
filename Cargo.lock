@@ -833,7 +833,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "zkgroup"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "aead 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "aes-gcm-siv 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
