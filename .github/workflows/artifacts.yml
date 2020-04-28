@@ -32,6 +32,7 @@ jobs:
           ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk-bundle/
         
       - name: Build Linux
+        working-directory: ffi/node
         run: make libzkgroup
 
       - name: Upload Android
@@ -47,7 +48,7 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/release/libzkgroup.so
+          file: ffi/node/libzkgroup.so
           asset_name: libzkgroup.so
           tag: ${{ github.ref }}
           overwrite: true
@@ -62,13 +63,14 @@ jobs:
         run: git config --global url."https://${{ secrets.REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com".insteadOf ssh://git@github.com
 
       - name: Build
+        working-directory: ffi/node
         run: make libzkgroup
       
       - name: Upload
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/release/zkgroup.dll
+          file: ffi/node/libzkgroup.dll
           asset_name: libzkgroup.dll
           tag: ${{ github.ref }}
           overwrite: true
@@ -90,8 +92,9 @@ jobs:
 
       - name: Build
         run: |
+          cd ffi/node
           make libzkgroup
-          cd ffi/swift
+          cd ../../ffi/swift
           make
           cd ZKGroup
           zip -r libzkgroup-ios.zip libzkgroup
@@ -100,7 +103,7 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/release/libzkgroup.dylib
+          file: ffi/node/libzkgroup.dylib
           asset_name: libzkgroup.dylib
           tag: ${{ github.ref }}
           overwrite: true

@@ -10,14 +10,17 @@ endif
 ifeq ($(DETECTED_OS),Windows)
 	SOURCE_LIB = zkgroup.dll
 	TARGET_LIB = libzkgroup.dll
+	RUSTFLAGS = '-C link-arg=-s -C target-feature=+crt-static'
 endif
 ifeq ($(DETECTED_OS),Linux)
 	SOURCE_LIB = libzkgroup.so
 	TARGET_LIB = libzkgroup.so
+	RUSTFLAGS='-C link-arg=-s'
 endif
 ifeq ($(DETECTED_OS),Darwin)
 	SOURCE_LIB = libzkgroup.dylib
 	TARGET_LIB = libzkgroup.dylib
+	RUSTFLAGS='-C link-arg=-s'
 endif
 
 default: libzkgroup
@@ -27,7 +30,7 @@ clean:
 	rm -r node_modules
 
 libzkgroup: FORCE
-	RUSTFLAGS='-C link-arg=-s' cargo build --manifest-path=$(ZKGROUP_RUST_DIR)/Cargo.toml --release
+	RUSTFLAGS=$(RUSTFLAGS) cargo build --manifest-path=$(ZKGROUP_RUST_DIR)/Cargo.toml --release
 	rm -f $(TARGET_LIB)
 	mv $(ZKGROUP_TARGET_DIR)/release/$(SOURCE_LIB) $(TARGET_LIB)
 
