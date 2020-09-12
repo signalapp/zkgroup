@@ -51,6 +51,8 @@ jobs:
       - name: Test Node
         working-directory: ffi/node
         run: |
+          rustup target add i686-pc-windows-msvc
+          rustup target add aarch64-pc-windows-msvc
           make libzkgroup
           make test
 
