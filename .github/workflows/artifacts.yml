@@ -64,14 +64,35 @@ jobs:
 
       - name: Build
         working-directory: ffi/node
-        run: make libzkgroup
-      
-      - name: Upload
+        run: |
+          rustup target add i686-pc-windows-msvc
+          rustup target add aarch64-pc-windows-msvc
+          make libzkgroup
+
+      - name: Upload x86
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup.dll
-          asset_name: libzkgroup.dll
+          file: ffi/node/libzkgroup_x86.dll
+          asset_name: libzkgroup_x86.dll
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload x64
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ffi/node/libzkgroup_x64.dll
+          asset_name: libzkgroup_x64.dll
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload arm64
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ffi/node/libzkgroup_arm64.dll
+          asset_name: libzkgroup_arm64.dll
           tag: ${{ github.ref }}
           overwrite: true
 

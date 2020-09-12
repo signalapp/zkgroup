@@ -9,7 +9,9 @@
     "dist/index.d.ts",
     "zkgroup/modules",
     "libzkgroup.dylib",
-    "libzkgroup.dll",
+    "libzkgroup_x86.dll",
+    "libzkgroup_x64.dll",
+    "libzkgroup_arm64.dll",
     "libzkgroup.so"
   ],
   "scripts": {
