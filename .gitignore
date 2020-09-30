@@ -6,6 +6,7 @@ ffi/java/.idea
 ffi/java/build
 ffi/java/out
 ffi/java/src/main/resources
+ffi/java/src/otherPlatformLibraries/resources
 *.iml
 ffi/node/node_modules
 ffi/node/dist
