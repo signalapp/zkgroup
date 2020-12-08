@@ -13,3 +13,4 @@ ffi/node/dist
 .DS_Store
 .project
 .settings
+/local.properties
