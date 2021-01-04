@@ -48,9 +48,21 @@ jobs:
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk/
           ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk-bundle/
 
+      - name: Read .nvmrc
+        id: node_version
+        working-directory: ffi/node
+        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.node_version.outputs.NODE_VERSION }}'
+
       - name: Test Node
         working-directory: ffi/node
         run: |
+          npm --version
+          node --version
           make libzkgroup
           make test
 

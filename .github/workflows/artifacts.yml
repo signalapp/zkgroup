@@ -30,10 +30,23 @@ jobs:
           RUSTFLAGS: -C link-arg=-s
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk/
           ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk-bundle/
-        
+
+      - name: Read .nvmrc
+        id: node_version
+        working-directory: ffi/node
+        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.node_version.outputs.NODE_VERSION }}'
+
       - name: Build Linux
         working-directory: ffi/node
-        run: make libzkgroup
+        run: |
+          npm --version
+          node --version
+          make libzkgroup
 
       - name: Upload Android
         uses: svenstaro/upload-release-action@v1-release
@@ -62,9 +75,22 @@ jobs:
       - name: Configure git to use HTTPS
         run: git config --global url."https://${{ secrets.REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com".insteadOf ssh://git@github.com
 
+      - name: Read .nvmrc
+        id: node_version
+        working-directory: ffi/node
+        run: echo "::set-output name=NODE_VERSION::$(cat .nvmrc)"
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.node_version.outputs.NODE_VERSION }}'
+
       - name: Build
         working-directory: ffi/node
-        run: make libzkgroup
+        run: |
+          npm --version
+          node --version
+          make libzkgroup
       
       - name: Upload
         uses: svenstaro/upload-release-action@v1-release
@@ -90,8 +116,20 @@ jobs:
           cd ffi/swift
           make install_build_dependencies
 
+      - name: Read .nvmrc
+        id: node_version
+        working-directory: ffi/node
+        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.node_version.outputs.NODE_VERSION }}'
+
       - name: Build
         run: |
+          npm --version
+          node --version
           cd ffi/node
           make libzkgroup
           cd ../../ffi/swift
