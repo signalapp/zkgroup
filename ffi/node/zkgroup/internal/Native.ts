@@ -15,9 +15,12 @@ export const RANDOM_LENGTH = 32;
 const rootPath = resolve(`${__dirname}/../../../`);
 
 // We need to do things differently if we are in an app.asar, common in the Electron world
-const libraryPath = join(rootPath.replace('app.asar', 'app.asar.unpacked'), 'libzkgroup');
+let libraryPath = join(rootPath.replace('app.asar', 'app.asar.unpacked'), 'libzkgroup');
 
-
+if (process.platform === 'win32') {
+  // On Windows, multiple architectures are supported (x64, x86, arm64)
+  libraryPath = join(rootPath.replace('app.asar', 'app.asar.unpacked'), 'libzkgroup_' + process.arch);
+}
 interface NativeCalls {
   FFI_ProfileKey_getCommitment: (param1: FFICompatArrayType, param2: UInt32Type, param3: FFICompatArrayType, param4: UInt32Type, param5: FFICompatArrayType, param6: UInt32Type) => IntType,
   FFI_ProfileKey_getProfileKeyVersion: (param1: FFICompatArrayType, param2: UInt32Type, param3: FFICompatArrayType, param4: UInt32Type, param5: FFICompatArrayType, param6: UInt32Type) => IntType,
