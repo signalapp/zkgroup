@@ -53,9 +53,14 @@ impl SystemParams {
     }
 
     pub fn get_hardcoded() -> SystemParams {
-        bincode::deserialize::<SystemParams>(&SystemParams::SYSTEM_HARDCODED).unwrap()
+        let G_a1 = RistrettoPoint::from_uniform_bytes(&[183, 127, 127, 108, 153, 239, 168, 155, 209, 237, 248, 201, 191, 87, 223, 136, 72, 193, 240, 224, 17, 142, 24, 236, 12, 152, 225, 13, 7, 226, 93, 178, 26, 132, 185, 238, 164, 85, 219, 121, 15, 140, 6, 205, 122, 77, 14, 55, 224, 241, 127, 203, 115, 157, 91, 167, 87, 201, 205, 39, 253, 144, 152, 189]);
+        let G_a2 = RistrettoPoint::from_uniform_bytes(&[230, 136, 32, 233, 179, 107, 166, 20, 55, 89, 207, 117, 95, 17, 11, 92, 253, 100, 26, 106, 87, 242, 221, 69, 27, 253, 18, 250, 122, 252, 170, 100, 59, 201, 190, 219, 70, 199, 147, 51, 208, 3, 237, 38, 231, 165, 0, 5, 238, 49, 37, 229, 145, 4, 37, 81, 90, 41, 38, 53, 217, 67, 230, 196]);
+        SystemParams { G_a1, G_a2 }
     }
 
+    pub fn get_hardcoded_old() -> SystemParams {
+        bincode::deserialize::<SystemParams>(&SystemParams::SYSTEM_HARDCODED).unwrap()
+    }
     const SYSTEM_HARDCODED: [u8; 64] = [
         0xa6, 0x32, 0x4c, 0x36, 0x8d, 0xf7, 0x34, 0x69, 0x11, 0x47, 0x98, 0x13, 0x48, 0xb6, 0xe7,
         0xeb, 0x42, 0xc3, 0x30, 0x7e, 0x71, 0x1b, 0x6c, 0x7e, 0xcc, 0xd3, 0x3, 0x2d, 0x45, 0x69,
