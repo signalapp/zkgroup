@@ -135,6 +135,9 @@ jobs:
           make install_build_dependencies
 
       - name: Build
+        env:
+          # Needed until hosted macos-11.0 runners become available
+          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
         run: |
           cd ffi/node
           make libzkgroup CARGO_TARGET=x86_64-apple-darwin NODE_ARCH=x64
