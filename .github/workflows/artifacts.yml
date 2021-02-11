@@ -56,12 +56,12 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
-      - name: Upload Linux x86
+      - name: Upload Linux ia32
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup-x86.so
-          asset_name: libzkgroup-x86.so
+          file: ffi/node/libzkgroup-ia32.so
+          asset_name: libzkgroup-ia32.so
           tag: ${{ github.ref }}
           overwrite: true
 
@@ -92,12 +92,12 @@ jobs:
           make libzkgroup CARGO_TARGET=aarch64-pc-windows-msvc NODE_ARCH=arm64
           make libzkgroup CARGO_TARGET=i686-pc-windows-msvc NODE_ARCH=ia32
 
-      - name: Upload x86
+      - name: Upload ia32
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup-x86.dll
-          asset_name: libzkgroup-x86.dll
+          file: ffi/node/libzkgroup-ia32.dll
+          asset_name: libzkgroup-ia32.dll
           tag: ${{ github.ref }}
           overwrite: true
 
