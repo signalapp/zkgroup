@@ -8,11 +8,15 @@
     "dist/zkgroup",
     "dist/index.d.ts",
     "zkgroup/modules",
-    "libzkgroup.dylib",
-    "libzkgroup_x86.dll",
-    "libzkgroup_x64.dll",
-    "libzkgroup_arm64.dll",
-    "libzkgroup.so"
+    "libzkgroup-x86.dylib",
+    "libzkgroup-x64.dylib",
+    "libzkgroup-arm64.dylib",
+    "libzkgroup-x86.dll",
+    "libzkgroup-x64.dll",
+    "libzkgroup-arm64.dll",
+    "libzkgroup-x86.so",
+    "libzkgroup-x64.so",
+    "libzkgroup-arm64.so"
   ],
   "scripts": {
     "build": "tsc",
