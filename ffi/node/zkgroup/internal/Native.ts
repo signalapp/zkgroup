@@ -1,6 +1,7 @@
 import { join, resolve } from 'path';
 import { Library } from 'ffi-napi';
 import FFICompatArray, { FFICompatArrayType } from './FFICompatArray';
+import * as process from 'process';
 
 type IntType = number;
 type UInt32Type = number;
@@ -15,12 +16,8 @@ export const RANDOM_LENGTH = 32;
 const rootPath = resolve(`${__dirname}/../../../`);
 
 // We need to do things differently if we are in an app.asar, common in the Electron world
-let libraryPath = join(rootPath.replace('app.asar', 'app.asar.unpacked'), 'libzkgroup');
-
-if (process.platform === 'win32') {
-  // On Windows, multiple architectures are supported (x64, x86, arm64)
-  libraryPath = join(rootPath.replace('app.asar', 'app.asar.unpacked'), 'libzkgroup_' + process.arch);
-}
+const arch = process.env.npm_config_arch || process.arch;
+let libraryPath = join(rootPath.replace('app.asar', 'app.asar.unpacked'), 'libzkgroup-' + arch);
 interface NativeCalls {
   FFI_ProfileKey_getCommitment: (param1: FFICompatArrayType, param2: UInt32Type, param3: FFICompatArrayType, param4: UInt32Type, param5: FFICompatArrayType, param6: UInt32Type) => IntType,
   FFI_ProfileKey_getProfileKeyVersion: (param1: FFICompatArrayType, param2: UInt32Type, param3: FFICompatArrayType, param4: UInt32Type, param5: FFICompatArrayType, param6: UInt32Type) => IntType,

@@ -17,7 +17,7 @@ jobs:
       - name: Install pre-requisites
         run: |
           cargo install cargo-ndk
-          rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android
+          rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android aarch64-unknown-linux-gnu i686-unknown-linux-gnu
 
       - name: Build Android
         run: |
@@ -33,7 +33,10 @@ jobs:
         
       - name: Build Linux
         working-directory: ffi/node
-        run: make libzkgroup
+        run: |
+          make libzkgroup CARGO_TARGET=x86_64-unknown-linux-gnu NODE_ARCH=x64
+          make libzkgroup CARGO_TARGET=aarch64-unknown-linux-gnu NODE_ARCH=arm64
+          make libzkgroup CARGO_TARGET=i686-unknown-linux-gnu NODE_ARCH=ia32
 
       - name: Upload Android
         uses: svenstaro/upload-release-action@v1-release
@@ -44,12 +47,30 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
-      - name: Upload Linux
+      - name: Upload Linux x64
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup.so
-          asset_name: libzkgroup.so
+          file: ffi/node/libzkgroup-x64.so
+          asset_name: libzkgroup-x64.so
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload Linux x86
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ffi/node/libzkgroup-x86.so
+          asset_name: libzkgroup-x86.so
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload Linux arm64
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ffi/node/libzkgroup-arm64.so
+          asset_name: libzkgroup-arm64.so
           tag: ${{ github.ref }}
           overwrite: true
 
@@ -67,14 +88,16 @@ jobs:
         run: |
           rustup target add i686-pc-windows-msvc
           rustup target add aarch64-pc-windows-msvc
-          make libzkgroup
+          make libzkgroup CARGO_TARGET=x86_64-pc-windows-msvc NODE_ARCH=x64
+          make libzkgroup CARGO_TARGET=aarch64-pc-windows-msvc NODE_ARCH=arm64
+          make libzkgroup CARGO_TARGET=i686-pc-windows-msvc NODE_ARCH=ia32
 
       - name: Upload x86
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup_x86.dll
-          asset_name: libzkgroup_x86.dll
+          file: ffi/node/libzkgroup-x86.dll
+          asset_name: libzkgroup-x86.dll
           tag: ${{ github.ref }}
           overwrite: true
 
@@ -82,8 +105,8 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup_x64.dll
-          asset_name: libzkgroup_x64.dll
+          file: ffi/node/libzkgroup-x64.dll
+          asset_name: libzkgroup-x64.dll
           tag: ${{ github.ref }}
           overwrite: true
 
@@ -91,8 +114,8 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup_arm64.dll
-          asset_name: libzkgroup_arm64.dll
+          file: ffi/node/libzkgroup-arm64.dll
+          asset_name: libzkgroup-arm64.dll
           tag: ${{ github.ref }}
           overwrite: true
 
@@ -107,25 +130,35 @@ jobs:
 
       - name: Install pre-requisites
         run: |
-          rustup target add aarch64-apple-ios x86_64-apple-ios armv7-apple-ios armv7s-apple-ios
+          rustup target add aarch64-apple-ios x86_64-apple-ios armv7-apple-ios armv7s-apple-ios aarch64-apple-darwin
           cd ffi/swift
           make install_build_dependencies
 
       - name: Build
         run: |
           cd ffi/node
-          make libzkgroup
+          make libzkgroup CARGO_TARGET=x86_64-apple-darwin NODE_ARCH=x64
+          make libzkgroup CARGO_TARGET=aarch64-apple-darwin NODE_ARCH=arm64
           cd ../../ffi/swift
           make
           cd ZKGroup
           zip -r libzkgroup-ios.zip libzkgroup
       
-      - name: Upload macOS
+      - name: Upload macOS x64
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup.dylib
-          asset_name: libzkgroup.dylib
+          file: ffi/node/libzkgroup-x64.dylib
+          asset_name: libzkgroup-x64.dylib
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload macOS arm64
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ffi/node/libzkgroup-arm64.dylib
+          asset_name: libzkgroup-arm64.dylib
           tag: ${{ github.ref }}
           overwrite: true
 
