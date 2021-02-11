@@ -25,7 +25,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 cargo install cbindgen
 cargo install cargo-lipo
 
-rustup target add aarch64-apple-ios x86_64-apple-ios armv7-apple-ios armv7s-apple-ios
+rustup target add aarch64-apple-ios x86_64-apple-ios
 ```
 
 `rustup show` should indicate that the `x86_64-apple-darwin` is the host and stable, as well as having all the targets above listed.
