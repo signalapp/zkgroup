@@ -28,7 +28,7 @@
   "dependencies": {
     "ffi-napi": "^4.0.1",
     "ref-array-napi": "1.2.0",
-    "ref-napi": "1.4.2"
+    "ref-napi": "^3.0.1"
   },
   "devDependencies": {
     "@types/chai": "4.2.7",
