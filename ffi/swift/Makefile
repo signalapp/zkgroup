@@ -15,6 +15,7 @@ libzkgroup_ios.a: FORCE
 
 install_build_dependencies:
 	cargo install --version 0.9.0 cbindgen
-	cargo install --version 3.0.1 cargo-lipo
+	# FIXME: We're only using stable because one of cargo-lipo's dependencies doesn't support our pinned toolchain. When we update our pinned toolchain, we can undo this.
+	cargo +stable install --version 3.0.1 cargo-lipo
 
 FORCE:
