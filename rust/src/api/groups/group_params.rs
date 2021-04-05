@@ -196,7 +196,7 @@ impl GroupSecretParams {
         plaintext: &[u8],
     ) -> Result<Vec<u8>, ZkGroupError> {
         let key = GenericArray::from_slice(key);
-        let aead_cipher = Aes256GcmSiv::new(*key);
+        let aead_cipher = Aes256GcmSiv::new(&*key);
         let nonce = GenericArray::from_slice(nonce);
         match aead_cipher.encrypt(nonce, plaintext) {
             Ok(ciphertext_vec) => Ok(ciphertext_vec),
@@ -215,7 +215,7 @@ impl GroupSecretParams {
             return Err(ZkGroupError::DecryptionFailure);
         }
         let key = GenericArray::from_slice(key);
-        let aead_cipher = Aes256GcmSiv::new(*key);
+        let aead_cipher = Aes256GcmSiv::new(&*key);
         let nonce = GenericArray::from_slice(nonce);
         match aead_cipher.decrypt(nonce, ciphertext) {
             Ok(plaintext_vec) => Ok(plaintext_vec),

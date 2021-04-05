@@ -23,8 +23,8 @@ serde = { version = "1.0.106", features = ["derive"] }
 sha2 = "0.8.0"
 jni = { version = "0.16.0", default-features = false }
 hex = "0.4.0"
-aead = "0.2.0"
-aes-gcm-siv = "0.4.1"
+aead = "0.3.0"
+aes-gcm-siv = "0.9.0"
 
 [dependencies.curve25519-dalek]
 features = ["std", "serde", "alloc"]
