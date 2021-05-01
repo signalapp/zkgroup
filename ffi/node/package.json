@@ -8,9 +8,9 @@
     "dist/zkgroup",
     "dist/index.d.ts",
     "zkgroup/modules",
-    "libzkgroup.dylib",
-    "libzkgroup.dll",
-    "libzkgroup.so"
+    "libzkgroup-*.dylib",
+    "libzkgroup-*.dll",
+    "libzkgroup-*.so"
   ],
   "scripts": {
     "build": "tsc",
