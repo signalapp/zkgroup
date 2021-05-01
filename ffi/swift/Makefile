@@ -10,7 +10,7 @@ zkgroup.h: FORCE
 	cbindgen --lang c $(ZKGROUP_RUST_DIR) -o ZKGroup/libzkgroup/zkgroup.h
 
 libzkgroup_ios.a: FORCE
-	cargo lipo --manifest-path=$(ZKGROUP_RUST_DIR)/Cargo.toml --release --targets=aarch64-apple-ios,x86_64-apple-ios,armv7-apple-ios,armv7s-apple-ios
+	cargo lipo --manifest-path=$(ZKGROUP_RUST_DIR)/Cargo.toml --release --targets=aarch64-apple-ios,x86_64-apple-ios
 	mv $(ZKGROUP_TARGET_DIR)/universal/release/libzkgroup.a ZKGroup/libzkgroup/libzkgroup_ios.a
 
 install_build_dependencies:
