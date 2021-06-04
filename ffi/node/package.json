@@ -7,7 +7,6 @@
   "files": [
     "dist/zkgroup",
     "dist/index.d.ts",
-    "zkgroup/modules",
     "libzkgroup-*.dylib",
     "libzkgroup-*.dll",
     "libzkgroup-*.so"
@@ -20,6 +19,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/ffi-napi": "^4.0.1",
+    "@types/ref-napi": "^3.0.1",
     "ffi-napi": "4.0.3",
     "ref-array-napi": "1.2.2",
     "ref-napi": "3.0.3"
