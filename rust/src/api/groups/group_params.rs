@@ -267,12 +267,12 @@ mod tests {
             .encrypt_blob_aesgcmsiv(&key_vec, &nonce_vec, &plaintext_vec)
             .unwrap();
 
-        assert!(&calc_ciphertext[..ciphertext_vec.len()] == &ciphertext_vec[..]);
+        assert!(calc_ciphertext[..ciphertext_vec.len()] == ciphertext_vec[..]);
 
         let calc_plaintext = group_secret_params
             .decrypt_blob_aesgcmsiv(&key_vec, &nonce_vec, &calc_ciphertext)
             .unwrap();
-        assert!(&calc_plaintext[..] == &plaintext_vec[..]);
+        assert!(calc_plaintext[..] == plaintext_vec[..]);
     }
 
     #[test]
@@ -308,11 +308,11 @@ mod tests {
             .encrypt_blob_aesgcmsiv(&key_vec, &nonce_vec, &plaintext_vec)
             .unwrap();
 
-        assert!(&calc_ciphertext[..ciphertext_vec.len()] == &ciphertext_vec[..]);
+        assert!(calc_ciphertext[..ciphertext_vec.len()] == ciphertext_vec[..]);
 
         let calc_plaintext = group_secret_params
             .decrypt_blob_aesgcmsiv(&key_vec, &nonce_vec, &calc_ciphertext)
             .unwrap();
-        assert!(&calc_plaintext[..] == &plaintext_vec[..]);
+        assert!(calc_plaintext[..] == plaintext_vec[..]);
     }
 }

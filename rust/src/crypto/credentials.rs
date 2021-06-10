@@ -181,7 +181,7 @@ impl SystemParams {
 
 impl KeyPair {
     pub fn generate(sho: &mut Sho, num_attributes: usize) -> Self {
-        if num_attributes > 4 || num_attributes < 3 {
+        if !(3..=4).contains(&num_attributes) {
             panic!();
         }
 

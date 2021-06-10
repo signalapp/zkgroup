@@ -521,7 +521,7 @@ impl AuthCredentialPresentationProof {
         point_args.add("C_y3", C_y3);
         point_args.add("G_y3", credentials_system.G_y3);
 
-        match Self::get_poksho_statement().verify_proof(&poksho_proof, &point_args, &[]) {
+        match Self::get_poksho_statement().verify_proof(poksho_proof, &point_args, &[]) {
             Err(_) => Err(ZkGroupError::ProofVerificationFailure),
             Ok(_) => Ok(()),
         }
@@ -723,7 +723,7 @@ impl ProfileKeyCredentialPresentationProof {
         point_args.add("C_y3", C_y3);
         point_args.add("G_y3", credentials_system.G_y3);
 
-        match Self::get_poksho_statement().verify_proof(&poksho_proof, &point_args, &[]) {
+        match Self::get_poksho_statement().verify_proof(poksho_proof, &point_args, &[]) {
             Err(_) => Err(ZkGroupError::ProofVerificationFailure),
             Ok(_) => Ok(()),
         }

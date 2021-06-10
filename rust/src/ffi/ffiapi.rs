@@ -30,7 +30,7 @@ pub extern "C" fn FFI_ProfileKey_getCommitment(
             slice::from_raw_parts_mut(profileKeyCommitmentOut, profileKeyCommitmentLen as usize)
         };
 
-        simpleapi::ProfileKey_getCommitment(profile_key, &uuid, profile_key_commitment)
+        simpleapi::ProfileKey_getCommitment(profile_key, uuid, profile_key_commitment)
     });
 
     match result {
@@ -56,7 +56,7 @@ pub extern "C" fn FFI_ProfileKey_getProfileKeyVersion(
             slice::from_raw_parts_mut(profileKeyVersionOut, profileKeyVersionLen as usize)
         };
 
-        simpleapi::ProfileKey_getProfileKeyVersion(profile_key, &uuid, profile_key_version)
+        simpleapi::ProfileKey_getProfileKeyVersion(profile_key, uuid, profile_key_version)
     });
 
     match result {
@@ -98,7 +98,7 @@ pub extern "C" fn FFI_GroupSecretParams_generateDeterministic(
             slice::from_raw_parts_mut(groupSecretParamsOut, groupSecretParamsLen as usize)
         };
 
-        simpleapi::GroupSecretParams_generateDeterministic(&randomness, group_secret_params)
+        simpleapi::GroupSecretParams_generateDeterministic(randomness, group_secret_params)
     });
 
     match result {
@@ -121,7 +121,7 @@ pub extern "C" fn FFI_GroupSecretParams_deriveFromMasterKey(
             slice::from_raw_parts_mut(groupSecretParamsOut, groupSecretParamsLen as usize)
         };
 
-        simpleapi::GroupSecretParams_deriveFromMasterKey(&group_master_key, group_secret_params)
+        simpleapi::GroupSecretParams_deriveFromMasterKey(group_master_key, group_secret_params)
     });
 
     match result {
@@ -209,7 +209,7 @@ pub extern "C" fn FFI_GroupSecretParams_encryptUuid(
         let uuid_ciphertext: &mut [u8] =
             unsafe { slice::from_raw_parts_mut(uuidCiphertextOut, uuidCiphertextLen as usize) };
 
-        simpleapi::GroupSecretParams_encryptUuid(group_secret_params, &uuid, uuid_ciphertext)
+        simpleapi::GroupSecretParams_encryptUuid(group_secret_params, uuid, uuid_ciphertext)
     });
 
     match result {
@@ -234,7 +234,7 @@ pub extern "C" fn FFI_GroupSecretParams_decryptUuid(
             unsafe { slice::from_raw_parts(uuidCiphertext, uuidCiphertextLen as usize) };
         let uuid: &mut [u8] = unsafe { slice::from_raw_parts_mut(uuidOut, uuidLen as usize) };
 
-        simpleapi::GroupSecretParams_decryptUuid(group_secret_params, &uuid_ciphertext, uuid)
+        simpleapi::GroupSecretParams_decryptUuid(group_secret_params, uuid_ciphertext, uuid)
     });
 
     match result {
@@ -266,8 +266,8 @@ pub extern "C" fn FFI_GroupSecretParams_encryptProfileKey(
 
         simpleapi::GroupSecretParams_encryptProfileKey(
             group_secret_params,
-            &profile_key,
-            &uuid,
+            profile_key,
+            uuid,
             profile_key_ciphertext,
         )
     });
@@ -301,8 +301,8 @@ pub extern "C" fn FFI_GroupSecretParams_decryptProfileKey(
 
         simpleapi::GroupSecretParams_decryptProfileKey(
             group_secret_params,
-            &profile_key_ciphertext,
-            &uuid,
+            profile_key_ciphertext,
+            uuid,
             profile_key,
         )
     });
@@ -335,8 +335,8 @@ pub extern "C" fn FFI_GroupSecretParams_encryptBlobDeterministic(
 
         simpleapi::GroupSecretParams_encryptBlobDeterministic(
             group_secret_params,
-            &randomness,
-            &plaintext,
+            randomness,
+            plaintext,
             blob_ciphertext,
         )
     });
@@ -364,7 +364,7 @@ pub extern "C" fn FFI_GroupSecretParams_decryptBlob(
         let plaintext: &mut [u8] =
             unsafe { slice::from_raw_parts_mut(plaintextOut, plaintextLen as usize) };
 
-        simpleapi::GroupSecretParams_decryptBlob(group_secret_params, &blob_ciphertext, plaintext)
+        simpleapi::GroupSecretParams_decryptBlob(group_secret_params, blob_ciphertext, plaintext)
     });
 
     match result {
@@ -387,7 +387,7 @@ pub extern "C" fn FFI_ServerSecretParams_generateDeterministic(
             slice::from_raw_parts_mut(serverSecretParamsOut, serverSecretParamsLen as usize)
         };
 
-        simpleapi::ServerSecretParams_generateDeterministic(&randomness, server_secret_params)
+        simpleapi::ServerSecretParams_generateDeterministic(randomness, server_secret_params)
     });
 
     match result {
@@ -459,8 +459,8 @@ pub extern "C" fn FFI_ServerSecretParams_signDeterministic(
 
         simpleapi::ServerSecretParams_signDeterministic(
             server_secret_params,
-            &randomness,
-            &message,
+            randomness,
+            message,
             notary_signature,
         )
     });
@@ -496,9 +496,9 @@ pub extern "C" fn FFI_ServerPublicParams_receiveAuthCredential(
 
         simpleapi::ServerPublicParams_receiveAuthCredential(
             server_public_params,
-            &uuid,
+            uuid,
             redemption_time,
-            &auth_credential_response,
+            auth_credential_response,
             auth_credential,
         )
     });
@@ -540,9 +540,9 @@ pub extern "C" fn FFI_ServerPublicParams_createAuthCredentialPresentationDetermi
 
         simpleapi::ServerPublicParams_createAuthCredentialPresentationDeterministic(
             server_public_params,
-            &randomness,
-            &group_secret_params,
-            &auth_credential,
+            randomness,
+            group_secret_params,
+            auth_credential,
             auth_credential_presentation,
         )
     });
@@ -583,9 +583,9 @@ pub extern "C" fn FFI_ServerPublicParams_createProfileKeyCredentialRequestContex
 
         simpleapi::ServerPublicParams_createProfileKeyCredentialRequestContextDeterministic(
             server_public_params,
-            &randomness,
-            &uuid,
-            &profile_key,
+            randomness,
+            uuid,
+            profile_key,
             profile_key_credential_request_context,
         )
     });
@@ -628,8 +628,8 @@ pub extern "C" fn FFI_ServerPublicParams_receiveProfileKeyCredential(
 
         simpleapi::ServerPublicParams_receiveProfileKeyCredential(
             server_public_params,
-            &profile_key_credential_request_context,
-            &profile_key_credential_response,
+            profile_key_credential_request_context,
+            profile_key_credential_response,
             profile_key_credential,
         )
     });
@@ -672,9 +672,9 @@ pub extern "C" fn FFI_ServerPublicParams_createProfileKeyCredentialPresentationD
 
         simpleapi::ServerPublicParams_createProfileKeyCredentialPresentationDeterministic(
             server_public_params,
-            &randomness,
-            &group_secret_params,
-            &profile_key_credential,
+            randomness,
+            group_secret_params,
+            profile_key_credential,
             profile_key_credential_presentation,
         )
     });
@@ -713,8 +713,8 @@ pub extern "C" fn FFI_ServerSecretParams_issueAuthCredentialDeterministic(
 
         simpleapi::ServerSecretParams_issueAuthCredentialDeterministic(
             server_secret_params,
-            &randomness,
-            &uuid,
+            randomness,
+            uuid,
             redemption_time,
             auth_credential_response,
         )
@@ -749,8 +749,8 @@ pub extern "C" fn FFI_ServerSecretParams_verifyAuthCredentialPresentation(
 
         simpleapi::ServerSecretParams_verifyAuthCredentialPresentation(
             server_secret_params,
-            &group_public_params,
-            &auth_credential_presentation,
+            group_public_params,
+            auth_credential_presentation,
         )
     });
 
@@ -799,10 +799,10 @@ pub extern "C" fn FFI_ServerSecretParams_issueProfileKeyCredentialDeterministic(
 
         simpleapi::ServerSecretParams_issueProfileKeyCredentialDeterministic(
             server_secret_params,
-            &randomness,
-            &profile_key_credential_request,
-            &uuid,
-            &profile_key_commitment,
+            randomness,
+            profile_key_credential_request,
+            uuid,
+            profile_key_commitment,
             profile_key_credential_response,
         )
     });
@@ -836,8 +836,8 @@ pub extern "C" fn FFI_ServerSecretParams_verifyProfileKeyCredentialPresentation(
 
         simpleapi::ServerSecretParams_verifyProfileKeyCredentialPresentation(
             server_secret_params,
-            &group_public_params,
-            &profile_key_credential_presentation,
+            group_public_params,
+            profile_key_credential_presentation,
         )
     });
 
@@ -923,8 +923,8 @@ pub extern "C" fn FFI_ServerPublicParams_verifySignature(
 
         simpleapi::ServerPublicParams_verifySignature(
             server_public_params,
-            &message,
-            &notary_signature,
+            message,
+            notary_signature,
         )
     });
 

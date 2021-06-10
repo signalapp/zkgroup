@@ -103,7 +103,7 @@ mod tests {
         message[0] ^= 1;
         match key_pair2.get_public_key().verify(&message, signature) {
             Err(SignatureVerificationFailure) => (),
-            _ => assert!(false),
+            _ => unreachable!(),
         }
 
         println!("signature = {:#x?}", &signature[..]);
@@ -115,6 +115,6 @@ mod tests {
             0xe1, 0x10, 0xee, 0xb7, 0x72, 0xb, 0x6,
         ];
 
-        assert!(&signature[..] == &signature_result[..]);
+        assert!(signature[..] == signature_result[..]);
     }
 }

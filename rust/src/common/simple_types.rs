@@ -32,6 +32,6 @@ fn test_encode_scalar() {
     let s_bytes = [0xFF; 32];
     match bincode::deserialize::<Scalar>(&s_bytes) {
         Err(_) => (),
-        Ok(_) => assert!(false),
+        Ok(_) => unreachable!(),
     }
 }

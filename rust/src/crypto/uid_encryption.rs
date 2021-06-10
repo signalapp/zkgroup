@@ -128,7 +128,7 @@ mod tests {
         let key_pair_bytes = bincode::serialize(&key_pair).unwrap();
         match bincode::deserialize::<KeyPair>(&key_pair_bytes[0..key_pair_bytes.len() - 1]) {
             Err(_) => (),
-            _ => assert!(false),
+            _ => unreachable!(),
         };
         let key_pair2: KeyPair = bincode::deserialize(&key_pair_bytes).unwrap();
         assert!(key_pair == key_pair2);
