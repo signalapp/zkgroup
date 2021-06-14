@@ -43,7 +43,7 @@ ENV SHELL /bin/bash
 WORKDIR /home/zkgroup
 
 # Rust setup...
-ARG RUST_TOOLCHAIN=1.41.1
+COPY rust-toolchain rust-toolchain
 ARG RUST_TOOLCHAIN_SHA=ad1f8b5199b3b9e231472ed7aa08d2e5d1d539198a15c5b1e53c746aad81d27b
 ARG CARGO_NDK_VERSION=1.0.0
 ENV PATH="/home/zkgroup/.cargo/bin:${PATH}"
@@ -51,7 +51,7 @@ ENV PATH="/home/zkgroup/.cargo/bin:${PATH}"
 RUN    curl -f https://static.rust-lang.org/rustup/archive/1.21.1/x86_64-unknown-linux-gnu/rustup-init -o /tmp/rustup-init \
     && echo "${RUST_TOOLCHAIN_SHA} /tmp/rustup-init" | sha256sum -c - \
     && chmod a+x /tmp/rustup-init \
-    && /tmp/rustup-init -y --profile minimal --default-toolchain "${RUST_TOOLCHAIN}" \
+    && /tmp/rustup-init -y --profile minimal --default-toolchain "$(cat rust-toolchain)" \
     && rm -rf /tmp/rustup-init \
     && rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android \
     && cargo install --version ${CARGO_NDK_VERSION} cargo-ndk
