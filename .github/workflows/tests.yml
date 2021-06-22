@@ -30,11 +30,8 @@ jobs:
       
       - name: Run clippy
         run: |
-          rustup toolchain install ${{ env.NIGHTLY_VERSION }}
-          rustup component add clippy --toolchain ${{ env.NIGHTLY_VERSION }}
-          cargo +${{ env.NIGHTLY_VERSION }} clippy -- -D warnings
-        env:
-          NIGHTLY_VERSION: nightly-2020-04-14       
+          rustup component add clippy
+          cargo clippy -- -D warnings
 
       - name: Test Rust
         run: cargo test

@@ -11,8 +11,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run rustfmt
         run: |
-          rustup toolchain install ${{ env.NIGHTLY_VERSION }}
-          rustup component add rustfmt --toolchain ${{ env.NIGHTLY_VERSION }}
-          cargo +${{ env.NIGHTLY_VERSION }} fmt -- --check
-        env:
-          NIGHTLY_VERSION: nightly-2020-04-12
+          rustup component add rustfmt
+          cargo fmt -- --check
