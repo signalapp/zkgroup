@@ -101,20 +101,14 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
-  build_macOS_iOS:
-    name: Build macOS + iOS
+  build_macOS:
+    name: Build macOS (Node)
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
 
       - name: Configure git to use HTTPS
         run: git config --global url."https://${{ secrets.REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com".insteadOf ssh://git@github.com
-
-      - name: Install pre-requisites
-        run: |
-          rustup target add aarch64-apple-ios x86_64-apple-ios
-          cd ffi/swift
-          make install_build_dependencies
 
       - name: Read .nvmrc
         id: node_version
@@ -132,10 +126,6 @@ jobs:
           node --version
           cd ffi/node
           make libzkgroup
-          cd ../../ffi/swift
-          make
-          cd ZKGroup
-          zip -r libzkgroup-ios.zip libzkgroup
       
       - name: Upload macOS
         uses: svenstaro/upload-release-action@v1-release
@@ -143,14 +133,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ffi/node/libzkgroup-x64.dylib
           asset_name: libzkgroup-x64.dylib
-          tag: ${{ github.ref }}
-          overwrite: true
-
-      - name: Upload iOS
-        uses: svenstaro/upload-release-action@v1-release
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/swift/ZKGroup/libzkgroup-ios.zip
-          asset_name: libzkgroup-ios.zip
           tag: ${{ github.ref }}
           overwrite: true
