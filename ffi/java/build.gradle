@@ -66,15 +66,15 @@ task testableJar(type: Jar) {
 
     def extraResources = ['libzkgroup.dll', 'libzkgroup.dylib']
     def extraResourcesDir = 'src/otherPlatformLibraries/resources'
-    def urls = extraResources.collect { name ->
-        'https://github.com/signalapp/zkgroup/releases/download/v' + project.version + '/' + name
-    }
 
     doFirst {
         mkdir extraResourcesDir
-        download {
-            src urls
-            dest extraResourcesDir
+        extraResources.each { name ->
+            def artifact = name.replace('libzkgroup', 'libzkgroup-x64')
+            download {
+                src 'https://github.com/signalapp/zkgroup/releases/download/v' + project.version + '/' + artifact
+                dest extraResourcesDir + '/' + name
+            }
         }
     }
 }
