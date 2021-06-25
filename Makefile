@@ -60,11 +60,11 @@ docker_test: docker_build
 		sh -c "cd src; ./gradlew test"
 
 
-SONATYPE_USERNAME     ?=
-SONATYPE_PASSWORD     ?=
-KEYRING_FILE          ?=
-SIGNING_KEY           ?=
-SIGNING_KEY_PASSSWORD ?=
+SONATYPE_USERNAME    ?=
+SONATYPE_PASSWORD    ?=
+KEYRING_FILE         ?=
+SIGNING_KEY          ?=
+SIGNING_KEY_PASSWORD ?=
 
 publish: DOCKER_EXTRA = $(shell [ -L build ] && P=$$(readlink build) && echo -v $$P/:$$P )
 publish: KEYRING_VOLUME := $(dir $(KEYRING_FILE))
