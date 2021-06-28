@@ -28,7 +28,7 @@ task makeAndroid(type:Exec) {
 
 task makeAll() {
   group 'Rust'
-  description 'Build the android libraries'
+  description 'Build all libraries'
 
   dependsOn 'makeMac', 'makeServer', 'makeAndroid'
 }
