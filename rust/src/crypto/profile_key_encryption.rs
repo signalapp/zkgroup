@@ -58,16 +58,10 @@ impl SystemParams {
     }
 
     pub fn get_hardcoded() -> SystemParams {
-        bincode::deserialize::<SystemParams>(&SystemParams::SYSTEM_HARDCODED).unwrap()
+        let G_b1 = RistrettoPoint::from_uniform_bytes(&[244, 94, 240, 129, 130, 81, 96, 23, 245, 231, 110, 46, 198, 110, 199, 195, 123, 17, 2, 174, 133, 143, 34, 26, 113, 29, 176, 8, 204, 126, 221, 61, 26, 137, 205, 65, 201, 206, 159, 96, 7, 33, 185, 86, 21, 165, 235, 208, 93, 243, 169, 83, 208, 67, 176, 107, 174, 64, 137, 126, 185, 208, 61, 50]);
+        let G_b2 = RistrettoPoint::from_uniform_bytes(&[41, 59, 89, 94, 166, 78, 191, 238, 79, 121, 188, 80, 42, 227, 91, 91, 243, 76, 63, 17, 12, 177, 49, 127, 255, 32, 120, 110, 210, 201, 234, 28, 71, 105, 217, 189, 201, 156, 247, 89, 87, 229, 125, 9, 194, 5, 114, 57, 44, 195, 130, 8, 65, 204, 47, 111, 122, 27, 75, 1, 172, 219, 148, 42]);
+        SystemParams { G_b1, G_b2 }
     }
-
-    const SYSTEM_HARDCODED: [u8; 64] = [
-        0xf6, 0xba, 0xa3, 0x17, 0xce, 0x18, 0x39, 0xc9, 0x3d, 0x61, 0x7e, 0xc, 0xd8, 0x37, 0xd1,
-        0x9d, 0xa9, 0xc8, 0xa4, 0xc5, 0x20, 0xbf, 0x7c, 0x51, 0xb1, 0xe6, 0xc2, 0xcb, 0x2a, 0x4,
-        0x9c, 0x61, 0x2e, 0x1, 0x75, 0x89, 0x4c, 0x87, 0x30, 0xb2, 0x3, 0xab, 0x3b, 0xd9, 0x8e,
-        0xcb, 0x2d, 0x81, 0xab, 0xac, 0xb6, 0x5f, 0x8a, 0x61, 0x24, 0xf4, 0x97, 0x71, 0xd1, 0x4a,
-        0x98, 0x52, 0x12, 0xc,
-    ];
 }
 
 impl KeyPair {
