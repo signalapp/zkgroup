@@ -35,6 +35,7 @@ export { default as ProfileKey } from './zkgroup/profiles/ProfileKey';
 export { default as ProfileKeyCommitment } from './zkgroup/profiles/ProfileKeyCommitment';
 export { default as ProfileKeyCredential } from './zkgroup/profiles/ProfileKeyCredential';
 export { default as ProfileKeyCredentialPresentation } from './zkgroup/profiles/ProfileKeyCredentialPresentation';
+export { default as ProfileKeyCredentialRequest } from './zkgroup/profiles/ProfileKeyCredentialRequest';
 export { default as ProfileKeyCredentialRequestContext } from './zkgroup/profiles/ProfileKeyCredentialRequestContext';
 export { default as ProfileKeyCredentialResponse } from './zkgroup/profiles/ProfileKeyCredentialResponse';
 export { default as ProfileKeyVersion } from './zkgroup/profiles/ProfileKeyVersion';
