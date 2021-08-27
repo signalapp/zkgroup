@@ -1007,7 +1007,7 @@ checksum = "4756f7db3f7b5574938c3eb1c117038b8e07f95ee6718c0efad4ac21508f1efd"
 
 [[package]]
 name = "zkgroup"
-version = "0.7.3"
+version = "0.7.4"
 dependencies = [
  "aead",
  "aes-gcm-siv",
