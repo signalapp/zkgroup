@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://signal.org/"
   s.license      = { :type => "GPLv3", :file => "LICENSE" }
   s.authors      = { "Signal iOS" => "ios@signal.org" }
-  s.source = { :git => "https://github.com/signalapp/zkgroup.git", :tag => "#{s.version}" }
+  s.source = { :git => "https://github.com/signalapp/zkgroup.git", :tag => "v#{s.version}" }
 
   s.swift_version    = '5'
   s.platform         = :ios, '10'
@@ -51,6 +51,10 @@ Pod::Spec.new do |s|
       'ARCHS[sdk=iphoneos*]' => 'arm64',
   }
 
+  s.user_target_xcconfig = {
+      'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
+  }
+
   s.script_phases = [
     { :name => 'Check libzkgroup',
       :execution_position => :before_compile,
@@ -71,7 +75,7 @@ Pod::Spec.new do |s|
     set -euo pipefail
     CARGO_BUILD_TARGET=aarch64-apple-ios ffi/swift/build_ffi.sh --release
     CARGO_BUILD_TARGET=x86_64-apple-ios ffi/swift/build_ffi.sh --release
-    CARGO_BUILD_TARGET=aarch64-apple-ios-sim ffi/swift/build_ffi.sh --release --build-std
+    CARGO_BUILD_TARGET=aarch64-apple-ios-sim ffi/swift/build_ffi.sh --release
     CARGO_BUILD_TARGET=x86_64-apple-ios-macabi ffi/swift/build_ffi.sh --release --build-std
     CARGO_BUILD_TARGET=aarch64-apple-ios-macabi ffi/swift/build_ffi.sh --release --build-std
   )
