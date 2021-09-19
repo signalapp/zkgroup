@@ -18,26 +18,13 @@ This library provides zero-knowledge group functionality through several layers 
      * Under `node` is some example code for declaring the FFI functions in javascript.
 
 Setup
-==
+=====
 
-Set to `stable` toolchain.
-
-```
-rustup default stable
-```
-
-Install [rustup](https://rustup.rs/) and these targets:
-
-```
-rustup target add armv7-linux-androideabi   # for arm
-rustup target add i686-linux-android        # for x86
-rustup target add aarch64-linux-android     # for arm64
-rustup target add x86_64-linux-android      # for x86_64
-rustup target add x86_64-unknown-linux-gnu  # for linux-x86-64
-rustup target add x86_64-apple-darwin       # for macOS (darwin)
-```
+The rust-toolchain.toml file should get things automatically setup for you
+provided you are using rustup. See it for the toolchain and channel and targets
+in use for this build.
 
 Building Rust
-==
+=============
 
 Run `./gradlew tasks` and see `make` tasks under the "Rust tasks" group.
