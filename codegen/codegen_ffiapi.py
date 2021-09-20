@@ -41,10 +41,7 @@ template_method_body_end = \
 def get_args(params, commaAtEnd):
     s = ""
     for param in params:
-        if param[0] != "int":
-            s += "&" + param[1].snake() + ", "
-        else:
-            s += param[1].snake() + ", "
+        s += param[1].snake() + ", "
 
     if len(s) != 0 and not commaAtEnd:
         s = s[:-2]
