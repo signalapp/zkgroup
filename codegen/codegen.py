@@ -314,9 +314,6 @@ def define_classes():
 
 
 
-if input("WARNING: Running this generator may result in some code being lost. Continue? yes/NO ").strip() != "yes":
-    sys.exit()
-
 classes = define_classes()
 codegen_java.produce_output(classes)
 codegen_ffiapi.produce_output(classes)
