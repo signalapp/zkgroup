@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2020 Signal Messenger, LLC.
+// Copyright (C) 2021 Signal Messenger, LLC.
 // All rights reserved.
 //
 // SPDX-License-Identifier: GPL-3.0-only
@@ -13,9 +13,9 @@ use crate::common::simple_types::*;
 use crate::crypto;
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
-pub struct AuthCredential {
+pub struct ReceiptCredential {
     pub(crate) reserved: ReservedBytes,
-    pub(crate) credential: crypto::credentials::AuthCredential,
-    pub(crate) uid: crypto::uid_struct::UidStruct,
-    pub(crate) redemption_time: RedemptionTime,
+    pub(crate) credential: crypto::credentials::ReceiptCredential,
+    pub(crate) receipt_expiration_time: ReceiptExpirationTime,
+    pub(crate) receipt_level: ReceiptLevel,
 }

@@ -8,6 +8,7 @@
 pub mod auth;
 pub mod groups;
 pub mod profiles;
+pub mod receipts;
 
 pub mod server_params;
 

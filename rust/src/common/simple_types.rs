@@ -21,17 +21,40 @@ pub type ProfileKeyVersionBytes = [u8; PROFILE_KEY_VERSION_LEN];
 pub type ProfileKeyVersionEncodedBytes = [u8; PROFILE_KEY_VERSION_ENCODED_LEN];
 pub type RedemptionTime = u32;
 
+// A random UUID that the receipt issuing server will blind authorize to redeem a given receipt
+// level within a certain time frame.
+pub type ReceiptSerialBytes = [u8; RECEIPT_SERIAL_LEN];
+
+// Seconds past the epoch; clients should only accept round multiples of 86400 within a couple of
+// days into the future.
+pub type ReceiptExpirationTime = u64;
+
+// Used to tell the server handling receipt redemptions what to redeem the receipt for. Clients
+// should validate this matches their expectations.
+pub type ReceiptLevel = u64;
+
 pub fn encode_redemption_time(redemption_time: u32) -> Scalar {
     let mut scalar_bytes: [u8; 32] = Default::default();
     scalar_bytes[0..4].copy_from_slice(&redemption_time.to_be_bytes());
     Scalar::from_bytes_mod_order(scalar_bytes)
 }
 
-#[test]
-fn test_encode_scalar() {
-    let s_bytes = [0xFF; 32];
-    match bincode::deserialize::<Scalar>(&s_bytes) {
-        Err(_) => (),
-        Ok(_) => unreachable!(),
+pub fn encode_receipt_serial_bytes(receipt_serial_bytes: ReceiptSerialBytes) -> Scalar {
+    let mut scalar_bytes: [u8; 32] = Default::default();
+    scalar_bytes[0..16].copy_from_slice(&receipt_serial_bytes[..]);
+    Scalar::from_bytes_mod_order(scalar_bytes)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_encode_scalar() {
+        let s_bytes = [0xFF; 32];
+        match bincode::deserialize::<Scalar>(&s_bytes) {
+            Err(_) => (),
+            Ok(_) => unreachable!(),
+        }
     }
 }

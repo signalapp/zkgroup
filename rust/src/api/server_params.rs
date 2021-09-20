@@ -7,13 +7,14 @@
 
 #![allow(non_snake_case)]
 
+use serde::{Deserialize, Serialize};
+
 use crate::api;
 use crate::common::constants::*;
 use crate::common::errors::*;
 use crate::common::sho::*;
 use crate::common::simple_types::*;
 use crate::crypto;
-use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct ServerSecretParams {
@@ -21,6 +22,7 @@ pub struct ServerSecretParams {
     pub(crate) auth_credentials_key_pair: crypto::credentials::KeyPair,
     pub(crate) profile_key_credentials_key_pair: crypto::credentials::KeyPair,
     sig_key_pair: crypto::signature::KeyPair,
+    receipt_credentials_key_pair: crypto::credentials::KeyPair,
 }
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
@@ -29,6 +31,7 @@ pub struct ServerPublicParams {
     pub(crate) auth_credentials_public_key: crypto::credentials::PublicKey,
     pub(crate) profile_key_credentials_public_key: crypto::credentials::PublicKey,
     sig_public_key: crypto::signature::PublicKey,
+    receipt_credentials_public_key: crypto::credentials::PublicKey,
 }
 
 impl ServerSecretParams {
@@ -43,12 +46,15 @@ impl ServerSecretParams {
         let profile_key_credentials_key_pair =
             crypto::credentials::KeyPair::generate(&mut sho, NUM_PROFILE_KEY_CRED_ATTRIBUTES);
         let sig_key_pair = crypto::signature::KeyPair::generate(&mut sho);
+        let receipt_credentials_key_pair =
+            crypto::credentials::KeyPair::generate(&mut sho, NUM_RECEIPT_CRED_ATTRIBUTES);
 
         Self {
             reserved: Default::default(),
             auth_credentials_key_pair,
             profile_key_credentials_key_pair,
             sig_key_pair,
+            receipt_credentials_key_pair,
         }
     }
 
@@ -60,6 +66,7 @@ impl ServerSecretParams {
                 .profile_key_credentials_key_pair
                 .get_public_key(),
             sig_public_key: self.sig_key_pair.get_public_key(),
+            receipt_credentials_public_key: self.receipt_credentials_key_pair.get_public_key(),
         }
     }
 
@@ -207,7 +214,6 @@ impl ServerPublicParams {
         Ok(api::auth::AuthCredential {
             reserved: Default::default(),
             credential: response.credential,
-            server_public_params: *self,
             uid,
             redemption_time,
         })
