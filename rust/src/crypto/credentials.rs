@@ -181,7 +181,7 @@ impl SystemParams {
 
 impl KeyPair {
     pub fn generate(sho: &mut Sho, num_attributes: usize) -> Self {
-        if !(3..=4).contains(&num_attributes) {
+        if !(2..=4).contains(&num_attributes) {
             panic!();
         }
 
@@ -201,8 +201,11 @@ impl KeyPair {
             - (x0 * system.G_x0)
             - (x1 * system.G_x1)
             - (y1 * system.G_y1)
-            - (y2 * system.G_y2)
-            - (y3 * system.G_y3);
+            - (y2 * system.G_y2);
+
+        if num_attributes > 2 {
+            I -= y3 * system.G_y3;
+        }
 
         if num_attributes > 3 {
             I -= y4 * system.G_y4;
