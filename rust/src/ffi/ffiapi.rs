@@ -1255,6 +1255,147 @@ pub extern "C" fn FFI_ProfileKeyCredentialPresentation_getProfileKeyCiphertext(
 }
 
 #[no_mangle]
+pub extern "C" fn FFI_ReceiptCredentialRequestContext_checkValidContents(
+    receiptCredentialRequestContext: *const u8,
+    receiptCredentialRequestContextLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential_request_context: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialRequestContext,
+                receiptCredentialRequestContextLen as usize,
+            )
+        };
+
+        simpleapi::ReceiptCredentialRequestContext_checkValidContents(
+            receipt_credential_request_context,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ReceiptCredentialRequestContext_getRequest(
+    receiptCredentialRequestContext: *const u8,
+    receiptCredentialRequestContextLen: u32,
+    receiptCredentialRequestOut: *mut u8,
+    receiptCredentialRequestLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential_request_context: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialRequestContext,
+                receiptCredentialRequestContextLen as usize,
+            )
+        };
+        let receipt_credential_request: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                receiptCredentialRequestOut,
+                receiptCredentialRequestLen as usize,
+            )
+        };
+
+        simpleapi::ReceiptCredentialRequestContext_getRequest(
+            receipt_credential_request_context,
+            receipt_credential_request,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ReceiptCredentialRequest_checkValidContents(
+    receiptCredentialRequest: *const u8,
+    receiptCredentialRequestLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential_request: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialRequest,
+                receiptCredentialRequestLen as usize,
+            )
+        };
+
+        simpleapi::ReceiptCredentialRequest_checkValidContents(receipt_credential_request)
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ReceiptCredentialResponse_checkValidContents(
+    receiptCredentialResponse: *const u8,
+    receiptCredentialResponseLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential_response: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialResponse,
+                receiptCredentialResponseLen as usize,
+            )
+        };
+
+        simpleapi::ReceiptCredentialResponse_checkValidContents(receipt_credential_response)
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ReceiptCredential_checkValidContents(
+    receiptCredential: *const u8,
+    receiptCredentialLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential: &[u8] =
+            unsafe { slice::from_raw_parts(receiptCredential, receiptCredentialLen as usize) };
+
+        simpleapi::ReceiptCredential_checkValidContents(receipt_credential)
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ReceiptCredentialPresentation_checkValidContents(
+    receiptCredentialPresentation: *const u8,
+    receiptCredentialPresentationLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialPresentation,
+                receiptCredentialPresentationLen as usize,
+            )
+        };
+
+        simpleapi::ReceiptCredentialPresentation_checkValidContents(receipt_credential_presentation)
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn FFI_UuidCiphertext_checkValidContents(
     uuidCiphertext: *const u8,
     uuidCiphertextLen: u32,

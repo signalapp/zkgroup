@@ -100,6 +100,12 @@ public final class Native {
   public static native int profileKeyCredentialPresentationGetUuidCiphertextJNI(byte[] self, byte[] output);
   public static native int profileKeyCredentialPresentationGetProfileKeyCiphertextJNI(byte[] self, byte[] output);
   public static native int profileKeyCredentialPresentationCheckValidContentsJNI(byte[] self);
+  public static native int receiptCredentialRequestContextGetRequestJNI(byte[] self, byte[] output);
+  public static native int receiptCredentialRequestContextCheckValidContentsJNI(byte[] self);
+  public static native int receiptCredentialRequestCheckValidContentsJNI(byte[] self);
+  public static native int receiptCredentialResponseCheckValidContentsJNI(byte[] self);
+  public static native int receiptCredentialCheckValidContentsJNI(byte[] self);
+  public static native int receiptCredentialPresentationCheckValidContentsJNI(byte[] self);
   public static native int uuidCiphertextCheckValidContentsJNI(byte[] self);
   public static native int profileKeyCiphertextCheckValidContentsJNI(byte[] self);
 

@@ -301,6 +301,23 @@ def define_classes():
 
     classes.append(c)
 
+    c = ClassDescriptor("receipt_credential_request_context", "receipts", "api::receipts::ReceiptCredentialRequestContext", 177)
+    c.add_method("get_request", "class", "receipt_credential_request", [],
+                 """    let receipt_credential_request = receipt_credential_request_context.get_request();""")
+    classes.append(c)
+
+    c = ClassDescriptor("receipt_credential_request", "receipts", "api::receipts::ReceiptCredentialRequest", 97)
+    classes.append(c)
+
+    c = ClassDescriptor("receipt_credential_response", "receipts", "api::receipts::ReceiptCredentialResponse", 409)
+    classes.append(c)
+
+    c = ClassDescriptor("receipt_credential", "receipts", "api::receipts::ReceiptCredential", 129)
+    classes.append(c)
+
+    c = ClassDescriptor("receipt_credential_presentation", "receipts", "api::receipts::ReceiptCredentialPresentation", 329)
+    classes.append(c)
+
     c = ClassDescriptor("uuid_ciphertext", "groups", "api::groups::UuidCiphertext", 65)
     classes.append(c)
 

@@ -864,6 +864,74 @@ pub fn ProfileKeyCredentialPresentation_getProfileKeyCiphertext(
     FFI_RETURN_OK
 }
 
+pub fn ReceiptCredentialRequestContext_checkValidContents(
+    receiptCredentialRequestContextIn: &[u8],
+) -> i32 {
+    let _: api::receipts::ReceiptCredentialRequestContext =
+        match bincode::deserialize(receiptCredentialRequestContextIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialRequestContext_getRequest(
+    receiptCredentialRequestContextIn: &[u8],
+    receiptCredentialRequestOut: &mut [u8],
+) -> i32 {
+    let receipt_credential_request_context: api::receipts::ReceiptCredentialRequestContext =
+        match bincode::deserialize(receiptCredentialRequestContextIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let receipt_credential_request = receipt_credential_request_context.get_request();
+    receiptCredentialRequestOut
+        .copy_from_slice(&bincode::serialize(&receipt_credential_request).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialRequest_checkValidContents(receiptCredentialRequestIn: &[u8]) -> i32 {
+    let _: api::receipts::ReceiptCredentialRequest =
+        match bincode::deserialize(receiptCredentialRequestIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialResponse_checkValidContents(receiptCredentialResponseIn: &[u8]) -> i32 {
+    let _: api::receipts::ReceiptCredentialResponse =
+        match bincode::deserialize(receiptCredentialResponseIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredential_checkValidContents(receiptCredentialIn: &[u8]) -> i32 {
+    let _: api::receipts::ReceiptCredential = match bincode::deserialize(receiptCredentialIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialPresentation_checkValidContents(
+    receiptCredentialPresentationIn: &[u8],
+) -> i32 {
+    let _: api::receipts::ReceiptCredentialPresentation =
+        match bincode::deserialize(receiptCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    FFI_RETURN_OK
+}
+
 pub fn UuidCiphertext_checkValidContents(uuidCiphertextIn: &[u8]) -> i32 {
     let _: api::groups::UuidCiphertext = match bincode::deserialize(uuidCiphertextIn) {
         Ok(result) => result,
