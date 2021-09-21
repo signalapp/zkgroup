@@ -13,6 +13,7 @@ output:
 	mkdir -p java/profiles
 	mkdir -p java/groups
 	mkdir -p java/internal
+	mkdir -p java/receipts
 	mkdir -p simpleapi
 	mkdir -p swift
 	python3 ./codegen.py
