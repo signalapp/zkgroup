@@ -186,6 +186,58 @@ impl ServerSecretParams {
             proof,
         })
     }
+
+    pub fn issue_receipt_credential(
+        &self,
+        randomness: RandomnessBytes,
+        request: &api::receipts::ReceiptCredentialRequest,
+        receipt_expiration_time: ReceiptExpirationTime,
+        receipt_level: ReceiptLevel,
+    ) -> api::receipts::ReceiptCredentialResponse {
+        let mut sho = Sho::new(
+            b"Signal_ZKGroup_20210919_Random_ServerSecretParams_IssueReceiptCredential",
+            &randomness,
+        );
+
+        let blinded_credential_with_secret_nonce = self
+            .receipt_credentials_key_pair
+            .create_blinded_receipt_credential(
+                request.public_key,
+                request.ciphertext,
+                receipt_expiration_time,
+                receipt_level,
+                &mut sho,
+            );
+
+        let proof = crypto::proofs::ReceiptCredentialIssuanceProof::new(
+            self.receipt_credentials_key_pair,
+            request.public_key,
+            request.ciphertext,
+            blinded_credential_with_secret_nonce,
+            receipt_expiration_time,
+            receipt_level,
+            &mut sho,
+        );
+
+        api::receipts::ReceiptCredentialResponse {
+            reserved: Default::default(),
+            receipt_expiration_time,
+            receipt_level,
+            blinded_credential: blinded_credential_with_secret_nonce
+                .get_blinded_receipt_credential(),
+            proof,
+        }
+    }
+
+    pub fn verify_receipt_credential_presentation(
+        &self,
+        presentation: &api::receipts::ReceiptCredentialPresentation,
+    ) -> Result<(), ZkGroupError> {
+        presentation.proof.verify(
+            self.receipt_credentials_key_pair,
+            presentation.get_receipt_struct(),
+        )
+    }
 }
 
 impl ServerPublicParams {
@@ -352,6 +404,79 @@ impl ServerPublicParams {
             proof,
             uid_enc_ciphertext: uuid_ciphertext.ciphertext,
             profile_key_enc_ciphertext: profile_key_ciphertext.ciphertext,
+        }
+    }
+
+    pub fn create_receipt_credential_request_context(
+        &self,
+        randomness: RandomnessBytes,
+        receipt_serial_bytes: ReceiptSerialBytes,
+    ) -> api::receipts::ReceiptCredentialRequestContext {
+        let mut sho = Sho::new(
+            b"Signal_ZKGroup_20210919_Random_ServerPublicParams_CreateReceiptCredentialRequestContext",
+            &randomness,
+        );
+
+        let key_pair = crypto::receipt_credential_request::KeyPair::generate(&mut sho);
+        let ciphertext_with_secret_nonce = key_pair.encrypt(receipt_serial_bytes, &mut sho);
+
+        api::receipts::ReceiptCredentialRequestContext {
+            reserved: Default::default(),
+            receipt_serial_bytes,
+            key_pair,
+            ciphertext_with_secret_nonce,
+        }
+    }
+
+    pub fn receive_receipt_credential(
+        &self,
+        context: &api::receipts::ReceiptCredentialRequestContext,
+        response: &api::receipts::ReceiptCredentialResponse,
+    ) -> Result<api::receipts::ReceiptCredential, ZkGroupError> {
+        let receipt_struct = crypto::receipt_struct::ReceiptStruct::new(
+            context.receipt_serial_bytes,
+            response.receipt_expiration_time,
+            response.receipt_level,
+        );
+        response.proof.verify(
+            self.receipt_credentials_public_key,
+            context.key_pair.get_public_key(),
+            context.ciphertext_with_secret_nonce.get_ciphertext(),
+            response.blinded_credential,
+            receipt_struct,
+        )?;
+        let credential = context
+            .key_pair
+            .decrypt_blinded_receipt_credential(response.blinded_credential);
+        Ok(api::receipts::ReceiptCredential {
+            reserved: Default::default(),
+            credential,
+            receipt_expiration_time: response.receipt_expiration_time,
+            receipt_level: response.receipt_level,
+            receipt_serial_bytes: context.receipt_serial_bytes,
+        })
+    }
+
+    pub fn create_receipt_credential_presentation(
+        &self,
+        randomness: RandomnessBytes,
+        receipt_credential: &api::receipts::ReceiptCredential,
+    ) -> api::receipts::ReceiptCredentialPresentation {
+        let mut sho = Sho::new(
+            b"Signal_ZKGroup_20210919_Random_ServerPublicParams_CreateReceiptCredentialPresentation",
+            &randomness,
+        );
+        let proof = crypto::proofs::ReceiptCredentialPresentationProof::new(
+            self.receipt_credentials_public_key,
+            receipt_credential.credential,
+            &mut sho,
+        );
+        api::receipts::ReceiptCredentialPresentation {
+            reserved: Default::default(),
+            proof,
+            receipt_expiration_time: receipt_credential.receipt_expiration_time,
+            receipt_level: receipt_credential.receipt_level,
+            receipt_serial_bytes: receipt_credential.receipt_serial_bytes,
         }
     }
 }

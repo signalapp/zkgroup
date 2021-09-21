@@ -10,6 +10,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::crypto;
+use crate::crypto::receipt_struct::ReceiptStruct;
 use crate::ReceiptExpirationTime;
 use crate::ReceiptLevel;
 use crate::ReceiptSerialBytes;
@@ -22,4 +23,14 @@ pub struct ReceiptCredentialPresentation {
     pub(crate) receipt_expiration_time: ReceiptExpirationTime,
     pub(crate) receipt_level: ReceiptLevel,
     pub(crate) receipt_serial_bytes: ReceiptSerialBytes,
+}
+
+impl ReceiptCredentialPresentation {
+    pub fn get_receipt_struct(&self) -> ReceiptStruct {
+        ReceiptStruct {
+            receipt_serial_bytes: self.receipt_serial_bytes,
+            receipt_expiration_time: self.receipt_expiration_time,
+            receipt_level: self.receipt_level,
+        }
+    }
 }

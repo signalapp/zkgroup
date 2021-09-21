@@ -10,7 +10,10 @@ use zkgroup::crypto::credentials;
 use zkgroup::crypto::proofs::{ReceiptCredentialIssuanceProof, ReceiptCredentialPresentationProof};
 use zkgroup::crypto::receipt_credential_request;
 use zkgroup::crypto::receipt_struct::ReceiptStruct;
-use zkgroup::{ReceiptExpirationTime, ReceiptLevel, NUM_RECEIPT_CRED_ATTRIBUTES};
+use zkgroup::{
+    RandomnessBytes, ReceiptExpirationTime, ReceiptLevel, ReceiptSerialBytes, ServerSecretParams,
+    NUM_RECEIPT_CRED_ATTRIBUTES, RANDOMNESS_LEN, RECEIPT_SERIAL_LEN,
+};
 
 #[test]
 fn test_request_response() {
@@ -77,4 +80,44 @@ fn test_request_response() {
     receipt_credential_presentation_proof
         .verify(server_key_pair, receipt_struct)
         .expect("presentation proof validity check failed");
+}
+
+/// Same as test_request_response but using the server params API.
+#[test]
+fn test_api() {
+    let randomness0: RandomnessBytes = [0x42u8; RANDOMNESS_LEN];
+    let randomness1: RandomnessBytes = [0x43u8; RANDOMNESS_LEN];
+    let randomness2: RandomnessBytes = [0x44u8; RANDOMNESS_LEN];
+    let randomness3: RandomnessBytes = [0x45u8; RANDOMNESS_LEN];
+    let receipt_serial_bytes: ReceiptSerialBytes = [0x84u8; RECEIPT_SERIAL_LEN];
+    let mut sho = Sho::new(b"Test_Receipt_Credential_API", b"");
+    let server_secret_params = ServerSecretParams::generate(randomness0);
+    let server_public_params = server_secret_params.get_public_params();
+
+    // client
+    let context = server_public_params
+        .create_receipt_credential_request_context(randomness1, receipt_serial_bytes);
+    let request = context.get_request();
+
+    // issuance server
+    let receipt_expiration_time: ReceiptExpirationTime = 31337;
+    let receipt_level: ReceiptLevel = 3;
+    let response = server_secret_params.issue_receipt_credential(
+        randomness2,
+        &request,
+        receipt_expiration_time,
+        receipt_level,
+    );
+
+    // client
+    let credential = server_public_params
+        .receive_receipt_credential(&context, &response)
+        .expect("Invalid Receipt Credential Issuance");
+    let presentation =
+        server_public_params.create_receipt_credential_presentation(randomness3, &credential);
+
+    // redemption server
+    server_secret_params
+        .verify_receipt_credential_presentation(&presentation)
+        .expect("Invalid Receipt Credential Presentation");
 }

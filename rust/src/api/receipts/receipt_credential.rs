@@ -18,4 +18,5 @@ pub struct ReceiptCredential {
     pub(crate) credential: crypto::credentials::ReceiptCredential,
     pub(crate) receipt_expiration_time: ReceiptExpirationTime,
     pub(crate) receipt_level: ReceiptLevel,
+    pub(crate) receipt_serial_bytes: ReceiptSerialBytes,
 }
