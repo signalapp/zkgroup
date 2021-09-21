@@ -96,6 +96,9 @@ class ClassDescriptor:
 def define_classes():
     classes = []
 
+    c = ClassDescriptor("receipt_serial", "receipts", "simple_types::ReceiptSerialBytes", 16, check_valid_contents=False)
+    classes.append(c)
+
     c = ClassDescriptor("group_identifier", "groups", "simple_types::GroupIdentifierBytes", 32, check_valid_contents=False)
     classes.append(c)
 
@@ -169,7 +172,7 @@ def define_classes():
 
     classes.append(c)
 
-    c = ClassDescriptor("server_secret_params", "", "api::ServerSecretParams", 769, runtime_error_on_serialize=True)
+    c = ClassDescriptor("server_secret_params", "", "api::ServerSecretParams", 1121, runtime_error_on_serialize=True)
     c.add_static_method("generate_deterministic", "class", "server_secret_params", [("class", "randomness")],
             """    let server_secret_params = api::ServerSecretParams::generate(randomness);""")
 
@@ -253,7 +256,7 @@ def define_classes():
 
     classes.append(c)
 
-    c = ClassDescriptor("server_public_params", "", "api::ServerPublicParams", 161, runtime_error_on_serialize=True)
+    c = ClassDescriptor("server_public_params", "", "api::ServerPublicParams", 225, runtime_error_on_serialize=True)
 
     c.add_method("verify_signature", "boolean", "None", [("byte[]", "message"), ("class", "notary_signature")],
             """    match server_public_params.verify_signature(message, notary_signature) {
@@ -266,7 +269,7 @@ def define_classes():
     c = ClassDescriptor("auth_credential_response", "auth", "api::auth::AuthCredentialResponse", 361)
     classes.append(c)
 
-    c = ClassDescriptor("auth_credential", "auth", "api::auth::AuthCredential", 342)
+    c = ClassDescriptor("auth_credential", "auth", "api::auth::AuthCredential", 181)
     classes.append(c)
 
     c = ClassDescriptor("auth_credential_presentation", "auth", "api::auth::AuthCredentialPresentation", 493)
