@@ -30,6 +30,18 @@ pub struct ReceiptStruct {
 }
 
 impl ReceiptStruct {
+    pub fn new(
+        receipt_serial_bytes: ReceiptSerialBytes,
+        receipt_expiration_time: ReceiptExpirationTime,
+        receipt_level: ReceiptLevel,
+    ) -> Self {
+        Self {
+            receipt_serial_bytes,
+            receipt_expiration_time,
+            receipt_level,
+        }
+    }
+
     pub fn calc_m1(&self) -> Scalar {
         Self::calc_m1_from(self.receipt_expiration_time, self.receipt_level)
     }

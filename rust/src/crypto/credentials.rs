@@ -132,6 +132,14 @@ pub(crate) fn convert_to_points_receipt_struct(
     vec![m1 * system.G_m1, receipt_serial_scalar * system.G_m2]
 }
 
+pub(crate) fn convert_to_point_M2_receipt_serial_bytes(
+    receipt_serial_bytes: ReceiptSerialBytes,
+) -> RistrettoPoint {
+    let system = SystemParams::get_hardcoded();
+    let receipt_serial_scalar = encode_receipt_serial_bytes(receipt_serial_bytes);
+    receipt_serial_scalar * system.G_m2
+}
+
 impl SystemParams {
     pub fn generate() -> Self {
         let mut sho = Sho::new(

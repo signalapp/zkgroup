@@ -16,7 +16,7 @@ use crate::common::sho::Sho;
 use crate::crypto::credentials;
 use crate::crypto::credentials::BlindedReceiptCredential;
 use crate::crypto::credentials::ReceiptCredential;
-use crate::crypto::receipt_struct::ReceiptStruct;
+use crate::ReceiptSerialBytes;
 
 #[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct KeyPair {
@@ -58,13 +58,13 @@ impl KeyPair {
 
     pub fn encrypt(
         &self,
-        receipt_struct: ReceiptStruct,
+        receipt_serial_bytes: ReceiptSerialBytes,
         sho: &mut Sho,
     ) -> CiphertextWithSecretNonce {
-        let M = credentials::convert_to_points_receipt_struct(receipt_struct);
+        let M2 = credentials::convert_to_point_M2_receipt_serial_bytes(receipt_serial_bytes);
         let r1 = sho.get_scalar();
         let D1 = r1 * RISTRETTO_BASEPOINT_POINT;
-        let D2 = r1 * (self.Y) + M[1];
+        let D2 = r1 * (self.Y) + M2;
 
         CiphertextWithSecretNonce { r1, D1, D2 }
     }
