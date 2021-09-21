@@ -907,8 +907,8 @@ impl ReceiptCredentialPresentationProof {
         point_args.add("I", I);
         point_args.add("C_x0", C_x0);
         point_args.add("C_x1", C_x1);
-        point_args.add("C_y1", z * credentials_system.G_y1);
-        point_args.add("C_y2", z * credentials_system.G_y2);
+        point_args.add("C_y1", C_y1);
+        point_args.add("C_y2", C_y2);
         point_args.add("G_x0", credentials_system.G_x0);
         point_args.add("G_x1", credentials_system.G_x1);
         point_args.add("G_y1", credentials_system.G_y1);
