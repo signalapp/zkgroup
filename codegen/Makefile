@@ -37,3 +37,10 @@ clean:
 	rm -rf java
 	rm -rf simpleapi
 	rm -rf swift
+
+.PHONY: clean-destination
+clean-destination:
+	rm -rf ../ffi/java/src/main/java/org/signal/zkgroup
+	mkdir -p ../ffi/java/src/main/java/org/signal/zkgroup
+	rm -rf ../ffi/swift/Sources/ZKGroup
+	mkdir -p ../ffi/swift/Sources/ZKGroup

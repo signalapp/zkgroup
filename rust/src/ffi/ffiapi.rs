@@ -1463,3 +1463,21 @@ pub extern "C" fn FFI_Uuid_checkValidContents(uuid: *const u8, uuidLen: u32) -> 
         Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
 }
+
+#[no_mangle]
+pub extern "C" fn FFI_ReceiptSerial_checkValidContents(
+    receiptSerial: *const u8,
+    receiptSerialLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_serial: &[u8] =
+            unsafe { slice::from_raw_parts(receiptSerial, receiptSerialLen as usize) };
+
+        simpleapi::ReceiptSerial_checkValidContents(receipt_serial)
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}

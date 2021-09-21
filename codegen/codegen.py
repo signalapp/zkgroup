@@ -96,9 +96,6 @@ class ClassDescriptor:
 def define_classes():
     classes = []
 
-    c = ClassDescriptor("receipt_serial", "receipts", "simple_types::ReceiptSerialBytes", 16, check_valid_contents=False)
-    classes.append(c)
-
     c = ClassDescriptor("group_identifier", "groups", "simple_types::GroupIdentifierBytes", 32, check_valid_contents=False)
     classes.append(c)
 
@@ -328,6 +325,9 @@ def define_classes():
     classes.append(c)
 
     c = ClassDescriptor("uuid", "", "simple_types::UidBytes", 32, no_class=True)
+    classes.append(c)
+
+    c = ClassDescriptor("receipt_serial", "receipts", "simple_types::ReceiptSerialBytes", 16, no_class=True)
     classes.append(c)
 
     return classes
