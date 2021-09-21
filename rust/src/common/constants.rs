@@ -11,6 +11,7 @@ pub const NUM_AUTH_CRED_ATTRIBUTES: usize = 3;
 pub const NUM_PROFILE_KEY_CRED_ATTRIBUTES: usize = 4;
 pub const NUM_RECEIPT_CRED_ATTRIBUTES: usize = 2;
 
+// NOTE: When any of these values change, codegen.py must also be updated.
 pub const AES_KEY_LEN: usize = 32;
 pub const AESGCM_NONCE_LEN: usize = 12;
 pub const AESGCM_TAG_LEN: usize = 16;
@@ -31,6 +32,11 @@ pub const PROFILE_KEY_CREDENTIAL_REQUEST_CONTEXT_LEN: usize = 473;
 pub const PROFILE_KEY_CREDENTIAL_RESPONSE_LEN: usize = 457;
 pub const PROFILE_KEY_VERSION_LEN: usize = 32;
 pub const PROFILE_KEY_VERSION_ENCODED_LEN: usize = 64;
+pub const RECEIPT_CREDENTIAL_LEN: usize = 129;
+pub const RECEIPT_CREDENTIAL_PRESENTATION_LEN: usize = 329;
+pub const RECEIPT_CREDENTIAL_REQUEST_LEN: usize = 97;
+pub const RECEIPT_CREDENTIAL_REQUEST_CONTEXT_LEN: usize = 177;
+pub const RECEIPT_CREDENTIAL_RESPONSE_LEN: usize = 409;
 pub const RECEIPT_SERIAL_LEN: usize = 16;
 pub const RESERVED_LEN: usize = 1;
 pub const SERVER_SECRET_PARAMS_LEN: usize = 1121;

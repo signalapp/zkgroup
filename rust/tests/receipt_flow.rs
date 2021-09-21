@@ -90,7 +90,6 @@ fn test_api() {
     let randomness2: RandomnessBytes = [0x44u8; RANDOMNESS_LEN];
     let randomness3: RandomnessBytes = [0x45u8; RANDOMNESS_LEN];
     let receipt_serial_bytes: ReceiptSerialBytes = [0x84u8; RECEIPT_SERIAL_LEN];
-    let mut sho = Sho::new(b"Test_Receipt_Credential_API", b"");
     let server_secret_params = ServerSecretParams::generate(randomness0);
     let server_public_params = server_secret_params.get_public_params();
 
@@ -120,4 +119,25 @@ fn test_api() {
     server_secret_params
         .verify_receipt_credential_presentation(&presentation)
         .expect("Invalid Receipt Credential Presentation");
+
+    assert_eq!(
+        zkgroup::common::constants::RECEIPT_CREDENTIAL_REQUEST_CONTEXT_LEN,
+        bincode::serialize(&context).unwrap().len(),
+    );
+    assert_eq!(
+        zkgroup::common::constants::RECEIPT_CREDENTIAL_REQUEST_LEN,
+        bincode::serialize(&request).unwrap().len(),
+    );
+    assert_eq!(
+        zkgroup::common::constants::RECEIPT_CREDENTIAL_RESPONSE_LEN,
+        bincode::serialize(&response).unwrap().len(),
+    );
+    assert_eq!(
+        zkgroup::common::constants::RECEIPT_CREDENTIAL_LEN,
+        bincode::serialize(&credential).unwrap().len(),
+    );
+    assert_eq!(
+        zkgroup::common::constants::RECEIPT_CREDENTIAL_PRESENTATION_LEN,
+        bincode::serialize(&presentation).unwrap().len(),
+    );
 }
