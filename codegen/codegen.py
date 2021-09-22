@@ -105,6 +105,9 @@ def define_classes():
     c = ClassDescriptor("notary_signature", "", "simple_types::NotarySignatureBytes", 64, check_valid_contents=False)
     classes.append(c)
 
+    c = ClassDescriptor("receipt_serial", "receipts", "simple_types::ReceiptSerialBytes", 16, check_valid_contents=False)
+    classes.append(c)
+
     c = ClassDescriptor("profile_key", "profiles", "api::profiles::ProfileKey", 32, check_valid_contents=False)
     c.add_method("get_commitment", "class", "profile_key_commitment", [("UUID", "uuid")],
             """    let profile_key_commitment = profile_key.get_commitment(uuid);""");
@@ -359,9 +362,6 @@ def define_classes():
     classes.append(c)
 
     c = ClassDescriptor("uuid", "", "simple_types::UidBytes", 32, no_class=True)
-    classes.append(c)
-
-    c = ClassDescriptor("receipt_serial", "receipts", "simple_types::ReceiptSerialBytes", 16, no_class=True)
     classes.append(c)
 
     return classes

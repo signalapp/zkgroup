@@ -1927,25 +1927,3 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_uuidCheckValidCon
         Err(_) => FFI_RETURN_INTERNAL_ERROR,
     }
 }
-
-#[no_mangle]
-pub extern "system" fn Java_org_signal_zkgroup_internal_Native_receiptSerialCheckValidContentsJNI(
-    env: JNIEnv,
-    _class: JClass,
-    receiptSerial: jbyteArray,
-) -> i32 {
-    let result = panic::catch_unwind(|| {
-        let receipt_serial = env.convert_byte_array(receiptSerial).unwrap();
-
-        let ffi_return = simpleapi::ReceiptSerial_checkValidContents(&receipt_serial);
-        if ffi_return != FFI_RETURN_OK {
-            return ffi_return;
-        }
-        FFI_RETURN_OK
-    });
-
-    match result {
-        Ok(result) => result,
-        Err(_) => FFI_RETURN_INTERNAL_ERROR,
-    }
-}

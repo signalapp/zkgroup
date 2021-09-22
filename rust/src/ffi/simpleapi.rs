@@ -1120,12 +1120,3 @@ pub fn Uuid_checkValidContents(uuidIn: &[u8]) -> i32 {
 
     FFI_RETURN_OK
 }
-
-pub fn ReceiptSerial_checkValidContents(receiptSerialIn: &[u8]) -> i32 {
-    let _: simple_types::ReceiptSerialBytes = match bincode::deserialize(receiptSerialIn) {
-        Ok(result) => result,
-        Err(_) => return FFI_RETURN_INPUT_ERROR,
-    };
-
-    FFI_RETURN_OK
-}
