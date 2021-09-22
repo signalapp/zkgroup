@@ -213,6 +213,22 @@ def define_classes():
 
     classes.append(c)
 
+    c = ClassDescriptor("client_zk_receipt_operations", "receipts", "api::receipts::ClientZkReceiptOperations", 256, wrap_class="server_public_params")
+
+    c.add_method("create_receipt_credential_request_context_deterministic", "class", "receipt_credential_request_context", [("class", "randomness"), ("class", "receipt_serial")],
+                 """    let receipt_credential_request_context = server_public_params.create_receipt_credential_request_context(randomness, receipt_serial);""")
+
+    c.add_method("receive_receipt_credential", "class", "receipt_credential", [("class", "receipt_credential_request_context"), ("class", "receipt_credential_response")],
+                 """    let receipt_credential = match server_public_params.receive_receipt_credential(&receipt_credential_request_context, &receipt_credential_response) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };""")
+
+    c.add_method("create_receipt_credential_presentation_deterministic", "class", "receipt_credential_presentation", [("class", "randomness"), ("class", "receipt_credential")],
+                 """    let receipt_credential_presentation = server_public_params.create_receipt_credential_presentation(randomness, &receipt_credential);""")
+
+    classes.append(c)
+
     c = ClassDescriptor("server_zk_auth_operations", "auth", "api::auth::ServerZkAuthOperations", 544, wrap_class="server_secret_params")
 
     c.add_method("issue_auth_credential_deterministic", "class", "auth_credential_response", [("class", "randomness"), ("UUID", "uuid"), ("int", "redemption_time")],
@@ -244,6 +260,24 @@ def define_classes():
         Ok(_) => (),
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     }""")
+
+    classes.append(c)
+
+    c = ClassDescriptor("server_zk_receipt_operations", "receipts", "api::receipts::ServerZkReceiptOperations", 544, wrap_class="server_secret_params")
+
+    c.add_method("issue_receipt_credential_deterministic", "class", "receipt_credential_response", [("class", "randomness"), ("class", "receipt_credential_request"), ("long", "receipt_expiration_time"), ("long", "receipt_level")],
+                 """    let receipt_credential_response = server_secret_params.issue_receipt_credential(
+        randomness,
+        &receipt_credential_request,
+        receipt_expiration_time,
+        receipt_level,
+    );""")
+
+    c.add_method("verify_receipt_credential_presentation", "boolean", "None", [("class", "receipt_credential_presentation")],
+                 """    match server_secret_params.verify_receipt_credential_presentation(&receipt_credential_presentation) {
+        Ok(_) => (),
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+        }""")
 
     classes.append(c)
 

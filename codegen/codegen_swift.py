@@ -239,6 +239,23 @@ template_method_int = \
   }
 """
 
+template_method_long = \
+"""
+  public func %(method_name)s(%(param_decls)s) %(exception_decl)s -> UInt64 {
+    var newContents: [UInt8] = Array(repeating: 0, count: Int(8))
+
+    let ffi_return = FFI_%(jni_method_name)s(%(contents)s, %(param_args)s&newContents, UInt32(newContents.count))%(exception_check)s
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw ZkGroupException.ZkGroupError
+     }
+
+    let data = Data(bytes: newContents)
+    let value = UInt64(bigEndian: data.withUnsafeBytes { $0.pointee })
+    return value
+  }
+"""
+
 template_method_rand_wrapper = \
 """
   public func %(method_name)s(%(param_decls)s) %(exception_decl)s -> %(return_name)s {
@@ -280,6 +297,9 @@ def get_decls(params, import_strings, class_dir_dict, my_dir_name):
         elif param[0] == "int":
             s += param[1].lower_camel() + ": UInt32, "
             #SWIFT add_import(import_strings, class_dir_dict, my_dir_name, param[1])
+        elif param[0] == "long":
+            s += param[1].lower_camel() + ": Uint64, "
+            #SWIFT add_import(import_strings, class_dir_dict, my_dir_name, param[1])
         elif param[0] == "UUID":
             s += param[1].lower_camel() + ": ZKGUuid, "
             #SWIFT add_import(import_strings, class_dir_dict, my_dir_name, param[1])
@@ -299,6 +319,8 @@ def get_rand_wrapper_decls(params):
                 s += param[1].lower_camel() + ": [UInt8], "
             elif param[0] == "int":
                 s += param[1].lower_camel() + ": UInt32, "
+            elif param[0] == "long":
+                s += param[1].lower_camel() + ": UInt64, "
             elif param[0] == "UUID":
                 s += param[1].lower_camel() + ": ZKGUuid, "
             else:
@@ -311,7 +333,7 @@ def get_rand_wrapper_decls(params):
 def get_args(params, import_strings, commaAtEnd):
     s = ""
     for param in params:
-        if param[0] == "byte[]" or param[0] == "int":
+        if param[0] == "byte[]" or param[0] == "int" or param[0] == "long":
             term = param[1].lower_camel()
         # SWIFT elif param[0] == "UUID":
         # SWIFT    term = "UUIDUtil.serialize(" + param[1].lower_camel() + ")"
@@ -320,10 +342,10 @@ def get_args(params, import_strings, commaAtEnd):
         else:
             term = param[1].lower_camel() + ".getInternalContentsForFFI()"
 
-        if param[0] != "int":
-            s += term + ", UInt32(" + term + ".count), "
-        else:
+        if param[0] == "int" or param[0] == "long":
             s += term + ", "
+        else:
+            s += term + ", UInt32(" + term + ".count), "
 
     if len(s) != 0 and not commaAtEnd:
         s = s[:-2]
@@ -339,6 +361,8 @@ def get_jni_arg_decls(params, selfBool, commaAtEndBool):
             s += "byte[] %s, " % param[1].lower_camel()
         elif param[0] == "int":
             s += "int %s, " % param[1].lower_camel()
+        elif param[0] == "long":
+            s += "long %s, " % param[1].lower_camel()
         # elif param[0] == "UUID":
         #    s += "byte[] %s, " % param[1].lower_camel()
         elif param[1].snake() == "randomness":
@@ -504,6 +528,9 @@ def print_class(c, runtime_error_on_serialize_dict, class_dir_dict):
             param_args = get_args(method.params, import_strings, False)
         elif method.return_type == "int":
             template = template_method_int
+            param_args = get_args(method.params, import_strings, False)
+        elif method.return_type == "long":
+            template = template_method_long
             param_args = get_args(method.params, import_strings, False)
         elif method.return_type == "byte[]": # copied from UUID?
             template = template_method_bytearray

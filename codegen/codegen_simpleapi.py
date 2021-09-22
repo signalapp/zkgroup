@@ -52,6 +52,8 @@ def get_args(c, m, class_name, static=True):
     for param in m.params:
         if param[0] == "int":
             s += param[1].lower_camel() + "In: u32,  "
+        elif param[0] == "long":
+            s += param[1].lower_camel() + "In: u64, "
         else:
             s += param[1].lower_camel() + "In: &[u8], "
 
@@ -92,7 +94,7 @@ def print_method(c, m, rustClasses, static):
         error_name = "FFI_RETURN_INPUT_ERROR"
 
     for param in m.params:
-        if param[0] == "int" or param[0] == "byte[]":
+        if param[0] == "int" or param[0] == "long" or param[0] == "byte[]":
             s += "    let %s = %sIn;\n" % (param[1].snake(), param[1].lower_camel())
         elif param[1].snake() == "notary_signature":
             s += """    let mut notary_signature: simple_types::NotarySignatureBytes = [0u8; SIGNATURE_LEN];

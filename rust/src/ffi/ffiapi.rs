@@ -686,6 +686,128 @@ pub extern "C" fn FFI_ServerPublicParams_createProfileKeyCredentialPresentationD
 }
 
 #[no_mangle]
+pub extern "C" fn FFI_ServerPublicParams_createReceiptCredentialRequestContextDeterministic(
+    serverPublicParams: *const u8,
+    serverPublicParamsLen: u32,
+    randomness: *const u8,
+    randomnessLen: u32,
+    receiptSerial: *const u8,
+    receiptSerialLen: u32,
+    receiptCredentialRequestContextOut: *mut u8,
+    receiptCredentialRequestContextLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let receipt_serial: &[u8] =
+            unsafe { slice::from_raw_parts(receiptSerial, receiptSerialLen as usize) };
+        let receipt_credential_request_context: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                receiptCredentialRequestContextOut,
+                receiptCredentialRequestContextLen as usize,
+            )
+        };
+
+        simpleapi::ServerPublicParams_createReceiptCredentialRequestContextDeterministic(
+            server_public_params,
+            randomness,
+            receipt_serial,
+            receipt_credential_request_context,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ServerPublicParams_receiveReceiptCredential(
+    serverPublicParams: *const u8,
+    serverPublicParamsLen: u32,
+    receiptCredentialRequestContext: *const u8,
+    receiptCredentialRequestContextLen: u32,
+    receiptCredentialResponse: *const u8,
+    receiptCredentialResponseLen: u32,
+    receiptCredentialOut: *mut u8,
+    receiptCredentialLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let receipt_credential_request_context: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialRequestContext,
+                receiptCredentialRequestContextLen as usize,
+            )
+        };
+        let receipt_credential_response: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialResponse,
+                receiptCredentialResponseLen as usize,
+            )
+        };
+        let receipt_credential: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(receiptCredentialOut, receiptCredentialLen as usize)
+        };
+
+        simpleapi::ServerPublicParams_receiveReceiptCredential(
+            server_public_params,
+            receipt_credential_request_context,
+            receipt_credential_response,
+            receipt_credential,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ServerPublicParams_createReceiptCredentialPresentationDeterministic(
+    serverPublicParams: *const u8,
+    serverPublicParamsLen: u32,
+    randomness: *const u8,
+    randomnessLen: u32,
+    receiptCredential: *const u8,
+    receiptCredentialLen: u32,
+    receiptCredentialPresentationOut: *mut u8,
+    receiptCredentialPresentationLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let receipt_credential: &[u8] =
+            unsafe { slice::from_raw_parts(receiptCredential, receiptCredentialLen as usize) };
+        let receipt_credential_presentation: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                receiptCredentialPresentationOut,
+                receiptCredentialPresentationLen as usize,
+            )
+        };
+
+        simpleapi::ServerPublicParams_createReceiptCredentialPresentationDeterministic(
+            server_public_params,
+            randomness,
+            receipt_credential,
+            receipt_credential_presentation,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn FFI_ServerSecretParams_issueAuthCredentialDeterministic(
     serverSecretParams: *const u8,
     serverSecretParamsLen: u32,
@@ -838,6 +960,84 @@ pub extern "C" fn FFI_ServerSecretParams_verifyProfileKeyCredentialPresentation(
             server_secret_params,
             group_public_params,
             profile_key_credential_presentation,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ServerSecretParams_issueReceiptCredentialDeterministic(
+    serverSecretParams: *const u8,
+    serverSecretParamsLen: u32,
+    randomness: *const u8,
+    randomnessLen: u32,
+    receiptCredentialRequest: *const u8,
+    receiptCredentialRequestLen: u32,
+    receiptExpirationTime: u64,
+    receiptLevel: u64,
+    receiptCredentialResponseOut: *mut u8,
+    receiptCredentialResponseLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let receipt_credential_request: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialRequest,
+                receiptCredentialRequestLen as usize,
+            )
+        };
+        let receipt_expiration_time = receiptExpirationTime as u64;
+        let receipt_level = receiptLevel as u64;
+        let receipt_credential_response: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                receiptCredentialResponseOut,
+                receiptCredentialResponseLen as usize,
+            )
+        };
+
+        simpleapi::ServerSecretParams_issueReceiptCredentialDeterministic(
+            server_secret_params,
+            randomness,
+            receipt_credential_request,
+            receipt_expiration_time,
+            receipt_level,
+            receipt_credential_response,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ServerSecretParams_verifyReceiptCredentialPresentation(
+    serverSecretParams: *const u8,
+    serverSecretParamsLen: u32,
+    receiptCredentialPresentation: *const u8,
+    receiptCredentialPresentationLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let receipt_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialPresentation,
+                receiptCredentialPresentationLen as usize,
+            )
+        };
+
+        simpleapi::ServerSecretParams_verifyReceiptCredentialPresentation(
+            server_secret_params,
+            receipt_credential_presentation,
         )
     });
 

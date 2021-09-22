@@ -79,10 +79,15 @@ public final class Native {
   public static native int serverPublicParamsCreateProfileKeyCredentialRequestContextDeterministicJNI(byte[] self, byte[] randomness, byte[] uuid, byte[] profileKey, byte[] output);
   public static native int serverPublicParamsReceiveProfileKeyCredentialJNI(byte[] self, byte[] profileKeyCredentialRequestContext, byte[] profileKeyCredentialResponse, byte[] output);
   public static native int serverPublicParamsCreateProfileKeyCredentialPresentationDeterministicJNI(byte[] self, byte[] randomness, byte[] groupSecretParams, byte[] profileKeyCredential, byte[] output);
+  public static native int serverPublicParamsCreateReceiptCredentialRequestContextDeterministicJNI(byte[] self, byte[] randomness, byte[] receiptSerial, byte[] output);
+  public static native int serverPublicParamsReceiveReceiptCredentialJNI(byte[] self, byte[] receiptCredentialRequestContext, byte[] receiptCredentialResponse, byte[] output);
+  public static native int serverPublicParamsCreateReceiptCredentialPresentationDeterministicJNI(byte[] self, byte[] randomness, byte[] receiptCredential, byte[] output);
   public static native int serverSecretParamsIssueAuthCredentialDeterministicJNI(byte[] self, byte[] randomness, byte[] uuid, int redemptionTime, byte[] output);
   public static native int serverSecretParamsVerifyAuthCredentialPresentationJNI(byte[] self, byte[] groupPublicParams, byte[] authCredentialPresentation);
   public static native int serverSecretParamsIssueProfileKeyCredentialDeterministicJNI(byte[] self, byte[] randomness, byte[] profileKeyCredentialRequest, byte[] uuid, byte[] profileKeyCommitment, byte[] output);
   public static native int serverSecretParamsVerifyProfileKeyCredentialPresentationJNI(byte[] self, byte[] groupPublicParams, byte[] profileKeyCredentialPresentation);
+  public static native int serverSecretParamsIssueReceiptCredentialDeterministicJNI(byte[] self, byte[] randomness, byte[] receiptCredentialRequest, long receiptExpirationTime, long receiptLevel, byte[] output);
+  public static native int serverSecretParamsVerifyReceiptCredentialPresentationJNI(byte[] self, byte[] receiptCredentialPresentation);
   public static native int groupPublicParamsGetGroupIdentifierJNI(byte[] self, byte[] output);
   public static native int groupPublicParamsCheckValidContentsJNI(byte[] self);
   public static native int serverPublicParamsVerifySignatureJNI(byte[] self, byte[] message, byte[] notarySignature);
