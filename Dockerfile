@@ -44,15 +44,17 @@ WORKDIR /home/zkgroup
 
 # Rust setup...
 COPY rust-toolchain.toml rust-toolchain.toml
-ARG RUST_TOOLCHAIN_SHA=ad1f8b5199b3b9e231472ed7aa08d2e5d1d539198a15c5b1e53c746aad81d27b
+ARG RUSTUP_SHA256=3dc5ef50861ee18657f9db2eeb7392f9c2a6c95c90ab41e45ab4ca71476b4338
 ARG CARGO_NDK_VERSION=1.0.0
 ENV PATH="/home/zkgroup/.cargo/bin:${PATH}"
 
-RUN    curl -f https://static.rust-lang.org/rustup/archive/1.21.1/x86_64-unknown-linux-gnu/rustup-init -o /tmp/rustup-init \
-    && echo "${RUST_TOOLCHAIN_SHA} /tmp/rustup-init" | sha256sum -c - \
+RUN    curl -f https://static.rust-lang.org/rustup/archive/1.24.3/x86_64-unknown-linux-gnu/rustup-init -o /tmp/rustup-init \
+    && echo "${RUSTUP_SHA256} /tmp/rustup-init" | sha256sum -c - \
     && chmod a+x /tmp/rustup-init \
-    && /tmp/rustup-init -y --profile minimal --default-toolchain "$(cat rust-toolchain)" \
+    && /tmp/rustup-init -y --profile default --default-toolchain nightly-2021-09-19 \
     && rm -rf /tmp/rustup-init \
+    && rustup component add rust-src \
+    && rustup target add aarch64-apple-darwin aarch64-apple-ios aarch64-apple-ios-sim aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-apple-darwin x86_64-apple-ios x86_64-linux-android x86_64-unknown-linux-gnu \
     && rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android \
     && cargo install --version ${CARGO_NDK_VERSION} cargo-ndk
 
