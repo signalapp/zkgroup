@@ -1,4 +1,6 @@
 // Root
+import exp = require("constants");
+
 export { default as ServerPublicParams } from './zkgroup/ServerPublicParams';
 export { default as ServerSecretParams } from './zkgroup/ServerSecretParams';
 
@@ -39,3 +41,14 @@ export { default as ProfileKeyCredentialRequest } from './zkgroup/profiles/Profi
 export { default as ProfileKeyCredentialRequestContext } from './zkgroup/profiles/ProfileKeyCredentialRequestContext';
 export { default as ProfileKeyCredentialResponse } from './zkgroup/profiles/ProfileKeyCredentialResponse';
 export { default as ProfileKeyVersion } from './zkgroup/profiles/ProfileKeyVersion';
+
+// Receipts
+export { default as ClientZkReceiptOperations } from './zkgroup/receipts/ClientZkReceiptOperations';
+export { default as ServerZkReceiptOperations } from './zkgroup/receipts/ServerZkReceiptOperations';
+
+export { default as ReceiptCredential } from './zkgroup/receipts/ReceiptCredential';
+export { default as ReceiptCredentialPresentation } from './zkgroup/receipts/ReceiptCredentialPresentation';
+export { default as ReceiptCredentialRequest } from './zkgroup/receipts/ReceiptCredentialRequest';
+export { default as ReceiptCredentialRequestContext } from './zkgroup/receipts/ReceiptCredentialRequestContext';
+export { default as ReceiptCredentialResponse } from './zkgroup/receipts/ReceiptCredentialResponse';
+export { default as ReceiptSerial } from './zkgroup/receipts/ReceiptSerial'
