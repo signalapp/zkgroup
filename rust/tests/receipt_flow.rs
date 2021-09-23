@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 //
 
+use zkgroup::api::receipts::ReceiptCredentialPresentation;
 use zkgroup::common::sho::Sho;
 use zkgroup::crypto::credentials;
 use zkgroup::crypto::proofs::{ReceiptCredentialIssuanceProof, ReceiptCredentialPresentationProof};
@@ -140,4 +141,14 @@ fn test_api() {
         zkgroup::common::constants::RECEIPT_CREDENTIAL_PRESENTATION_LEN,
         bincode::serialize(&presentation).unwrap().len(),
     );
+
+    let mut presentation_bytes = bincode::serialize(&presentation).unwrap();
+    // change it ever so slightly; maybe try a higher level for instance
+    let i = presentation_bytes.len() - 17;
+    presentation_bytes[i] += 1;
+    let bad_presentation =
+        bincode::deserialize::<ReceiptCredentialPresentation>(&presentation_bytes).unwrap();
+    server_secret_params
+        .verify_receipt_credential_presentation(&bad_presentation)
+        .expect_err("This Presentation Should Be Bad");
 }
