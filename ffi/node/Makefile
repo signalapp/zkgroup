@@ -31,14 +31,14 @@ clean:
 	rm $(TARGET_LIB)
 	rm -r node_modules
 
-libzkgroup: FORCE
+.PHONY: libzkgroup
+libzkgroup:
 	RUSTFLAGS=$(RUSTFLAGS) cargo build --manifest-path=$(ZKGROUP_RUST_DIR)/Cargo.toml --release
 	rm -f $(TARGET_LIB)
 	mv $(ZKGROUP_TARGET_DIR)/${CARGO_BUILD_TARGET}/release/$(SOURCE_LIB) $(TARGET_LIB)
 
-test: FORCE
+.PHONY: test
+test:
 	npm install
 	npm run build
 	npm test
-
-FORCE:
