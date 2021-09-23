@@ -143,7 +143,7 @@ diff --git b/ffi/swift/Sources/ZKGroup/ClientZkGroupCipher.swift a/ffi/swift/Sou
 index 4d36edb46acf..fa7f1b4aba5c 100644
 --- b/ffi/swift/Sources/ZKGroup/ClientZkGroupCipher.swift
 +++ a/ffi/swift/Sources/ZKGroup/ClientZkGroupCipher.swift
-@@ -85,7 +85,7 @@ public class ClientZkGroupCipher {
+@@ -91,7 +91,7 @@ public class ClientZkGroupCipher {
  
    }
  
@@ -152,7 +152,7 @@ index 4d36edb46acf..fa7f1b4aba5c 100644
      var randomness: [UInt8] = Array(repeating: 0, count: Int(32))
      let result = SecRandomCopyBytes(kSecRandomDefault, randomness.count, &randomness)
      guard result == errSecSuccess else {
-@@ -96,9 +96,11 @@ public class ClientZkGroupCipher {
+@@ -102,9 +102,11 @@ public class ClientZkGroupCipher {
    }
  
    public func encryptBlob(randomness: [UInt8], plaintext: [UInt8]) throws  -> [UInt8] {
@@ -166,7 +166,7 @@ index 4d36edb46acf..fa7f1b4aba5c 100644
      if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
        throw ZkGroupException.VerificationFailed
      }
-@@ -111,9 +113,10 @@ public class ClientZkGroupCipher {
+@@ -117,9 +120,10 @@ public class ClientZkGroupCipher {
    }
  
    public func decryptBlob(blobCiphertext: [UInt8]) throws  -> [UInt8] {
@@ -178,7 +178,7 @@ index 4d36edb46acf..fa7f1b4aba5c 100644
      if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
        throw ZkGroupException.VerificationFailed
      }
-@@ -122,7 +125,18 @@ public class ClientZkGroupCipher {
+@@ -128,7 +131,18 @@ public class ClientZkGroupCipher {
        throw ZkGroupException.ZkGroupError
      }
  
