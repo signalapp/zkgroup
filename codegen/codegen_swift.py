@@ -304,7 +304,7 @@ def get_decls(params, import_strings, class_dir_dict, my_dir_name):
             s += param[1].lower_camel() + ": UInt32, "
             #SWIFT add_import(import_strings, class_dir_dict, my_dir_name, param[1])
         elif param[0] == "long":
-            s += param[1].lower_camel() + ": Uint64, "
+            s += param[1].lower_camel() + ": UInt64, "
             #SWIFT add_import(import_strings, class_dir_dict, my_dir_name, param[1])
         elif param[0] == "UUID":
             s += param[1].lower_camel() + ": ZKGUuid, "

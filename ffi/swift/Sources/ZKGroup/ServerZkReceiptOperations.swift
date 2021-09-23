@@ -27,7 +27,7 @@ public class ServerZkReceiptOperations {
     return try issueReceiptCredential(randomness: randomness, receiptCredentialRequest: receiptCredentialRequest, receiptExpirationTime: receiptExpirationTime, receiptLevel: receiptLevel)
   }
 
-  public func issueReceiptCredential(randomness: [UInt8], receiptCredentialRequest: ReceiptCredentialRequest, receiptExpirationTime: Uint64, receiptLevel: Uint64) throws  -> ReceiptCredentialResponse {
+  public func issueReceiptCredential(randomness: [UInt8], receiptCredentialRequest: ReceiptCredentialRequest, receiptExpirationTime: UInt64, receiptLevel: UInt64) throws  -> ReceiptCredentialResponse {
     var newContents: [UInt8] = Array(repeating: 0, count: ReceiptCredentialResponse.SIZE)
 
     let ffi_return = FFI_ServerSecretParams_issueReceiptCredentialDeterministic(serverSecretParams.getInternalContentsForFFI(), UInt32(serverSecretParams.getInternalContentsForFFI().count), randomness, UInt32(randomness.count), receiptCredentialRequest.getInternalContentsForFFI(), UInt32(receiptCredentialRequest.getInternalContentsForFFI().count), receiptExpirationTime, receiptLevel, &newContents, UInt32(newContents.count))
