@@ -55,7 +55,6 @@ RUN    curl -f https://static.rust-lang.org/rustup/archive/1.24.3/x86_64-unknown
     && rm -rf /tmp/rustup-init \
     && rustup component add rust-src \
     && rustup target add aarch64-apple-darwin aarch64-apple-ios aarch64-apple-ios-sim aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-apple-darwin x86_64-apple-ios x86_64-linux-android x86_64-unknown-linux-gnu \
-    && rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android \
     && cargo install --version ${CARGO_NDK_VERSION} cargo-ndk
 
 # Android SDK setup...
