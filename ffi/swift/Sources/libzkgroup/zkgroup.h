@@ -407,6 +407,16 @@ int32_t FFI_ReceiptCredentialResponse_checkValidContents(const uint8_t *receiptC
 int32_t FFI_ReceiptCredential_checkValidContents(const uint8_t *receiptCredential,
                                                  uint32_t receiptCredentialLen);
 
+int32_t FFI_ReceiptCredential_getReceiptExpirationTime(const uint8_t *receiptCredential,
+                                                       uint32_t receiptCredentialLen,
+                                                       uint8_t *receiptExpirationTimeOut,
+                                                       uint32_t receiptExpirationTimeLen);
+
+int32_t FFI_ReceiptCredential_getReceiptLevel(const uint8_t *receiptCredential,
+                                              uint32_t receiptCredentialLen,
+                                              uint8_t *receiptLevelOut,
+                                              uint32_t receiptLevelLen);
+
 int32_t FFI_ReceiptCredentialPresentation_checkValidContents(const uint8_t *receiptCredentialPresentation,
                                                              uint32_t receiptCredentialPresentationLen);
 
