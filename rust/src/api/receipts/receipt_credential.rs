@@ -20,3 +20,13 @@ pub struct ReceiptCredential {
     pub(crate) receipt_level: ReceiptLevel,
     pub(crate) receipt_serial_bytes: ReceiptSerialBytes,
 }
+
+impl ReceiptCredential {
+    pub fn get_receipt_expiration_time(&self) -> ReceiptExpirationTime {
+        self.receipt_expiration_time
+    }
+
+    pub fn get_receipt_level(&self) -> ReceiptLevel {
+        self.receipt_level
+    }
+}
