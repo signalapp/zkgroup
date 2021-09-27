@@ -243,7 +243,7 @@ template_method_int = \
 
 template_method_long = \
 """
-  %(access)s int %(method_name)s(%(param_decls)s) %(exception_decl)s{
+  %(access)s long %(method_name)s(%(param_decls)s) %(exception_decl)s{
     byte[] newContents = new byte[8];
 
     int ffi_return = Native.%(jni_method_name)s(%(contents)s, %(param_args)snewContents);%(exception_check)s

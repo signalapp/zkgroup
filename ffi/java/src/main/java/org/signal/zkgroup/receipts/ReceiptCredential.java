@@ -33,7 +33,7 @@ public final class ReceiptCredential extends ByteArray {
     }
   }
 
-  public int getReceiptExpirationTime() {
+  public long getReceiptExpirationTime() {
     byte[] newContents = new byte[8];
 
     int ffi_return = Native.receiptCredentialGetReceiptExpirationTimeJNI(contents, newContents);
@@ -45,7 +45,7 @@ public final class ReceiptCredential extends ByteArray {
     return ByteBuffer.wrap(newContents).getLong();
   }
 
-  public int getReceiptLevel() {
+  public long getReceiptLevel() {
     byte[] newContents = new byte[8];
 
     int ffi_return = Native.receiptCredentialGetReceiptLevelJNI(contents, newContents);
