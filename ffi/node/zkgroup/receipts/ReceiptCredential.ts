@@ -8,7 +8,7 @@
  */
 
 import ByteArray from '../internal/ByteArray';
-import {FFICompatArrayType} from '../internal/FFICompatArray';
+import FFICompatArray, {FFICompatArrayType} from '../internal/FFICompatArray';
 import InvalidInputException from '../errors/InvalidInputException';
 import ZkGroupError from '../errors/ZkGroupError';
 import Native, {FFI_RETURN_INPUT_ERROR, FFI_RETURN_OK} from '../internal/Native';
@@ -29,5 +29,29 @@ export default class ReceiptCredential extends ByteArray {
         if (ffi_return != FFI_RETURN_OK) {
             throw new ZkGroupError('FFI_RETURN!=OK');
         }
+    }
+
+    getReceiptExpirationTime(): string | number {
+        const newContents = new FFICompatArray(Buffer.alloc(8));
+
+        const ffi_return = Native.FFI_ReceiptCredential_getReceiptExpirationTime(this.contents, this.contents.length, newContents, newContents.length);
+
+        if (ffi_return != FFI_RETURN_OK) {
+            throw new ZkGroupError("FFI_RETURN!=OK");
+        }
+
+        return newContents.buffer.readUInt64BE(0);
+    }
+
+    getReceiptLevel(): string | number {
+        const newContents = new FFICompatArray(Buffer.alloc(8));
+
+        const ffi_return = Native.FFI_ReceiptCredential_getReceiptLevel(this.contents, this.contents.length, newContents, newContents.length);
+
+        if (ffi_return != FFI_RETURN_OK) {
+            throw new ZkGroupError("FFI_RETURN!=OK");
+        }
+
+        return newContents.buffer.readUInt64BE(0);
     }
 }

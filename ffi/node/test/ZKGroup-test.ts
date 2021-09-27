@@ -259,6 +259,8 @@ describe('ZKGroup', () => {
 
     // client
     const credential = clientOps.receiveReceiptCredential(context, response);
+    assert(receiptExpirationTime == credential.getReceiptExpirationTime());
+    assert(receiptLevel == credential.getReceiptLevel());
     const presentation = clientOps.createReceiptCredentialPresentation(credential);
 
     // redemption server
