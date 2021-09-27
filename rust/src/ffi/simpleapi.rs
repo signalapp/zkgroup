@@ -1083,8 +1083,7 @@ pub fn ReceiptCredential_getReceiptExpirationTime(
             Err(_) => return FFI_RETURN_INTERNAL_ERROR,
         };
     let receipt_expiration_time = receipt_credential.get_receipt_expiration_time();
-    receiptExpirationTimeOut
-        .copy_from_slice(&bincode::serialize(&receipt_expiration_time).unwrap());
+    receiptExpirationTimeOut.copy_from_slice(&receipt_expiration_time.to_be_bytes());
     FFI_RETURN_OK
 }
 
@@ -1098,7 +1097,7 @@ pub fn ReceiptCredential_getReceiptLevel(
             Err(_) => return FFI_RETURN_INTERNAL_ERROR,
         };
     let receipt_level = receipt_credential.get_receipt_level();
-    receiptLevelOut.copy_from_slice(&bincode::serialize(&receipt_level).unwrap());
+    receiptLevelOut.copy_from_slice(&receipt_level.to_be_bytes());
     FFI_RETURN_OK
 }
 

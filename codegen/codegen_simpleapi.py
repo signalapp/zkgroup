@@ -37,6 +37,10 @@ template_ret_simple = \
 """
     %sOut.copy_from_slice(&%s);"""
 
+template_ret_int = \
+"""
+    %sOut.copy_from_slice(&%s.to_be_bytes());"""
+
 
 template_method_decl_end = \
 """
@@ -107,8 +111,8 @@ def print_method(c, m, rustClasses, static):
     if m.return_name.snake() == "change_signature" or m.return_name.snake() == "notary_signature" or \
        m.return_type == "byte[]":
         s += template_ret_simple % (m.return_name.lower_camel(), m.return_name.snake())
-    elif m.return_name.snake() == "redemption_time":
-        s += "\n    redemptionTimeOut.copy_from_slice(&redemption_time.to_be_bytes());"
+    elif m.return_type == "int" or m.return_type == "long":
+        s += template_ret_int % (m.return_name.lower_camel(), m.return_name.snake())
     elif m.return_type != "boolean":
         s += template_ret % (m.return_name.lower_camel(), m.return_name.snake())
 
