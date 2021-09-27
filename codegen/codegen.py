@@ -347,6 +347,10 @@ def define_classes():
     classes.append(c)
 
     c = ClassDescriptor("receipt_credential", "receipts", "api::receipts::ReceiptCredential", 129)
+    c.add_method("get_receipt_expiration_time", "long", "receipt_expiration_time", [],
+                 """    let receipt_expiration_time = receipt_credential.get_receipt_expiration_time();""")
+    c.add_method("get_receipt_level", "long", "receipt_level", [],
+                 """    let receipt_level = receipt_credential.get_receipt_level();""")
     classes.append(c)
 
     c = ClassDescriptor("receipt_credential_presentation", "receipts", "api::receipts::ReceiptCredentialPresentation", 329)

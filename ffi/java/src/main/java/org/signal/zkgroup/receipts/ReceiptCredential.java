@@ -9,6 +9,7 @@
 
 package org.signal.zkgroup.receipts;
 
+import java.nio.ByteBuffer;
 import org.signal.zkgroup.InvalidInputException;
 import org.signal.zkgroup.ZkGroupError;
 import org.signal.zkgroup.internal.ByteArray;
@@ -30,6 +31,30 @@ public final class ReceiptCredential extends ByteArray {
     if (ffi_return != Native.FFI_RETURN_OK) {
       throw new ZkGroupError("FFI_RETURN!=OK");
     }
+  }
+
+  public int getReceiptExpirationTime() {
+    byte[] newContents = new byte[8];
+
+    int ffi_return = Native.receiptCredentialGetReceiptExpirationTimeJNI(contents, newContents);
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw new ZkGroupError("FFI_RETURN!=OK");
+    }
+
+    return ByteBuffer.wrap(newContents).getLong();
+  }
+
+  public int getReceiptLevel() {
+    byte[] newContents = new byte[8];
+
+    int ffi_return = Native.receiptCredentialGetReceiptLevelJNI(contents, newContents);
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw new ZkGroupError("FFI_RETURN!=OK");
+    }
+
+    return ByteBuffer.wrap(newContents).getLong();
   }
 
   public byte[] serialize() {

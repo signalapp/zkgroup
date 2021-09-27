@@ -28,6 +28,34 @@ public class ReceiptCredential : ByteArray {
     }
   }
 
+  public func getReceiptExpirationTime() throws  -> UInt64 {
+    var newContents: [UInt8] = Array(repeating: 0, count: Int(8))
+
+    let ffi_return = FFI_ReceiptCredential_getReceiptExpirationTime(self.contents, UInt32(self.contents.count), &newContents, UInt32(newContents.count))
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw ZkGroupException.ZkGroupError
+     }
+
+    let data = Data(bytes: newContents)
+    let value = UInt64(bigEndian: data.withUnsafeBytes { $0.pointee })
+    return value
+  }
+
+  public func getReceiptLevel() throws  -> UInt64 {
+    var newContents: [UInt8] = Array(repeating: 0, count: Int(8))
+
+    let ffi_return = FFI_ReceiptCredential_getReceiptLevel(self.contents, UInt32(self.contents.count), &newContents, UInt32(newContents.count))
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw ZkGroupException.ZkGroupError
+     }
+
+    let data = Data(bytes: newContents)
+    let value = UInt64(bigEndian: data.withUnsafeBytes { $0.pointee })
+    return value
+  }
+
   public func serialize() -> [UInt8] {
     return contents
   }

@@ -1814,6 +1814,70 @@ pub extern "system" fn Java_org_signal_zkgroup_internal_Native_receiptCredential
 }
 
 #[no_mangle]
+pub extern "system" fn Java_org_signal_zkgroup_internal_Native_receiptCredentialGetReceiptExpirationTimeJNI(
+    env: JNIEnv,
+    _class: JClass,
+    receiptCredential: jbyteArray,
+    receiptExpirationTimeOut: jbyteArray,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential = env.convert_byte_array(receiptCredential).unwrap();
+        let mut receipt_expiration_time: Vec<u8> =
+            vec![0; env.get_array_length(receiptExpirationTimeOut).unwrap() as usize];
+
+        let ffi_return = simpleapi::ReceiptCredential_getReceiptExpirationTime(
+            &receipt_credential,
+            &mut receipt_expiration_time,
+        );
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(
+            receiptExpirationTimeOut,
+            0,
+            &u8toi8(receipt_expiration_time)[..],
+        )
+        .unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "system" fn Java_org_signal_zkgroup_internal_Native_receiptCredentialGetReceiptLevelJNI(
+    env: JNIEnv,
+    _class: JClass,
+    receiptCredential: jbyteArray,
+    receiptLevelOut: jbyteArray,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential = env.convert_byte_array(receiptCredential).unwrap();
+        let mut receipt_level: Vec<u8> =
+            vec![0; env.get_array_length(receiptLevelOut).unwrap() as usize];
+
+        let ffi_return =
+            simpleapi::ReceiptCredential_getReceiptLevel(&receipt_credential, &mut receipt_level);
+        if ffi_return != FFI_RETURN_OK {
+            return ffi_return;
+        }
+
+        env.set_byte_array_region(receiptLevelOut, 0, &u8toi8(receipt_level)[..])
+            .unwrap();
+        FFI_RETURN_OK
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
 pub extern "system" fn Java_org_signal_zkgroup_internal_Native_receiptCredentialPresentationCheckValidContentsJNI(
     env: JNIEnv,
     _class: JClass,

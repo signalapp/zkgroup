@@ -109,6 +109,8 @@ public final class Native {
   public static native int receiptCredentialRequestContextCheckValidContentsJNI(byte[] self);
   public static native int receiptCredentialRequestCheckValidContentsJNI(byte[] self);
   public static native int receiptCredentialResponseCheckValidContentsJNI(byte[] self);
+  public static native int receiptCredentialGetReceiptExpirationTimeJNI(byte[] self, byte[] output);
+  public static native int receiptCredentialGetReceiptLevelJNI(byte[] self, byte[] output);
   public static native int receiptCredentialCheckValidContentsJNI(byte[] self);
   public static native int receiptCredentialPresentationCheckValidContentsJNI(byte[] self);
   public static native int uuidCiphertextCheckValidContentsJNI(byte[] self);

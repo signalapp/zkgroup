@@ -1073,6 +1073,35 @@ pub fn ReceiptCredential_checkValidContents(receiptCredentialIn: &[u8]) -> i32 {
     FFI_RETURN_OK
 }
 
+pub fn ReceiptCredential_getReceiptExpirationTime(
+    receiptCredentialIn: &[u8],
+    receiptExpirationTimeOut: &mut [u8],
+) -> i32 {
+    let receipt_credential: api::receipts::ReceiptCredential =
+        match bincode::deserialize(receiptCredentialIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let receipt_expiration_time = receipt_credential.get_receipt_expiration_time();
+    receiptExpirationTimeOut
+        .copy_from_slice(&bincode::serialize(&receipt_expiration_time).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredential_getReceiptLevel(
+    receiptCredentialIn: &[u8],
+    receiptLevelOut: &mut [u8],
+) -> i32 {
+    let receipt_credential: api::receipts::ReceiptCredential =
+        match bincode::deserialize(receiptCredentialIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let receipt_level = receipt_credential.get_receipt_level();
+    receiptLevelOut.copy_from_slice(&bincode::serialize(&receipt_level).unwrap());
+    FFI_RETURN_OK
+}
+
 pub fn ReceiptCredentialPresentation_checkValidContents(
     receiptCredentialPresentationIn: &[u8],
 ) -> i32 {
