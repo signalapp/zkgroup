@@ -1,16 +1,15 @@
 {
   "name": "zkgroup",
-  "version": "0.7.1",
+  "version": "0.8.1",
   "description": "zero-knowledge group functionality",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist/zkgroup",
     "dist/index.d.ts",
-    "zkgroup/modules",
-    "libzkgroup.dylib",
-    "libzkgroup.dll",
-    "libzkgroup.so"
+    "libzkgroup-*.dylib",
+    "libzkgroup-*.dll",
+    "libzkgroup-*.so"
   ],
   "scripts": {
     "build": "tsc",
@@ -20,9 +19,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ffi-napi": "2.4.5",
-    "ref-array-napi": "1.2.0",
-    "ref-napi": "1.4.2"
+    "@types/ffi-napi": "^4.0.1",
+    "@types/ref-napi": "^3.0.1",
+    "ffi-napi": "4.0.3",
+    "ref-array-napi": "1.2.2",
+    "ref-napi": "3.0.3"
   },
   "devDependencies": {
     "@types/chai": "4.2.7",

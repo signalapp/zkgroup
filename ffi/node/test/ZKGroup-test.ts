@@ -14,6 +14,9 @@ import ServerZkProfileOperations from '../zkgroup/profiles/ServerZkProfileOperat
 import ClientZkProfileOperations from '../zkgroup/profiles/ClientZkProfileOperations';
 import ProfileKey from '../zkgroup/profiles/ProfileKey';
 import ProfileKeyVersion from '../zkgroup/profiles/ProfileKeyVersion';
+import ClientZkReceiptOperations from "../zkgroup/receipts/ClientZkReceiptOperations";
+import ServerZkReceiptOperations from "../zkgroup/receipts/ServerZkReceiptOperations";
+import ReceiptSerial from "../zkgroup/receipts/ReceiptSerial";
 
 function hexToCompatArray(hex: string) {
   const buffer = Buffer.from(hex, 'hex');
@@ -237,4 +240,30 @@ describe('ZKGroup', () => {
     const plaintext257 = clientZkGroupCipher.decryptBlob(ciphertextPaddedWith257);
     assertArrayEquals(plaintext, plaintext257);
   });
+
+  it('testReceiptFlow', () => {
+    const serverSecretParams = ServerSecretParams.generateWithRandom(TEST_ARRAY_32);
+    const serverPublicParams = serverSecretParams.getPublicParams();
+    const serverOps = new ServerZkReceiptOperations(serverSecretParams);
+    const clientOps = new ClientZkReceiptOperations(serverPublicParams);
+    const receiptSerial = new ReceiptSerial(hexToCompatArray('00112233445566778899aabbccddeeff'));
+
+    // client
+    const context = clientOps.createReceiptCredentialRequestContext(receiptSerial);
+    const request = context.getRequest();
+
+    // issuance server
+    const receiptExpirationTime = "31337";
+    const receiptLevel = "3";
+    const response = serverOps.issueReceiptCredential(request, receiptExpirationTime, receiptLevel);
+
+    // client
+    const credential = clientOps.receiveReceiptCredential(context, response);
+    assert(receiptExpirationTime == credential.getReceiptExpirationTime());
+    assert(receiptLevel == credential.getReceiptLevel());
+    const presentation = clientOps.createReceiptCredentialPresentation(credential);
+
+    // redemption server
+    serverOps.verifyReceiptCredentialPresentation(presentation);
+  })
 });

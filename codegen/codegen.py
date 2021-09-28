@@ -105,6 +105,9 @@ def define_classes():
     c = ClassDescriptor("notary_signature", "", "simple_types::NotarySignatureBytes", 64, check_valid_contents=False)
     classes.append(c)
 
+    c = ClassDescriptor("receipt_serial", "receipts", "simple_types::ReceiptSerialBytes", 16, check_valid_contents=False)
+    classes.append(c)
+
     c = ClassDescriptor("profile_key", "profiles", "api::profiles::ProfileKey", 32, check_valid_contents=False)
     c.add_method("get_commitment", "class", "profile_key_commitment", [("UUID", "uuid")],
             """    let profile_key_commitment = profile_key.get_commitment(uuid);""");
@@ -169,7 +172,7 @@ def define_classes():
 
     classes.append(c)
 
-    c = ClassDescriptor("server_secret_params", "", "api::ServerSecretParams", 769, runtime_error_on_serialize=True)
+    c = ClassDescriptor("server_secret_params", "", "api::ServerSecretParams", 1121, runtime_error_on_serialize=True)
     c.add_static_method("generate_deterministic", "class", "server_secret_params", [("class", "randomness")],
             """    let server_secret_params = api::ServerSecretParams::generate(randomness);""")
 
@@ -213,6 +216,22 @@ def define_classes():
 
     classes.append(c)
 
+    c = ClassDescriptor("client_zk_receipt_operations", "receipts", "api::receipts::ClientZkReceiptOperations", 256, wrap_class="server_public_params")
+
+    c.add_method("create_receipt_credential_request_context_deterministic", "class", "receipt_credential_request_context", [("class", "randomness"), ("class", "receipt_serial")],
+                 """    let receipt_credential_request_context = server_public_params.create_receipt_credential_request_context(randomness, receipt_serial);""")
+
+    c.add_method("receive_receipt_credential", "class", "receipt_credential", [("class", "receipt_credential_request_context"), ("class", "receipt_credential_response")],
+                 """    let receipt_credential = match server_public_params.receive_receipt_credential(&receipt_credential_request_context, &receipt_credential_response) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };""")
+
+    c.add_method("create_receipt_credential_presentation_deterministic", "class", "receipt_credential_presentation", [("class", "randomness"), ("class", "receipt_credential")],
+                 """    let receipt_credential_presentation = server_public_params.create_receipt_credential_presentation(randomness, &receipt_credential);""")
+
+    classes.append(c)
+
     c = ClassDescriptor("server_zk_auth_operations", "auth", "api::auth::ServerZkAuthOperations", 544, wrap_class="server_secret_params")
 
     c.add_method("issue_auth_credential_deterministic", "class", "auth_credential_response", [("class", "randomness"), ("UUID", "uuid"), ("int", "redemption_time")],
@@ -247,13 +266,31 @@ def define_classes():
 
     classes.append(c)
 
+    c = ClassDescriptor("server_zk_receipt_operations", "receipts", "api::receipts::ServerZkReceiptOperations", 544, wrap_class="server_secret_params")
+
+    c.add_method("issue_receipt_credential_deterministic", "class", "receipt_credential_response", [("class", "randomness"), ("class", "receipt_credential_request"), ("long", "receipt_expiration_time"), ("long", "receipt_level")],
+                 """    let receipt_credential_response = server_secret_params.issue_receipt_credential(
+        randomness,
+        &receipt_credential_request,
+        receipt_expiration_time,
+        receipt_level,
+    );""")
+
+    c.add_method("verify_receipt_credential_presentation", "boolean", "None", [("class", "receipt_credential_presentation")],
+                 """    match server_secret_params.verify_receipt_credential_presentation(&receipt_credential_presentation) {
+        Ok(_) => (),
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+        }""")
+
+    classes.append(c)
+
     c = ClassDescriptor("group_public_params", "groups", "api::groups::GroupPublicParams", 97)
     c.add_method("get_group_identifier", "class", "group_identifier", [],
             """    let group_identifier = group_public_params.get_group_identifier();""")
 
     classes.append(c)
 
-    c = ClassDescriptor("server_public_params", "", "api::ServerPublicParams", 161, runtime_error_on_serialize=True)
+    c = ClassDescriptor("server_public_params", "", "api::ServerPublicParams", 225, runtime_error_on_serialize=True)
 
     c.add_method("verify_signature", "boolean", "None", [("byte[]", "message"), ("class", "notary_signature")],
             """    match server_public_params.verify_signature(message, notary_signature) {
@@ -266,7 +303,7 @@ def define_classes():
     c = ClassDescriptor("auth_credential_response", "auth", "api::auth::AuthCredentialResponse", 361)
     classes.append(c)
 
-    c = ClassDescriptor("auth_credential", "auth", "api::auth::AuthCredential", 342)
+    c = ClassDescriptor("auth_credential", "auth", "api::auth::AuthCredential", 181)
     classes.append(c)
 
     c = ClassDescriptor("auth_credential_presentation", "auth", "api::auth::AuthCredentialPresentation", 493)
@@ -298,6 +335,27 @@ def define_classes():
 
     classes.append(c)
 
+    c = ClassDescriptor("receipt_credential_request_context", "receipts", "api::receipts::ReceiptCredentialRequestContext", 177)
+    c.add_method("get_request", "class", "receipt_credential_request", [],
+                 """    let receipt_credential_request = receipt_credential_request_context.get_request();""")
+    classes.append(c)
+
+    c = ClassDescriptor("receipt_credential_request", "receipts", "api::receipts::ReceiptCredentialRequest", 97)
+    classes.append(c)
+
+    c = ClassDescriptor("receipt_credential_response", "receipts", "api::receipts::ReceiptCredentialResponse", 409)
+    classes.append(c)
+
+    c = ClassDescriptor("receipt_credential", "receipts", "api::receipts::ReceiptCredential", 129)
+    c.add_method("get_receipt_expiration_time", "long", "receipt_expiration_time", [],
+                 """    let receipt_expiration_time = receipt_credential.get_receipt_expiration_time();""")
+    c.add_method("get_receipt_level", "long", "receipt_level", [],
+                 """    let receipt_level = receipt_credential.get_receipt_level();""")
+    classes.append(c)
+
+    c = ClassDescriptor("receipt_credential_presentation", "receipts", "api::receipts::ReceiptCredentialPresentation", 329)
+    classes.append(c)
+
     c = ClassDescriptor("uuid_ciphertext", "groups", "api::groups::UuidCiphertext", 65)
     classes.append(c)
 
@@ -313,9 +371,6 @@ def define_classes():
     return classes
 
 
-
-if input("WARNING: Running this generator may result in some code being lost. Continue? yes/NO ").strip() != "yes":
-    sys.exit()
 
 classes = define_classes()
 codegen_java.produce_output(classes)

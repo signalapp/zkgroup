@@ -16,7 +16,7 @@ jobs:
 
       - name: Install pre-requisites
         run: |
-          cargo install cargo-ndk
+          cargo install --version=1.0.0 cargo-ndk
           rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android
 
       - name: Build Android
@@ -30,10 +30,23 @@ jobs:
           RUSTFLAGS: -C link-arg=-s
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk/
           ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk-bundle/
-        
+
+      - name: Read .nvmrc
+        id: node_version
+        working-directory: ffi/node
+        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.node_version.outputs.NODE_VERSION }}'
+
       - name: Build Linux
         working-directory: ffi/node
-        run: make libzkgroup
+        run: |
+          npm --version
+          node --version
+          make libzkgroup
 
       - name: Upload Android
         uses: svenstaro/upload-release-action@v1-release
@@ -48,8 +61,8 @@ jobs:
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup.so
-          asset_name: libzkgroup.so
+          file: ffi/node/libzkgroup-x64.so
+          asset_name: libzkgroup-x64.so
           tag: ${{ github.ref }}
           overwrite: true
 
@@ -62,21 +75,34 @@ jobs:
       - name: Configure git to use HTTPS
         run: git config --global url."https://${{ secrets.REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com".insteadOf ssh://git@github.com
 
+      - name: Read .nvmrc
+        id: node_version
+        working-directory: ffi/node
+        run: echo "::set-output name=NODE_VERSION::$(cat .nvmrc)"
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.node_version.outputs.NODE_VERSION }}'
+
       - name: Build
         working-directory: ffi/node
-        run: make libzkgroup
+        run: |
+          npm --version
+          node --version
+          make libzkgroup
       
       - name: Upload
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup.dll
-          asset_name: libzkgroup.dll
+          file: ffi/node/libzkgroup-x64.dll
+          asset_name: libzkgroup-x64.dll
           tag: ${{ github.ref }}
           overwrite: true
 
-  build_macOS_iOS:
-    name: Build macOS + iOS
+  build_macOS:
+    name: Build macOS (Node)
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
@@ -84,35 +110,28 @@ jobs:
       - name: Configure git to use HTTPS
         run: git config --global url."https://${{ secrets.REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com".insteadOf ssh://git@github.com
 
-      - name: Install pre-requisites
-        run: |
-          rustup target add aarch64-apple-ios x86_64-apple-ios armv7-apple-ios armv7s-apple-ios
-          cd ffi/swift
-          make install_build_dependencies
+      - name: Read .nvmrc
+        id: node_version
+        working-directory: ffi/node
+        run: echo ::set-output name=NODE_VERSION::$(cat .nvmrc)
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '${{ steps.node_version.outputs.NODE_VERSION }}'
 
       - name: Build
         run: |
+          npm --version
+          node --version
           cd ffi/node
           make libzkgroup
-          cd ../../ffi/swift
-          make
-          cd ZKGroup
-          zip -r libzkgroup-ios.zip libzkgroup
       
       - name: Upload macOS
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/node/libzkgroup.dylib
-          asset_name: libzkgroup.dylib
-          tag: ${{ github.ref }}
-          overwrite: true
-
-      - name: Upload iOS
-        uses: svenstaro/upload-release-action@v1-release
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ffi/swift/ZKGroup/libzkgroup-ios.zip
-          asset_name: libzkgroup-ios.zip
+          file: ffi/node/libzkgroup-x64.dylib
+          asset_name: libzkgroup-x64.dylib
           tag: ${{ github.ref }}
           overwrite: true

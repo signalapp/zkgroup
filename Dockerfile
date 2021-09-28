@@ -1,4 +1,7 @@
-FROM ubuntu:18.04
+FROM debian:stretch
+
+COPY docker/ docker/
+COPY docker/apt.conf docker/sources.list /etc/apt/
 
 RUN    dpkg --add-architecture i386
 
@@ -17,14 +20,9 @@ RUN    apt-get update \
                openssh-client \
                unzip
 
-RUN    apt-get install -y --no-install-recommends \
-               libc6:i386=2.27-3ubuntu1 \
-               libncurses5:i386=6.1-1ubuntu1.18.04 \
-               libstdc++6:i386=8.4.0-1ubuntu1~18.04 \
-               lib32z1=1:1.2.11.dfsg-0ubuntu2
-
-RUN    apt-get install -y --no-install-recommends \
-               openjdk-8-jdk=8u242-b08-0ubuntu3~18.04
+# Install pinned dependencies
+RUN    apt-get install -y $(cat docker/dependencies.txt)
+RUN    docker/print-versions.sh docker/dependencies.txt
 
 RUN    rm -rf /var/lib/apt/lists/* && \
        apt-get autoremove -y && \
@@ -45,17 +43,18 @@ ENV SHELL /bin/bash
 WORKDIR /home/zkgroup
 
 # Rust setup...
-ARG RUST_TOOLCHAIN=1.41.1
-ARG RUST_TOOLCHAIN_SHA=ad1f8b5199b3b9e231472ed7aa08d2e5d1d539198a15c5b1e53c746aad81d27b
+COPY rust-toolchain.toml rust-toolchain.toml
+ARG RUSTUP_SHA256=3dc5ef50861ee18657f9db2eeb7392f9c2a6c95c90ab41e45ab4ca71476b4338
 ARG CARGO_NDK_VERSION=1.0.0
 ENV PATH="/home/zkgroup/.cargo/bin:${PATH}"
 
-RUN    curl -f https://static.rust-lang.org/rustup/archive/1.21.1/x86_64-unknown-linux-gnu/rustup-init -o /tmp/rustup-init \
-    && echo "${RUST_TOOLCHAIN_SHA} /tmp/rustup-init" | sha256sum -c - \
+RUN    curl -f https://static.rust-lang.org/rustup/archive/1.24.3/x86_64-unknown-linux-gnu/rustup-init -o /tmp/rustup-init \
+    && echo "${RUSTUP_SHA256} /tmp/rustup-init" | sha256sum -c - \
     && chmod a+x /tmp/rustup-init \
-    && /tmp/rustup-init -y --profile minimal --default-toolchain "${RUST_TOOLCHAIN}" \
+    && /tmp/rustup-init -y --profile default --default-toolchain nightly-2021-09-19 \
     && rm -rf /tmp/rustup-init \
-    && rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android \
+    && rustup component add rust-src \
+    && rustup target add aarch64-apple-darwin aarch64-apple-ios aarch64-apple-ios-sim aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-apple-darwin x86_64-apple-ios x86_64-linux-android x86_64-unknown-linux-gnu \
     && cargo install --version ${CARGO_NDK_VERSION} cargo-ndk
 
 # Android SDK setup...

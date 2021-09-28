@@ -5,6 +5,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 //
 
+plugins {
+    id "de.undercouch.download" version "4.1.1"
+}
+
 apply plugin: 'java'
 apply from: '../../deploy.gradle'
 
@@ -19,6 +23,10 @@ repositories {
 dependencies {
     testImplementation 'org.mockito:mockito-core:1.9.5'
     testImplementation 'junit:junit:4.12'
+}
+
+sourceSets {
+    otherPlatformLibraries {}
 }
 
 tasks.withType(JavaCompile) {
@@ -50,7 +58,29 @@ task packageSources(type: Jar) {
     classifier = 'sources'
 }
 
+
+task testableJar(type: Jar) {
+    from sourceSets.main.output
+    from sourceSets.otherPlatformLibraries.resources
+    classifier = 'testable'
+
+    def extraResources = ['libzkgroup.dll', 'libzkgroup.dylib']
+    def extraResourcesDir = 'src/otherPlatformLibraries/resources'
+
+    doFirst {
+        mkdir extraResourcesDir
+        extraResources.each { name ->
+            def artifact = name.replace('libzkgroup', 'libzkgroup-x64')
+            download {
+                src 'https://github.com/signalapp/zkgroup/releases/download/v' + project.version + '/' + artifact
+                dest extraResourcesDir + '/' + name
+            }
+        }
+    }
+}
+
 artifacts {
     archives packageJavadoc
     archives packageSources
+    archives testableJar
 }

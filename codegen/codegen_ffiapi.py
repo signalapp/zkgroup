@@ -41,10 +41,7 @@ template_method_body_end = \
 def get_args(params, commaAtEnd):
     s = ""
     for param in params:
-        if param[0] != "int":
-            s += "&" + param[1].snake() + ", "
-        else:
-            s += param[1].snake() + ", "
+        s += param[1].snake() + ", "
 
     if len(s) != 0 and not commaAtEnd:
         s = s[:-2]
@@ -67,12 +64,14 @@ def print_method(c, m, static):
         s += "    " + class_name.lower_camel() + ": *const u8,\n"
         s += "    " + class_name.lower_camel() + "Len: u32,\n"
     for param in m.params:
-        if param[0] != "int":
-            s += "    " + param[1].lower_camel() + ": *const u8,\n"
-            s += "    " + param[1].lower_camel() + "Len: u32,\n"
+        if param[0] == "int":
+            s += f"    {param[1].lower_camel()}: u32,\n"
+        elif param[0] == "long":
+            s += f"    {param[1].lower_camel()}: u64,\n"
         else:
-            s += "    " + param[1].lower_camel() + ": u32,\n"
-    if m.return_type != "boolean": 
+            s += f"    {param[1].lower_camel()}: *const u8,\n"
+            s += f"    {param[1].lower_camel()}Len: u32,\n"
+    if m.return_type != "boolean":
         s += "    " + m.return_name.lower_camel() + "Out: *mut u8,\n" 
         s += "    " + m.return_name.lower_camel() + "Len: u32,\n" 
     s += template_method_decl_end
@@ -83,10 +82,12 @@ def print_method(c, m, static):
     if not static:
         s += "        let " + class_name.snake() + ": &[u8] = unsafe { slice::from_raw_parts(%s, %sLen as usize) };\n" % (class_name.lower_camel(), class_name.lower_camel())
     for param in m.params:
-        if param[0] != "int":
-            s += "        let " + param[1].snake() + ": &[u8] = unsafe { slice::from_raw_parts(%s, %sLen as usize) };\n" % (param[1].lower_camel(), param[1].lower_camel())
+        if param[0] == "int":
+            s += f"        let {param[1].snake()} = {param[1].lower_camel()} as u32;\n"
+        elif param[0] == "long":
+            s += f"        let {param[1].snake()} = {param[1].lower_camel()} as u64;\n"
         else:
-            s += "        let " + param[1].snake() + " = %s as u32;\n" % param[1].lower_camel()
+            s += f"        let {param[1].snake()}: &[u8] = unsafe {{ slice::from_raw_parts({param[1].lower_camel()}, {param[1].lower_camel()}Len as usize) }};\n"
     if m.return_type != "boolean":
         s += "        let %s: &mut [u8] = unsafe { slice::from_raw_parts_mut(%sOut, %sLen as usize) };\n" % (m.return_name.snake(), m.return_name.lower_camel(), m.return_name.lower_camel())
 

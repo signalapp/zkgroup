@@ -514,6 +514,98 @@ pub fn ServerPublicParams_createProfileKeyCredentialPresentationDeterministic(
     FFI_RETURN_OK
 }
 
+pub fn ServerPublicParams_createReceiptCredentialRequestContextDeterministic(
+    serverPublicParamsIn: &[u8],
+    randomnessIn: &[u8],
+    receiptSerialIn: &[u8],
+    receiptCredentialRequestContextOut: &mut [u8],
+) -> i32 {
+    let server_public_params: api::ServerPublicParams =
+        match bincode::deserialize(serverPublicParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+
+    let randomness: simple_types::RandomnessBytes = match bincode::deserialize(randomnessIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    let receipt_serial: simple_types::ReceiptSerialBytes =
+        match bincode::deserialize(receiptSerialIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+    let receipt_credential_request_context =
+        server_public_params.create_receipt_credential_request_context(randomness, receipt_serial);
+    receiptCredentialRequestContextOut
+        .copy_from_slice(&bincode::serialize(&receipt_credential_request_context).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn ServerPublicParams_receiveReceiptCredential(
+    serverPublicParamsIn: &[u8],
+    receiptCredentialRequestContextIn: &[u8],
+    receiptCredentialResponseIn: &[u8],
+    receiptCredentialOut: &mut [u8],
+) -> i32 {
+    let server_public_params: api::ServerPublicParams =
+        match bincode::deserialize(serverPublicParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+
+    let receipt_credential_request_context: api::receipts::ReceiptCredentialRequestContext =
+        match bincode::deserialize(receiptCredentialRequestContextIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    let receipt_credential_response: api::receipts::ReceiptCredentialResponse =
+        match bincode::deserialize(receiptCredentialResponseIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+    let receipt_credential = match server_public_params.receive_receipt_credential(
+        &receipt_credential_request_context,
+        &receipt_credential_response,
+    ) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+    receiptCredentialOut.copy_from_slice(&bincode::serialize(&receipt_credential).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn ServerPublicParams_createReceiptCredentialPresentationDeterministic(
+    serverPublicParamsIn: &[u8],
+    randomnessIn: &[u8],
+    receiptCredentialIn: &[u8],
+    receiptCredentialPresentationOut: &mut [u8],
+) -> i32 {
+    let server_public_params: api::ServerPublicParams =
+        match bincode::deserialize(serverPublicParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+
+    let randomness: simple_types::RandomnessBytes = match bincode::deserialize(randomnessIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    let receipt_credential: api::receipts::ReceiptCredential =
+        match bincode::deserialize(receiptCredentialIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+    let receipt_credential_presentation = server_public_params
+        .create_receipt_credential_presentation(randomness, &receipt_credential);
+    receiptCredentialPresentationOut
+        .copy_from_slice(&bincode::serialize(&receipt_credential_presentation).unwrap());
+    FFI_RETURN_OK
+}
+
 pub fn ServerSecretParams_issueAuthCredentialDeterministic(
     serverSecretParamsIn: &[u8],
     randomnessIn: &[u8],
@@ -650,6 +742,67 @@ pub fn ServerSecretParams_verifyProfileKeyCredentialPresentation(
         group_public_params,
         &profile_key_credential_presentation,
     ) {
+        Ok(_) => (),
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    }
+    FFI_RETURN_OK
+}
+
+pub fn ServerSecretParams_issueReceiptCredentialDeterministic(
+    serverSecretParamsIn: &[u8],
+    randomnessIn: &[u8],
+    receiptCredentialRequestIn: &[u8],
+    receiptExpirationTimeIn: u64,
+    receiptLevelIn: u64,
+    receiptCredentialResponseOut: &mut [u8],
+) -> i32 {
+    let server_secret_params: api::ServerSecretParams =
+        match bincode::deserialize(serverSecretParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+
+    let randomness: simple_types::RandomnessBytes = match bincode::deserialize(randomnessIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    let receipt_credential_request: api::receipts::ReceiptCredentialRequest =
+        match bincode::deserialize(receiptCredentialRequestIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+    let receipt_expiration_time = receiptExpirationTimeIn;
+    let receipt_level = receiptLevelIn;
+    let receipt_credential_response = server_secret_params.issue_receipt_credential(
+        randomness,
+        &receipt_credential_request,
+        receipt_expiration_time,
+        receipt_level,
+    );
+    receiptCredentialResponseOut
+        .copy_from_slice(&bincode::serialize(&receipt_credential_response).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn ServerSecretParams_verifyReceiptCredentialPresentation(
+    serverSecretParamsIn: &[u8],
+    receiptCredentialPresentationIn: &[u8],
+) -> i32 {
+    let server_secret_params: api::ServerSecretParams =
+        match bincode::deserialize(serverSecretParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+
+    let receipt_credential_presentation: api::receipts::ReceiptCredentialPresentation =
+        match bincode::deserialize(receiptCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+    match server_secret_params
+        .verify_receipt_credential_presentation(&receipt_credential_presentation)
+    {
         Ok(_) => (),
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     }
@@ -861,6 +1014,102 @@ pub fn ProfileKeyCredentialPresentation_getProfileKeyCiphertext(
         };
     let profile_key_ciphertext = profile_key_credential_presentation.get_profile_key_ciphertext();
     profileKeyCiphertextOut.copy_from_slice(&bincode::serialize(&profile_key_ciphertext).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialRequestContext_checkValidContents(
+    receiptCredentialRequestContextIn: &[u8],
+) -> i32 {
+    let _: api::receipts::ReceiptCredentialRequestContext =
+        match bincode::deserialize(receiptCredentialRequestContextIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialRequestContext_getRequest(
+    receiptCredentialRequestContextIn: &[u8],
+    receiptCredentialRequestOut: &mut [u8],
+) -> i32 {
+    let receipt_credential_request_context: api::receipts::ReceiptCredentialRequestContext =
+        match bincode::deserialize(receiptCredentialRequestContextIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let receipt_credential_request = receipt_credential_request_context.get_request();
+    receiptCredentialRequestOut
+        .copy_from_slice(&bincode::serialize(&receipt_credential_request).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialRequest_checkValidContents(receiptCredentialRequestIn: &[u8]) -> i32 {
+    let _: api::receipts::ReceiptCredentialRequest =
+        match bincode::deserialize(receiptCredentialRequestIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialResponse_checkValidContents(receiptCredentialResponseIn: &[u8]) -> i32 {
+    let _: api::receipts::ReceiptCredentialResponse =
+        match bincode::deserialize(receiptCredentialResponseIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredential_checkValidContents(receiptCredentialIn: &[u8]) -> i32 {
+    let _: api::receipts::ReceiptCredential = match bincode::deserialize(receiptCredentialIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredential_getReceiptExpirationTime(
+    receiptCredentialIn: &[u8],
+    receiptExpirationTimeOut: &mut [u8],
+) -> i32 {
+    let receipt_credential: api::receipts::ReceiptCredential =
+        match bincode::deserialize(receiptCredentialIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let receipt_expiration_time = receipt_credential.get_receipt_expiration_time();
+    receiptExpirationTimeOut.copy_from_slice(&receipt_expiration_time.to_be_bytes());
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredential_getReceiptLevel(
+    receiptCredentialIn: &[u8],
+    receiptLevelOut: &mut [u8],
+) -> i32 {
+    let receipt_credential: api::receipts::ReceiptCredential =
+        match bincode::deserialize(receiptCredentialIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let receipt_level = receipt_credential.get_receipt_level();
+    receiptLevelOut.copy_from_slice(&receipt_level.to_be_bytes());
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialPresentation_checkValidContents(
+    receiptCredentialPresentationIn: &[u8],
+) -> i32 {
+    let _: api::receipts::ReceiptCredentialPresentation =
+        match bincode::deserialize(receiptCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
     FFI_RETURN_OK
 }
 

@@ -196,7 +196,7 @@ impl GroupSecretParams {
         plaintext: &[u8],
     ) -> Result<Vec<u8>, ZkGroupError> {
         let key = GenericArray::from_slice(key);
-        let aead_cipher = Aes256GcmSiv::new(*key);
+        let aead_cipher = Aes256GcmSiv::new(&*key);
         let nonce = GenericArray::from_slice(nonce);
         match aead_cipher.encrypt(nonce, plaintext) {
             Ok(ciphertext_vec) => Ok(ciphertext_vec),
@@ -215,7 +215,7 @@ impl GroupSecretParams {
             return Err(ZkGroupError::DecryptionFailure);
         }
         let key = GenericArray::from_slice(key);
-        let aead_cipher = Aes256GcmSiv::new(*key);
+        let aead_cipher = Aes256GcmSiv::new(&*key);
         let nonce = GenericArray::from_slice(nonce);
         match aead_cipher.decrypt(nonce, ciphertext) {
             Ok(plaintext_vec) => Ok(plaintext_vec),
@@ -267,12 +267,12 @@ mod tests {
             .encrypt_blob_aesgcmsiv(&key_vec, &nonce_vec, &plaintext_vec)
             .unwrap();
 
-        assert!(&calc_ciphertext[..ciphertext_vec.len()] == &ciphertext_vec[..]);
+        assert!(calc_ciphertext[..ciphertext_vec.len()] == ciphertext_vec[..]);
 
         let calc_plaintext = group_secret_params
             .decrypt_blob_aesgcmsiv(&key_vec, &nonce_vec, &calc_ciphertext)
             .unwrap();
-        assert!(&calc_plaintext[..] == &plaintext_vec[..]);
+        assert!(calc_plaintext[..] == plaintext_vec[..]);
     }
 
     #[test]
@@ -308,11 +308,11 @@ mod tests {
             .encrypt_blob_aesgcmsiv(&key_vec, &nonce_vec, &plaintext_vec)
             .unwrap();
 
-        assert!(&calc_ciphertext[..ciphertext_vec.len()] == &ciphertext_vec[..]);
+        assert!(calc_ciphertext[..ciphertext_vec.len()] == ciphertext_vec[..]);
 
         let calc_plaintext = group_secret_params
             .decrypt_blob_aesgcmsiv(&key_vec, &nonce_vec, &calc_ciphertext)
             .unwrap();
-        assert!(&calc_plaintext[..] == &plaintext_vec[..]);
+        assert!(calc_plaintext[..] == plaintext_vec[..]);
     }
 }

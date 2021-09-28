@@ -20,6 +20,7 @@ extern crate jni;
 use super::simpleapi;
 
 use jni::sys::jint;
+use jni::sys::jlong;
 
 // This is the interface to the JVM that we'll
 // call the majority of our methods on.
@@ -71,10 +72,10 @@ template_method_body_end = \
 def get_args(params, commaAtEnd):
     s = ""
     for param in params:
-        if param[0] != "int":
-            s += "&" + param[1].snake() + ", "
-        else:
+        if param[0] == "int" or param[0] == "long":
             s += param[1].snake() + ", "
+        else:
+            s += "&" + param[1].snake() + ", "
 
     if len(s) != 0 and not commaAtEnd:
         s = s[:-2]
@@ -96,11 +97,13 @@ def print_method(c, m, static):
     if not static:
         s += "    " + class_name.lower_camel() + ": jbyteArray,\n"
     for param in m.params:
-        if param[0] != "int":
-            s += "    " + param[1].lower_camel() + ": jbyteArray,\n"
+        if param[0] == "int":
+            s += f"    {param[1].lower_camel()}: jint,\n"
+        elif param[0] == "long":
+            s += f"    {param[1].lower_camel()}: jlong,\n"
         else:
-            s += "    " + param[1].lower_camel() + ": jint,\n"
-    if m.return_type != "boolean": 
+            s += f"    {param[1].lower_camel()}: jbyteArray,\n"
+    if m.return_type != "boolean":
         s += "    " + m.return_name.lower_camel() + "Out: jbyteArray,\n" 
     s += template_method_decl_end
 
@@ -110,10 +113,12 @@ def print_method(c, m, static):
     if not static:
         s += "        let " + class_name.snake() + " = env.convert_byte_array(%s).unwrap();\n" % class_name.lower_camel()
     for param in m.params:
-        if param[0] != "int":
-            s += "        let " + param[1].snake() + " = env.convert_byte_array(%s).unwrap();\n" % param[1].lower_camel()
+        if param[0] == "int":
+            s += f"        let {param[1].snake()} = {param[1].lower_camel()} as u32;\n"
+        elif param[0] == "long":
+            s += f"        let {param[1].snake()} = {param[1].lower_camel()} as u64;\n"
         else:
-            s += "        let " + param[1].snake() + " = %s as u32;\n" % param[1].lower_camel()
+            s += f"        let {param[1].snake()} = env.convert_byte_array({param[1].lower_camel()}).unwrap();\n"
     if m.return_type != "boolean":
         s += "        let mut %s: Vec<u8> = vec![0; env.get_array_length(%sOut).unwrap() as usize];\n" % (m.return_name.snake(), m.return_name.lower_camel())
 

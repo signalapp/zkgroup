@@ -7,7 +7,7 @@
 
 [package]
 name = "zkgroup"
-version = "0.7.1"
+version = "0.8.1"
 authors = ["Trevor Perrin <trevp@signal.org>"]
 edition = "2018"
 description = "A zero-knowledge group library"
@@ -23,8 +23,8 @@ serde = { version = "1.0.106", features = ["derive"] }
 sha2 = "0.8.0"
 jni = { version = "0.16.0", default-features = false }
 hex = "0.4.0"
-aead = "0.2.0"
-aes-gcm-siv = "0.4.1"
+aead = "0.4.0"
+aes-gcm-siv = "0.10.0"
 
 [dependencies.curve25519-dalek]
 features = ["std", "serde", "alloc"]

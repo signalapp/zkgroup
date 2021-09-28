@@ -1,12 +1,13 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+//
+// Copyright (C) 2020 Signal Messenger, LLC.
+// All rights reserved.
+//
+// SPDX-License-Identifier: GPL-3.0-only
+//
+
+use criterion::{criterion_group, criterion_main, Criterion};
 
 extern crate zkgroup;
-
-use zkgroup::common::simple_types::*;
-use zkgroup::crypto;
-
-use curve25519_dalek::ristretto::RistrettoPoint;
-use sha2::Sha256;
 
 fn benchmark_integration_auth(c: &mut Criterion) {
     let server_secret_params = zkgroup::ServerSecretParams::generate(zkgroup::TEST_ARRAY_32);
@@ -68,7 +69,7 @@ fn benchmark_integration_auth(c: &mut Criterion) {
         })
     });
 
-    let presentation_bytes = &bincode::serialize(&presentation).unwrap();
+    let _presentation_bytes = &bincode::serialize(&presentation).unwrap();
 
     //for b in presentation_bytes.iter() {
     //    print!("0x{:02x}, ", b);

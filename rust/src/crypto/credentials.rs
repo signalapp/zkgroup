@@ -7,14 +7,16 @@
 
 #![allow(non_snake_case)]
 
-use crate::common::sho::*;
-use crate::common::simple_types::*;
-use crate::crypto::profile_key_credential_request;
-use crate::crypto::uid_struct;
 use curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT;
 use curve25519_dalek::ristretto::RistrettoPoint;
 use curve25519_dalek::scalar::Scalar;
 use serde::{Deserialize, Serialize};
+
+use crate::common::sho::*;
+use crate::common::simple_types::*;
+use crate::crypto::receipt_struct::ReceiptStruct;
+use crate::crypto::uid_struct;
+use crate::crypto::{profile_key_credential_request, receipt_credential_request, receipt_struct};
 
 #[derive(Copy, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct SystemParams {
@@ -71,7 +73,6 @@ pub struct ProfileKeyCredential {
     pub(crate) U: RistrettoPoint,
     pub(crate) V: RistrettoPoint,
 }
-
 #[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BlindedProfileKeyCredentialWithSecretNonce {
     pub(crate) rprime: Scalar,
@@ -89,6 +90,30 @@ pub struct BlindedProfileKeyCredential {
     pub(crate) S2: RistrettoPoint,
 }
 
+#[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ReceiptCredential {
+    pub(crate) t: Scalar,
+    pub(crate) U: RistrettoPoint,
+    pub(crate) V: RistrettoPoint,
+}
+
+#[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub struct BlindedReceiptCredentialWithSecretNonce {
+    pub(crate) rprime: Scalar,
+    pub(crate) t: Scalar,
+    pub(crate) U: RistrettoPoint,
+    pub(crate) S1: RistrettoPoint,
+    pub(crate) S2: RistrettoPoint,
+}
+
+#[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
+pub struct BlindedReceiptCredential {
+    pub(crate) t: Scalar,
+    pub(crate) U: RistrettoPoint,
+    pub(crate) S1: RistrettoPoint,
+    pub(crate) S2: RistrettoPoint,
+}
+
 pub(crate) fn convert_to_points_uid_struct(
     uid: uid_struct::UidStruct,
     redemption_time: RedemptionTime,
@@ -96,6 +121,23 @@ pub(crate) fn convert_to_points_uid_struct(
     let system = SystemParams::get_hardcoded();
     let redemption_time_scalar = encode_redemption_time(redemption_time);
     vec![uid.M1, uid.M2, redemption_time_scalar * system.G_m3]
+}
+
+pub(crate) fn convert_to_points_receipt_struct(
+    receipt: receipt_struct::ReceiptStruct,
+) -> Vec<RistrettoPoint> {
+    let system = SystemParams::get_hardcoded();
+    let m1 = receipt.calc_m1();
+    let receipt_serial_scalar = encode_receipt_serial_bytes(receipt.receipt_serial_bytes);
+    vec![m1 * system.G_m1, receipt_serial_scalar * system.G_m2]
+}
+
+pub(crate) fn convert_to_point_M2_receipt_serial_bytes(
+    receipt_serial_bytes: ReceiptSerialBytes,
+) -> RistrettoPoint {
+    let system = SystemParams::get_hardcoded();
+    let receipt_serial_scalar = encode_receipt_serial_bytes(receipt_serial_bytes);
+    receipt_serial_scalar * system.G_m2
 }
 
 impl SystemParams {
@@ -183,7 +225,7 @@ impl SystemParams {
 
 impl KeyPair {
     pub fn generate(sho: &mut Sho, num_attributes: usize) -> Self {
-        if num_attributes > 4 || num_attributes < 3 {
+        if !(2..=4).contains(&num_attributes) {
             panic!();
         }
 
@@ -203,8 +245,11 @@ impl KeyPair {
             - (x0 * system.G_x0)
             - (x1 * system.G_x1)
             - (y1 * system.G_y1)
-            - (y2 * system.G_y2)
-            - (y3 * system.G_y3);
+            - (y2 * system.G_y2);
+
+        if num_attributes > 2 {
+            I -= y3 * system.G_y3;
+        }
 
         if num_attributes > 3 {
             I -= y4 * system.G_y4;
@@ -256,7 +301,9 @@ impl KeyPair {
 
         let mut V = self.W + (self.x0 + self.x1 * t) * U;
         V += self.y1 * M[0];
-        V += self.y2 * M[1];
+        if M.len() > 1 {
+            V += self.y2 * M[1];
+        }
         if M.len() > 2 {
             V += self.y3 * M[2];
         }
@@ -289,6 +336,33 @@ impl KeyPair {
             S2,
         }
     }
+
+    pub fn create_blinded_receipt_credential(
+        &self,
+        public_key: receipt_credential_request::PublicKey,
+        ciphertext: receipt_credential_request::Ciphertext,
+        receipt_expiration_time: ReceiptExpirationTime,
+        receipt_level: ReceiptLevel,
+        sho: &mut Sho,
+    ) -> BlindedReceiptCredentialWithSecretNonce {
+        let params = SystemParams::get_hardcoded();
+        let m1 = ReceiptStruct::calc_m1_from(receipt_expiration_time, receipt_level);
+        let M = vec![m1 * params.G_m1];
+
+        let (t, U, Vprime) = self.credential_core(M, sho);
+        let rprime = sho.get_scalar();
+        let R1 = rprime * RISTRETTO_BASEPOINT_POINT;
+        let R2 = rprime * public_key.Y + Vprime;
+        let S1 = self.y2 * ciphertext.D1 + R1;
+        let S2 = self.y2 * ciphertext.D2 + R2;
+        BlindedReceiptCredentialWithSecretNonce {
+            rprime,
+            t,
+            U,
+            S1,
+            S2,
+        }
+    }
 }
 
 impl BlindedProfileKeyCredentialWithSecretNonce {
@@ -302,11 +376,23 @@ impl BlindedProfileKeyCredentialWithSecretNonce {
     }
 }
 
+impl BlindedReceiptCredentialWithSecretNonce {
+    pub fn get_blinded_receipt_credential(&self) -> BlindedReceiptCredential {
+        BlindedReceiptCredential {
+            t: self.t,
+            U: self.U,
+            S1: self.S1,
+            S2: self.S2,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::common::constants::*;
     use crate::crypto::proofs;
+
+    use super::*;
 
     #[test]
     fn test_system() {
