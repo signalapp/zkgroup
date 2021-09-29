@@ -1113,6 +1113,48 @@ pub fn ReceiptCredentialPresentation_checkValidContents(
     FFI_RETURN_OK
 }
 
+pub fn ReceiptCredentialPresentation_getReceiptExpirationTime(
+    receiptCredentialPresentationIn: &[u8],
+    receiptExpirationTimeOut: &mut [u8],
+) -> i32 {
+    let receipt_credential_presentation: api::receipts::ReceiptCredentialPresentation =
+        match bincode::deserialize(receiptCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let receipt_expiration_time = receipt_credential_presentation.get_receipt_expiration_time();
+    receiptExpirationTimeOut.copy_from_slice(&receipt_expiration_time.to_be_bytes());
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialPresentation_getReceiptLevel(
+    receiptCredentialPresentationIn: &[u8],
+    receiptLevelOut: &mut [u8],
+) -> i32 {
+    let receipt_credential_presentation: api::receipts::ReceiptCredentialPresentation =
+        match bincode::deserialize(receiptCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let receipt_level = receipt_credential_presentation.get_receipt_level();
+    receiptLevelOut.copy_from_slice(&receipt_level.to_be_bytes());
+    FFI_RETURN_OK
+}
+
+pub fn ReceiptCredentialPresentation_getReceiptSerial(
+    receiptCredentialPresentationIn: &[u8],
+    receiptSerialOut: &mut [u8],
+) -> i32 {
+    let receipt_credential_presentation: api::receipts::ReceiptCredentialPresentation =
+        match bincode::deserialize(receiptCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let receipt_serial = receipt_credential_presentation.get_receipt_serial_bytes();
+    receiptSerialOut.copy_from_slice(&bincode::serialize(&receipt_serial).unwrap());
+    FFI_RETURN_OK
+}
+
 pub fn UuidCiphertext_checkValidContents(uuidCiphertextIn: &[u8]) -> i32 {
     let _: api::groups::UuidCiphertext = match bincode::deserialize(uuidCiphertextIn) {
         Ok(result) => result,

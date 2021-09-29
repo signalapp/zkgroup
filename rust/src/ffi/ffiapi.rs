@@ -1644,6 +1644,94 @@ pub extern "C" fn FFI_ReceiptCredentialPresentation_checkValidContents(
 }
 
 #[no_mangle]
+pub extern "C" fn FFI_ReceiptCredentialPresentation_getReceiptExpirationTime(
+    receiptCredentialPresentation: *const u8,
+    receiptCredentialPresentationLen: u32,
+    receiptExpirationTimeOut: *mut u8,
+    receiptExpirationTimeLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialPresentation,
+                receiptCredentialPresentationLen as usize,
+            )
+        };
+        let receipt_expiration_time: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(receiptExpirationTimeOut, receiptExpirationTimeLen as usize)
+        };
+
+        simpleapi::ReceiptCredentialPresentation_getReceiptExpirationTime(
+            receipt_credential_presentation,
+            receipt_expiration_time,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ReceiptCredentialPresentation_getReceiptLevel(
+    receiptCredentialPresentation: *const u8,
+    receiptCredentialPresentationLen: u32,
+    receiptLevelOut: *mut u8,
+    receiptLevelLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialPresentation,
+                receiptCredentialPresentationLen as usize,
+            )
+        };
+        let receipt_level: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(receiptLevelOut, receiptLevelLen as usize) };
+
+        simpleapi::ReceiptCredentialPresentation_getReceiptLevel(
+            receipt_credential_presentation,
+            receipt_level,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ReceiptCredentialPresentation_getReceiptSerial(
+    receiptCredentialPresentation: *const u8,
+    receiptCredentialPresentationLen: u32,
+    receiptSerialOut: *mut u8,
+    receiptSerialLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let receipt_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                receiptCredentialPresentation,
+                receiptCredentialPresentationLen as usize,
+            )
+        };
+        let receipt_serial: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(receiptSerialOut, receiptSerialLen as usize) };
+
+        simpleapi::ReceiptCredentialPresentation_getReceiptSerial(
+            receipt_credential_presentation,
+            receipt_serial,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn FFI_UuidCiphertext_checkValidContents(
     uuidCiphertext: *const u8,
     uuidCiphertextLen: u32,

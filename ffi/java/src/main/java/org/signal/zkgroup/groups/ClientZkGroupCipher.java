@@ -105,7 +105,7 @@ public class ClientZkGroupCipher {
     byte[] paddedPlaintext = new byte[plaintext.length + 4];
     System.arraycopy(plaintext, 0, paddedPlaintext, 4, plaintext.length);
 
-    byte[] newContents = new byte[paddedPlaintext.length+29];
+    byte[] newContents = new byte[paddedPlaintext.length + 29];
     byte[] random      = new byte[Native.RANDOM_LENGTH];
 
     secureRandom.nextBytes(random);
@@ -123,7 +123,7 @@ public class ClientZkGroupCipher {
   }
 
   public byte[] decryptBlob(byte[] blobCiphertext) throws VerificationFailedException {
-    byte[] newContents = new byte[blobCiphertext.length-29];
+    byte[] newContents = new byte[blobCiphertext.length + -29];
 
     int ffi_return = Native.groupSecretParamsDecryptBlobJNI(groupSecretParams.getInternalContentsForJNI(), blobCiphertext, newContents);
     if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
@@ -144,7 +144,7 @@ public class ClientZkGroupCipher {
     if (newContents.length < (4 + padLen))  {
         throw new VerificationFailedException();
     }
-   
+
     byte[] depaddedContents = new byte[newContents.length - (4 + padLen)];
     System.arraycopy(newContents, 4, depaddedContents, 0, newContents.length - (4 + padLen));
 

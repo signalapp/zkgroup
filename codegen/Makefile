@@ -6,6 +6,7 @@ all:
 
 .PHONY: output
 output:
+	mkdir -p c
 	mkdir -p ffiapijava
 	mkdir -p ffiapi
 	mkdir -p java
@@ -20,6 +21,7 @@ output:
 	rustfmt ffiapijava/ffiapijava.rs
 	rustfmt ffiapi/ffiapi.rs
 	rustfmt simpleapi/simpleapi.rs
+	cbindgen --quiet --lang c ../rust -o c/zkgroup.h
 
 .PHONY: install
 install:
@@ -28,10 +30,13 @@ install:
 	cp simpleapi/simpleapi.rs ../rust/src/ffi/
 	cp -r java/* ../ffi/java/src/main/java/org/signal/zkgroup
 	cp -r swift/* ../ffi/swift/Sources/ZKGroup
+	cp c/zkgroup.h ../ffi/c/zkgroup.h
+	cp c/zkgroup.h ../ffi/swift/Sources/libzkgroup/zkgroup.h
 	patch -d .. -p1 < codegen_hack.patch
 
 .PHONY: clean
 clean:
+	rm -rf c
 	rm -rf ffiapijava
 	rm -rf ffiapi
 	rm -rf java

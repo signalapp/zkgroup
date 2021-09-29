@@ -3,7 +3,6 @@ import codegen_ffiapi
 import codegen_ffiapijava
 import codegen_simpleapi
 import codegen_swift
-import sys
 
 class Name:
     def __init__(self, name):
@@ -32,8 +31,8 @@ class Name:
         return ret
 
 class StaticMethodDescriptor:
-    def __init__(self, method_name, return_type, return_name, params, rustCode, verification=False, runtime_error=False, 
-            return_size_increment=0):
+    def __init__(self, method_name, return_type, return_name, params, rustCode, verification=False, runtime_error=False,
+            return_size_increment=0, relative_return_size=None):
         self.method_name = Name(method_name)
         self.return_type = return_type
         self.return_name = Name(return_name)
@@ -42,10 +41,11 @@ class StaticMethodDescriptor:
         self.verification = verification
         self.runtime_error = runtime_error
         self.return_size_increment = return_size_increment
+        self.relative_return_size = relative_return_size
 
 class MethodDescriptor:
     def __init__(self, method_name, return_type, return_name, params, rustCode, verification=False, runtime_error=False,
-            unused_self=False, return_size_increment=0):
+            unused_self=False, return_size_increment=0, relative_return_size=None):
         self.method_name = Name(method_name)
         self.return_type = return_type
         self.return_name = Name(return_name)
@@ -55,9 +55,9 @@ class MethodDescriptor:
         self.runtime_error = runtime_error
         self.unused_self = unused_self
         self.return_size_increment = return_size_increment
+        self.relative_return_size = relative_return_size
 
 class ClassDescriptor:
-
     def __init__(self, class_name, dir_name, rust_class_name, class_len_int, check_valid_contents=True, no_class=False, no_serialize=False,
             runtime_error_on_serialize=False, string_contents=False, wrap_class=None):
         self.class_name = Name(class_name)
@@ -81,17 +81,21 @@ class ClassDescriptor:
         else:
             self.wrap_class = None
 
-    def add_static_method(self, method_name, return_type, return_name, params, rustCode="", verification=False, runtime_error=False,
-            return_size_increment=0):
+    def add_static_method(
+            self, method_name, return_type, return_name, params, rust_code="", verification=False, runtime_error=False,
+            return_size_increment=0, relative_return_size=None):
         params2 = [(p[0], Name(p[1])) for p in params]
-        self.static_methods.append(StaticMethodDescriptor(method_name, return_type, return_name, params2, rustCode, verification, runtime_error,
-            return_size_increment))
+        self.static_methods.append(StaticMethodDescriptor(
+            method_name, return_type, return_name, params2, rust_code, verification, runtime_error,
+            return_size_increment, relative_return_size=relative_return_size))
 
-    def add_method(self, method_name, return_type, return_name, params, rustCode="", verification=False, runtime_error=False,
-            return_size_increment=0, unused_self=False):
+    def add_method(
+            self, method_name, return_type, return_name, params, rust_code="", verification=False, runtime_error=False,
+            return_size_increment=0, unused_self=False, relative_return_size=None):
         params2 = [(p[0], Name(p[1])) for p in params]
-        self.methods.append(MethodDescriptor(method_name, return_type, return_name, params2, rustCode, verification, runtime_error,
-            unused_self, return_size_increment))
+        self.methods.append(MethodDescriptor(
+            method_name, return_type, return_name, params2, rust_code, verification, runtime_error, unused_self,
+            return_size_increment, relative_return_size=relative_return_size))
 
 def define_classes():
     classes = []
@@ -125,7 +129,7 @@ def define_classes():
     c = ClassDescriptor("group_secret_params", "groups", "api::groups::GroupSecretParams", 289, runtime_error_on_serialize=True)
 
     c.add_static_method("generate_deterministic", "class", "group_secret_params", [("class", "randomness")],
-            """    let group_secret_params = api::groups::GroupSecretParams::generate(randomness);""" )   
+            """    let group_secret_params = api::groups::GroupSecretParams::generate(randomness);""" )
 
     c.add_static_method("derive_from_master_key", "class", "group_secret_params", [("class", "group_master_key")],
             """    let group_secret_params = api::groups::GroupSecretParams::derive_from_master_key(group_master_key);""", runtime_error=True)
@@ -140,19 +144,19 @@ def define_classes():
 
     c = ClassDescriptor("client_zk_group_cipher", "groups", "api::groups::ClientZkGroupCipher", 192, wrap_class="group_secret_params")
 
-    c.add_method("encrypt_uuid", "class", "uuid_ciphertext", [("UUID", "uuid")], 
+    c.add_method("encrypt_uuid", "class", "uuid_ciphertext", [("UUID", "uuid")],
             """    let uuid_ciphertext = group_secret_params.encrypt_uuid(uuid);""", runtime_error=True)
 
-    c.add_method("decrypt_uuid", "UUID", "uuid", [("class", "uuid_ciphertext")], 
+    c.add_method("decrypt_uuid", "UUID", "uuid", [("class", "uuid_ciphertext")],
             """    let uuid = match group_secret_params.decrypt_uuid(uuid_ciphertext) {
         Ok(result) => result,
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     };""")
 
-    c.add_method("encrypt_profile_key", "class", "profile_key_ciphertext", [("class", "profile_key"), ("UUID", "uuid")], 
+    c.add_method("encrypt_profile_key", "class", "profile_key_ciphertext", [("class", "profile_key"), ("UUID", "uuid")],
             """    let profile_key_ciphertext = group_secret_params.encrypt_profile_key(profile_key, uuid);""", runtime_error=True)
 
-    c.add_method("decrypt_profile_key", "class", "profile_key", [("class", "profile_key_ciphertext"), ("UUID", "uuid")], 
+    c.add_method("decrypt_profile_key", "class", "profile_key", [("class", "profile_key_ciphertext"), ("UUID", "uuid")],
             """    let profile_key = match group_secret_params.decrypt_profile_key(profile_key_ciphertext, uuid) {
         Ok(result) => result,
         Err(_) => return FFI_RETURN_INPUT_ERROR,
@@ -162,13 +166,13 @@ def define_classes():
              """    let blob_ciphertext = match group_secret_params.encrypt_blob(randomness, plaintext) {
          Ok(result) => result,
          Err(_) => return FFI_RETURN_INPUT_ERROR,
-     };""", return_size_increment=+29)
+     };""", return_size_increment=+29, relative_return_size=1)
 
-    c.add_method("decrypt_blob", "byte[]", "plaintext", [("byte[]", "blob_ciphertext")], 
+    c.add_method("decrypt_blob", "byte[]", "plaintext", [("byte[]", "blob_ciphertext")],
             """    let plaintext = match group_secret_params.decrypt_blob(blob_ciphertext) {
         Ok(result) => result,
         Err(_) => return FFI_RETURN_INPUT_ERROR,
-    };""", return_size_increment=-29)
+    };""", return_size_increment=-29, relative_return_size=0)
 
     classes.append(c)
 
@@ -188,7 +192,7 @@ def define_classes():
     classes.append(c)
 
     c = ClassDescriptor("client_zk_auth_operations", "auth", "api::auth::ClientZkAuthOperations", 256, wrap_class="server_public_params")
-    
+
     c.add_method("receive_auth_credential", "class", "auth_credential", [("UUID", "uuid"), ("int", "redemption_time"), ("class", "auth_credential_response")],
      """    let auth_credential = match server_public_params.receive_auth_credential(uuid, redemption_time, &auth_credential_response) {
         Ok(result) => result,
@@ -201,8 +205,8 @@ def define_classes():
     classes.append(c)
 
     c = ClassDescriptor("client_zk_profile_operations", "profiles", "api::profiles::ClientZkProfileOperations", 256, wrap_class="server_public_params")
-    
-    c.add_method("create_profile_key_credential_request_context_deterministic", "class", "profile_key_credential_request_context", [("class", "randomness"), ("UUID", "uuid"), ("class", "profile_key")],  
+
+    c.add_method("create_profile_key_credential_request_context_deterministic", "class", "profile_key_credential_request_context", [("class", "randomness"), ("UUID", "uuid"), ("class", "profile_key")],
     """    let profile_key_credential_request_context = server_public_params.create_profile_key_credential_request_context(randomness, uuid, profile_key);""", runtime_error=True)
 
     c.add_method("receive_profile_key_credential", "class", "profile_key_credential", [("class", "profile_key_credential_request_context"), ("class",  "profile_key_credential_response")],
@@ -354,6 +358,12 @@ def define_classes():
     classes.append(c)
 
     c = ClassDescriptor("receipt_credential_presentation", "receipts", "api::receipts::ReceiptCredentialPresentation", 329)
+    c.add_method("get_receipt_expiration_time", "long", "receipt_expiration_time", [],
+                 """    let receipt_expiration_time = receipt_credential_presentation.get_receipt_expiration_time();""")
+    c.add_method("get_receipt_level", "long", "receipt_level", [],
+                 """    let receipt_level = receipt_credential_presentation.get_receipt_level();""")
+    c.add_method("get_receipt_serial", "class", "receipt_serial", [],
+                 """    let receipt_serial = receipt_credential_presentation.get_receipt_serial_bytes();""")
     classes.append(c)
 
     c = ClassDescriptor("uuid_ciphertext", "groups", "api::groups::UuidCiphertext", 65)

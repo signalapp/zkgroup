@@ -112,6 +112,9 @@ public final class Native {
   public static native int receiptCredentialGetReceiptExpirationTimeJNI(byte[] self, byte[] output);
   public static native int receiptCredentialGetReceiptLevelJNI(byte[] self, byte[] output);
   public static native int receiptCredentialCheckValidContentsJNI(byte[] self);
+  public static native int receiptCredentialPresentationGetReceiptExpirationTimeJNI(byte[] self, byte[] output);
+  public static native int receiptCredentialPresentationGetReceiptLevelJNI(byte[] self, byte[] output);
+  public static native int receiptCredentialPresentationGetReceiptSerialJNI(byte[] self, byte[] output);
   public static native int receiptCredentialPresentationCheckValidContentsJNI(byte[] self);
   public static native int uuidCiphertextCheckValidContentsJNI(byte[] self);
   public static native int profileKeyCiphertextCheckValidContentsJNI(byte[] self);

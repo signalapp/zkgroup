@@ -604,14 +604,8 @@ def print_class(c, runtime_error_on_serialize_dict, class_dir_dict):
             template = template_method_bytearray
             param_args = get_args(method.params, import_strings, True)
             append_jni_function_decl(jni_method_name, method.params, True, True)
-            if method.params[0][1].lower_camel() == "randomness":
-                return_len = method.params[1][1].lower_camel()  # hardcode to second arg if first is randomness
-            else:
-                return_len = method.params[0][1].lower_camel()  # hardcode to first arg
-            if method.return_size_increment >= 0:
-                return_len += ".length+%d" % method.return_size_increment
-            if method.return_size_increment < 0:
-                return_len += ".length%d" % method.return_size_increment
+            if method.relative_return_size is not None:
+                return_len = f"{method.params[method.relative_return_size][1].lower_camel()}.length + {method.return_size_increment}"
         else:
             add_import(import_strings, class_dir_dict, my_dir_name, method.return_name)
             if runtime_error_on_serialize_dict[method.return_name.snake()]:
@@ -623,7 +617,7 @@ def print_class(c, runtime_error_on_serialize_dict, class_dir_dict):
             append_jni_function_decl(jni_method_name, method.params, True, True)
         if method.return_name.snake() == "uuid":
             return_len = "UUIDUtil.UUID_LENGTH"
-        elif return_len == None:
+        elif return_len is None:
             return_len = method.return_name.camel() + ".SIZE"
 
 
