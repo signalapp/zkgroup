@@ -13,7 +13,7 @@ use zkgroup::crypto::receipt_credential_request;
 use zkgroup::crypto::receipt_struct::ReceiptStruct;
 use zkgroup::{
     RandomnessBytes, ReceiptExpirationTime, ReceiptLevel, ReceiptSerialBytes, ServerSecretParams,
-    NUM_RECEIPT_CRED_ATTRIBUTES, RANDOMNESS_LEN, RECEIPT_SERIAL_LEN,
+    RANDOMNESS_LEN, RECEIPT_SERIAL_LEN,
 };
 
 #[test]
@@ -37,7 +37,8 @@ fn test_request_response() {
     let given_to_server_public_key = client_key_pair.get_public_key();
 
     // server generated materials; issuance request -> issuance response
-    let server_key_pair = credentials::KeyPair::generate(&mut sho, NUM_RECEIPT_CRED_ATTRIBUTES);
+    let server_key_pair =
+        credentials::KeyPair::<credentials::ReceiptCredential>::generate(&mut sho);
     let blinded_receipt_credential = server_key_pair.create_blinded_receipt_credential(
         given_to_server_public_key,
         given_to_server_ciphertext,
