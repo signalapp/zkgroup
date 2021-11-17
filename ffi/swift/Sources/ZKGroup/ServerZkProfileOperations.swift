@@ -47,8 +47,49 @@ public class ServerZkProfileOperations {
 
   }
 
+  public func issuePniCredential(profileKeyCredentialRequest: ProfileKeyCredentialRequest, aci: ZKGUuid, pni: ZKGUuid, profileKeyCommitment: ProfileKeyCommitment) throws  -> PniCredentialResponse {
+    var randomness: [UInt8] = Array(repeating: 0, count: Int(32))
+    let result = SecRandomCopyBytes(kSecRandomDefault, randomness.count, &randomness)
+    guard result == errSecSuccess else {
+      throw ZkGroupException.AssertionError
+    }
+
+    return try issuePniCredential(randomness: randomness, profileKeyCredentialRequest: profileKeyCredentialRequest, aci: aci, pni: pni, profileKeyCommitment: profileKeyCommitment)
+  }
+
+  public func issuePniCredential(randomness: [UInt8], profileKeyCredentialRequest: ProfileKeyCredentialRequest, aci: ZKGUuid, pni: ZKGUuid, profileKeyCommitment: ProfileKeyCommitment) throws  -> PniCredentialResponse {
+    var newContents: [UInt8] = Array(repeating: 0, count: PniCredentialResponse.SIZE)
+
+    let ffi_return = FFI_ServerSecretParams_issuePniCredentialDeterministic(serverSecretParams.getInternalContentsForFFI(), UInt32(serverSecretParams.getInternalContentsForFFI().count), randomness, UInt32(randomness.count), profileKeyCredentialRequest.getInternalContentsForFFI(), UInt32(profileKeyCredentialRequest.getInternalContentsForFFI().count), aci.getInternalContentsForFFI(), UInt32(aci.getInternalContentsForFFI().count), pni.getInternalContentsForFFI(), UInt32(pni.getInternalContentsForFFI().count), profileKeyCommitment.getInternalContentsForFFI(), UInt32(profileKeyCommitment.getInternalContentsForFFI().count), &newContents, UInt32(newContents.count))
+    if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
+      throw ZkGroupException.VerificationFailed
+    }
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw ZkGroupException.ZkGroupError
+    }
+
+    do {
+      return try PniCredentialResponse(contents: newContents)
+    } catch ZkGroupException.InvalidInput {
+      throw ZkGroupException.AssertionError
+    }
+
+  }
+
   public func verifyProfileKeyCredentialPresentation(groupPublicParams: GroupPublicParams, profileKeyCredentialPresentation: ProfileKeyCredentialPresentation) throws {
     let ffi_return = FFI_ServerSecretParams_verifyProfileKeyCredentialPresentation(serverSecretParams.getInternalContentsForFFI(), UInt32(serverSecretParams.getInternalContentsForFFI().count), groupPublicParams.getInternalContentsForFFI(), UInt32(groupPublicParams.getInternalContentsForFFI().count), profileKeyCredentialPresentation.getInternalContentsForFFI(), UInt32(profileKeyCredentialPresentation.getInternalContentsForFFI().count))
+    if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
+      throw ZkGroupException.VerificationFailed
+    }
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw ZkGroupException.ZkGroupError
+    }
+  }
+
+  public func verifyPniCredentialPresentation(groupPublicParams: GroupPublicParams, pniCredentialPresentation: PniCredentialPresentation) throws {
+    let ffi_return = FFI_ServerSecretParams_verifyPniCredentialPresentation(serverSecretParams.getInternalContentsForFFI(), UInt32(serverSecretParams.getInternalContentsForFFI().count), groupPublicParams.getInternalContentsForFFI(), UInt32(groupPublicParams.getInternalContentsForFFI().count), pniCredentialPresentation.getInternalContentsForFFI(), UInt32(pniCredentialPresentation.getInternalContentsForFFI().count))
     if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
       throw ZkGroupException.VerificationFailed
     }

@@ -19,6 +19,10 @@ import ProfileKeyCredential from './ProfileKeyCredential';
 import ProfileKeyCredentialPresentation from './ProfileKeyCredentialPresentation';
 import GroupSecretParams from '../groups/GroupSecretParams';
 import ProfileKeyCredentialResponse from './ProfileKeyCredentialResponse';
+import PniCredentialRequestContext from './PniCredentialRequestContext';
+import PniCredentialResponse from './PniCredentialResponse';
+import PniCredential from './PniCredential';
+import PniCredentialPresentation from './PniCredentialPresentation';
 
 import { UUID_LENGTH, UUIDType, fromUUID, toUUID } from '../internal/UUIDUtil';
 
@@ -52,6 +56,29 @@ export default class ClientZkProfileOperations {
     return new ProfileKeyCredentialRequestContext(newContents);
   }
 
+  createPniCredentialRequestContext(aci: UUIDType, pni: UUIDType, profileKey: ProfileKey): PniCredentialRequestContext {
+    const random = new FFICompatArray(randomBytes(RANDOM_LENGTH));
+
+    return this.createPniCredentialRequestContextWithRandom(random, aci, pni, profileKey);
+  }
+
+  createPniCredentialRequestContextWithRandom(random: FFICompatArrayType, aci: UUIDType, pni: UUIDType, profileKey: ProfileKey): PniCredentialRequestContext {
+    const newContents = new FFICompatArray(PniCredentialRequestContext.SIZE);
+
+    const serverPublicParamsContents = this.serverPublicParams.getContents();
+    const aciContents = fromUUID(aci);
+    const pniContents = fromUUID(pni);
+    const profileKeyContents = profileKey.getContents();
+
+    const ffi_return = Native.FFI_ServerPublicParams_createPniCredentialRequestContextDeterministic(serverPublicParamsContents, serverPublicParamsContents.length, random, random.length, aciContents, aciContents.length, pniContents, pniContents.length, profileKeyContents, profileKeyContents.length, newContents, newContents.length);
+
+    if (ffi_return != FFI_RETURN_OK) {
+      throw new ZkGroupError("FFI_RETURN!=OK");
+    }
+
+    return new PniCredentialRequestContext(newContents);
+  }
+
   receiveProfileKeyCredential(profileKeyCredentialRequestContext: ProfileKeyCredentialRequestContext, profileKeyCredentialResponse: ProfileKeyCredentialResponse): ProfileKeyCredential {
     const newContents = new FFICompatArray(ProfileKeyCredential.SIZE);
 
@@ -69,6 +96,25 @@ export default class ClientZkProfileOperations {
     }
 
     return new ProfileKeyCredential(newContents);
+  }
+
+  receivePniCredential(pniCredentialRequestContext: PniCredentialRequestContext, pniCredentialResponse: PniCredentialResponse): PniCredential {
+    const newContents = new FFICompatArray(PniCredential.SIZE);
+
+    const serverPublicParamsContents = this.serverPublicParams.getContents();
+    const pniCredentialRequestContextContents = pniCredentialRequestContext.getContents();
+    const pniCredentialResponseContents = pniCredentialResponse.getContents();
+
+    const ffi_return = Native.FFI_ServerPublicParams_receivePniCredential(serverPublicParamsContents, serverPublicParamsContents.length, pniCredentialRequestContextContents, pniCredentialRequestContextContents.length, pniCredentialResponseContents, pniCredentialResponseContents.length, newContents, newContents.length);
+    if (ffi_return == FFI_RETURN_INPUT_ERROR) {
+      throw new VerificationFailedException('FFI_RETURN_INPUT_ERROR');
+    }
+
+    if (ffi_return != FFI_RETURN_OK) {
+      throw new ZkGroupError("FFI_RETURN!=OK");
+    }
+
+    return new PniCredential(newContents);
   }
 
   createProfileKeyCredentialPresentation(groupSecretParams: GroupSecretParams, profileKeyCredential: ProfileKeyCredential): ProfileKeyCredentialPresentation {
@@ -93,4 +139,25 @@ export default class ClientZkProfileOperations {
     return new ProfileKeyCredentialPresentation(newContents);
   }
 
+  createPniCredentialPresentation(groupSecretParams: GroupSecretParams, pniCredential: PniCredential): PniCredentialPresentation {
+    const random = new FFICompatArray(randomBytes(RANDOM_LENGTH));
+
+    return this.createPniCredentialPresentationWithRandom(random, groupSecretParams, pniCredential);
+  }
+
+  createPniCredentialPresentationWithRandom(random: FFICompatArrayType, groupSecretParams: GroupSecretParams, pniCredential: PniCredential): PniCredentialPresentation {
+    const newContents = new FFICompatArray(PniCredentialPresentation.SIZE);
+
+    const serverPublicParamsContents = this.serverPublicParams.getContents();
+    const groupSecretParamsContents = groupSecretParams.getContents();
+    const pniCredentialContents = pniCredential.getContents();
+
+    const ffi_return = Native.FFI_ServerPublicParams_createPniCredentialPresentationDeterministic(serverPublicParamsContents, serverPublicParamsContents.length, random, random.length, groupSecretParamsContents, groupSecretParamsContents.length, pniCredentialContents, pniCredentialContents.length, newContents, newContents.length);
+
+    if (ffi_return != FFI_RETURN_OK) {
+      throw new ZkGroupError("FFI_RETURN!=OK");
+    }
+
+    return new PniCredentialPresentation(newContents);
+  }
 }

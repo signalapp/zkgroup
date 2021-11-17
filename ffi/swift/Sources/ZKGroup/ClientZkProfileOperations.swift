@@ -44,6 +44,33 @@ public class ClientZkProfileOperations {
 
   }
 
+  public func createPniCredentialRequestContext(aci: ZKGUuid, pni: ZKGUuid, profileKey: ProfileKey) throws  -> PniCredentialRequestContext {
+    var randomness: [UInt8] = Array(repeating: 0, count: Int(32))
+    let result = SecRandomCopyBytes(kSecRandomDefault, randomness.count, &randomness)
+    guard result == errSecSuccess else {
+      throw ZkGroupException.AssertionError
+    }
+
+    return try createPniCredentialRequestContext(randomness: randomness, aci: aci, pni: pni, profileKey: profileKey)
+  }
+
+  public func createPniCredentialRequestContext(randomness: [UInt8], aci: ZKGUuid, pni: ZKGUuid, profileKey: ProfileKey) throws  -> PniCredentialRequestContext {
+    var newContents: [UInt8] = Array(repeating: 0, count: PniCredentialRequestContext.SIZE)
+
+    let ffi_return = FFI_ServerPublicParams_createPniCredentialRequestContextDeterministic(serverPublicParams.getInternalContentsForFFI(), UInt32(serverPublicParams.getInternalContentsForFFI().count), randomness, UInt32(randomness.count), aci.getInternalContentsForFFI(), UInt32(aci.getInternalContentsForFFI().count), pni.getInternalContentsForFFI(), UInt32(pni.getInternalContentsForFFI().count), profileKey.getInternalContentsForFFI(), UInt32(profileKey.getInternalContentsForFFI().count), &newContents, UInt32(newContents.count))
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw ZkGroupException.ZkGroupError
+    }
+
+    do {
+      return try PniCredentialRequestContext(contents: newContents)
+    } catch ZkGroupException.InvalidInput {
+      throw ZkGroupException.AssertionError
+    }
+
+  }
+
   public func receiveProfileKeyCredential(profileKeyCredentialRequestContext: ProfileKeyCredentialRequestContext, profileKeyCredentialResponse: ProfileKeyCredentialResponse) throws  -> ProfileKeyCredential {
     var newContents: [UInt8] = Array(repeating: 0, count: ProfileKeyCredential.SIZE)
 
@@ -58,6 +85,26 @@ public class ClientZkProfileOperations {
 
     do {
       return try ProfileKeyCredential(contents: newContents)
+    } catch ZkGroupException.InvalidInput {
+      throw ZkGroupException.AssertionError
+    }
+
+  }
+
+  public func receivePniCredential(pniCredentialRequestContext: PniCredentialRequestContext, pniCredentialResponse: PniCredentialResponse) throws  -> PniCredential {
+    var newContents: [UInt8] = Array(repeating: 0, count: PniCredential.SIZE)
+
+    let ffi_return = FFI_ServerPublicParams_receivePniCredential(serverPublicParams.getInternalContentsForFFI(), UInt32(serverPublicParams.getInternalContentsForFFI().count), pniCredentialRequestContext.getInternalContentsForFFI(), UInt32(pniCredentialRequestContext.getInternalContentsForFFI().count), pniCredentialResponse.getInternalContentsForFFI(), UInt32(pniCredentialResponse.getInternalContentsForFFI().count), &newContents, UInt32(newContents.count))
+    if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
+      throw ZkGroupException.VerificationFailed
+    }
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw ZkGroupException.ZkGroupError
+    }
+
+    do {
+      return try PniCredential(contents: newContents)
     } catch ZkGroupException.InvalidInput {
       throw ZkGroupException.AssertionError
     }
@@ -85,6 +132,33 @@ public class ClientZkProfileOperations {
 
     do {
       return try ProfileKeyCredentialPresentation(contents: newContents)
+    } catch ZkGroupException.InvalidInput {
+      throw ZkGroupException.AssertionError
+    }
+
+  }
+
+  public func createPniCredentialPresentation(groupSecretParams: GroupSecretParams, pniCredential: PniCredential) throws  -> PniCredentialPresentation {
+    var randomness: [UInt8] = Array(repeating: 0, count: Int(32))
+    let result = SecRandomCopyBytes(kSecRandomDefault, randomness.count, &randomness)
+    guard result == errSecSuccess else {
+      throw ZkGroupException.AssertionError
+    }
+
+    return try createPniCredentialPresentation(randomness: randomness, groupSecretParams: groupSecretParams, pniCredential: pniCredential)
+  }
+
+  public func createPniCredentialPresentation(randomness: [UInt8], groupSecretParams: GroupSecretParams, pniCredential: PniCredential) throws  -> PniCredentialPresentation {
+    var newContents: [UInt8] = Array(repeating: 0, count: PniCredentialPresentation.SIZE)
+
+    let ffi_return = FFI_ServerPublicParams_createPniCredentialPresentationDeterministic(serverPublicParams.getInternalContentsForFFI(), UInt32(serverPublicParams.getInternalContentsForFFI().count), randomness, UInt32(randomness.count), groupSecretParams.getInternalContentsForFFI(), UInt32(groupSecretParams.getInternalContentsForFFI().count), pniCredential.getInternalContentsForFFI(), UInt32(pniCredential.getInternalContentsForFFI().count), &newContents, UInt32(newContents.count))
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw ZkGroupException.ZkGroupError
+    }
+
+    do {
+      return try PniCredentialPresentation(contents: newContents)
     } catch ZkGroupException.InvalidInput {
       throw ZkGroupException.AssertionError
     }

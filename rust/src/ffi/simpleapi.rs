@@ -440,6 +440,46 @@ pub fn ServerPublicParams_createProfileKeyCredentialRequestContextDeterministic(
     FFI_RETURN_OK
 }
 
+pub fn ServerPublicParams_createPniCredentialRequestContextDeterministic(
+    serverPublicParamsIn: &[u8],
+    randomnessIn: &[u8],
+    aciIn: &[u8],
+    pniIn: &[u8],
+    profileKeyIn: &[u8],
+    pniCredentialRequestContextOut: &mut [u8],
+) -> i32 {
+    let server_public_params: api::ServerPublicParams =
+        match bincode::deserialize(serverPublicParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+
+    let randomness: simple_types::RandomnessBytes = match bincode::deserialize(randomnessIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    let aci: simple_types::UidBytes = match bincode::deserialize(aciIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    let pni: simple_types::UidBytes = match bincode::deserialize(pniIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    let profile_key: api::profiles::ProfileKey = match bincode::deserialize(profileKeyIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+    let pni_credential_request_context = server_public_params
+        .create_pni_credential_request_context(randomness, aci, pni, profile_key);
+    pniCredentialRequestContextOut
+        .copy_from_slice(&bincode::serialize(&pni_credential_request_context).unwrap());
+    FFI_RETURN_OK
+}
+
 pub fn ServerPublicParams_receiveProfileKeyCredential(
     serverPublicParamsIn: &[u8],
     profileKeyCredentialRequestContextIn: &[u8],
@@ -471,6 +511,39 @@ pub fn ServerPublicParams_receiveProfileKeyCredential(
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     };
     profileKeyCredentialOut.copy_from_slice(&bincode::serialize(&profile_key_credential).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn ServerPublicParams_receivePniCredential(
+    serverPublicParamsIn: &[u8],
+    pniCredentialRequestContextIn: &[u8],
+    pniCredentialResponseIn: &[u8],
+    pniCredentialOut: &mut [u8],
+) -> i32 {
+    let server_public_params: api::ServerPublicParams =
+        match bincode::deserialize(serverPublicParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+
+    let pni_credential_request_context: api::profiles::PniCredentialRequestContext =
+        match bincode::deserialize(pniCredentialRequestContextIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    let pni_credential_response: api::profiles::PniCredentialResponse =
+        match bincode::deserialize(pniCredentialResponseIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+    let pni_credential = match server_public_params
+        .receive_pni_credential(&pni_credential_request_context, &pni_credential_response)
+    {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+    pniCredentialOut.copy_from_slice(&bincode::serialize(&pni_credential).unwrap());
     FFI_RETURN_OK
 }
 
@@ -511,6 +584,44 @@ pub fn ServerPublicParams_createProfileKeyCredentialPresentationDeterministic(
         );
     profileKeyCredentialPresentationOut
         .copy_from_slice(&bincode::serialize(&profile_key_credential_presentation).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn ServerPublicParams_createPniCredentialPresentationDeterministic(
+    serverPublicParamsIn: &[u8],
+    randomnessIn: &[u8],
+    groupSecretParamsIn: &[u8],
+    pniCredentialIn: &[u8],
+    pniCredentialPresentationOut: &mut [u8],
+) -> i32 {
+    let server_public_params: api::ServerPublicParams =
+        match bincode::deserialize(serverPublicParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+
+    let randomness: simple_types::RandomnessBytes = match bincode::deserialize(randomnessIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    let group_secret_params: api::groups::GroupSecretParams =
+        match bincode::deserialize(groupSecretParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    let pni_credential: api::profiles::PniCredential = match bincode::deserialize(pniCredentialIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+    let pni_credential_presentation = server_public_params.create_pni_credential_presentation(
+        randomness,
+        group_secret_params,
+        pni_credential,
+    );
+    pniCredentialPresentationOut
+        .copy_from_slice(&bincode::serialize(&pni_credential_presentation).unwrap());
     FFI_RETURN_OK
 }
 
@@ -716,6 +827,62 @@ pub fn ServerSecretParams_issueProfileKeyCredentialDeterministic(
     FFI_RETURN_OK
 }
 
+pub fn ServerSecretParams_issuePniCredentialDeterministic(
+    serverSecretParamsIn: &[u8],
+    randomnessIn: &[u8],
+    profileKeyCredentialRequestIn: &[u8],
+    aciIn: &[u8],
+    pniIn: &[u8],
+    profileKeyCommitmentIn: &[u8],
+    pniCredentialResponseOut: &mut [u8],
+) -> i32 {
+    let server_secret_params: api::ServerSecretParams =
+        match bincode::deserialize(serverSecretParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+
+    let randomness: simple_types::RandomnessBytes = match bincode::deserialize(randomnessIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    let profile_key_credential_request: api::profiles::ProfileKeyCredentialRequest =
+        match bincode::deserialize(profileKeyCredentialRequestIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    let aci: simple_types::UidBytes = match bincode::deserialize(aciIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    let pni: simple_types::UidBytes = match bincode::deserialize(pniIn) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    let profile_key_commitment: api::profiles::ProfileKeyCommitment =
+        match bincode::deserialize(profileKeyCommitmentIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+    let pni_credential_response = match server_secret_params.issue_pni_credential(
+        randomness,
+        &profile_key_credential_request,
+        aci,
+        pni,
+        profile_key_commitment,
+    ) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+    pniCredentialResponseOut
+        .copy_from_slice(&bincode::serialize(&pni_credential_response).unwrap());
+    FFI_RETURN_OK
+}
+
 pub fn ServerSecretParams_verifyProfileKeyCredentialPresentation(
     serverSecretParamsIn: &[u8],
     groupPublicParamsIn: &[u8],
@@ -742,6 +909,37 @@ pub fn ServerSecretParams_verifyProfileKeyCredentialPresentation(
         group_public_params,
         &profile_key_credential_presentation,
     ) {
+        Ok(_) => (),
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    }
+    FFI_RETURN_OK
+}
+
+pub fn ServerSecretParams_verifyPniCredentialPresentation(
+    serverSecretParamsIn: &[u8],
+    groupPublicParamsIn: &[u8],
+    pniCredentialPresentationIn: &[u8],
+) -> i32 {
+    let server_secret_params: api::ServerSecretParams =
+        match bincode::deserialize(serverSecretParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+
+    let group_public_params: api::groups::GroupPublicParams =
+        match bincode::deserialize(groupPublicParamsIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    let pni_credential_presentation: api::profiles::PniCredentialPresentation =
+        match bincode::deserialize(pniCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+    match server_secret_params
+        .verify_pni_credential_presentation(group_public_params, &pni_credential_presentation)
+    {
         Ok(_) => (),
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     }
@@ -945,6 +1143,31 @@ pub fn ProfileKeyCredentialRequestContext_getRequest(
     FFI_RETURN_OK
 }
 
+pub fn PniCredentialRequestContext_checkValidContents(pniCredentialRequestContextIn: &[u8]) -> i32 {
+    let _: api::profiles::PniCredentialRequestContext =
+        match bincode::deserialize(pniCredentialRequestContextIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    FFI_RETURN_OK
+}
+
+pub fn PniCredentialRequestContext_getRequest(
+    pniCredentialRequestContextIn: &[u8],
+    profileKeyCredentialRequestOut: &mut [u8],
+) -> i32 {
+    let pni_credential_request_context: api::profiles::PniCredentialRequestContext =
+        match bincode::deserialize(pniCredentialRequestContextIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let profile_key_credential_request = pni_credential_request_context.get_request();
+    profileKeyCredentialRequestOut
+        .copy_from_slice(&bincode::serialize(&profile_key_credential_request).unwrap());
+    FFI_RETURN_OK
+}
+
 pub fn ProfileKeyCredentialRequest_checkValidContents(profileKeyCredentialRequestIn: &[u8]) -> i32 {
     let _: api::profiles::ProfileKeyCredentialRequest =
         match bincode::deserialize(profileKeyCredentialRequestIn) {
@@ -967,9 +1190,28 @@ pub fn ProfileKeyCredentialResponse_checkValidContents(
     FFI_RETURN_OK
 }
 
+pub fn PniCredentialResponse_checkValidContents(pniCredentialResponseIn: &[u8]) -> i32 {
+    let _: api::profiles::PniCredentialResponse =
+        match bincode::deserialize(pniCredentialResponseIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    FFI_RETURN_OK
+}
+
 pub fn ProfileKeyCredential_checkValidContents(profileKeyCredentialIn: &[u8]) -> i32 {
     let _: api::profiles::ProfileKeyCredential = match bincode::deserialize(profileKeyCredentialIn)
     {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };
+
+    FFI_RETURN_OK
+}
+
+pub fn PniCredential_checkValidContents(pniCredentialIn: &[u8]) -> i32 {
+    let _: api::profiles::PniCredential = match bincode::deserialize(pniCredentialIn) {
         Ok(result) => result,
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     };
@@ -1013,6 +1255,58 @@ pub fn ProfileKeyCredentialPresentation_getProfileKeyCiphertext(
             Err(_) => return FFI_RETURN_INTERNAL_ERROR,
         };
     let profile_key_ciphertext = profile_key_credential_presentation.get_profile_key_ciphertext();
+    profileKeyCiphertextOut.copy_from_slice(&bincode::serialize(&profile_key_ciphertext).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn PniCredentialPresentation_checkValidContents(pniCredentialPresentationIn: &[u8]) -> i32 {
+    let _: api::profiles::PniCredentialPresentation =
+        match bincode::deserialize(pniCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INPUT_ERROR,
+        };
+
+    FFI_RETURN_OK
+}
+
+pub fn PniCredentialPresentation_getAciCiphertext(
+    pniCredentialPresentationIn: &[u8],
+    uuidCiphertextOut: &mut [u8],
+) -> i32 {
+    let pni_credential_presentation: api::profiles::PniCredentialPresentation =
+        match bincode::deserialize(pniCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let uuid_ciphertext = pni_credential_presentation.get_aci_ciphertext();
+    uuidCiphertextOut.copy_from_slice(&bincode::serialize(&uuid_ciphertext).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn PniCredentialPresentation_getPniCiphertext(
+    pniCredentialPresentationIn: &[u8],
+    uuidCiphertextOut: &mut [u8],
+) -> i32 {
+    let pni_credential_presentation: api::profiles::PniCredentialPresentation =
+        match bincode::deserialize(pniCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let uuid_ciphertext = pni_credential_presentation.get_pni_ciphertext();
+    uuidCiphertextOut.copy_from_slice(&bincode::serialize(&uuid_ciphertext).unwrap());
+    FFI_RETURN_OK
+}
+
+pub fn PniCredentialPresentation_getProfileKeyCiphertext(
+    pniCredentialPresentationIn: &[u8],
+    profileKeyCiphertextOut: &mut [u8],
+) -> i32 {
+    let pni_credential_presentation: api::profiles::PniCredentialPresentation =
+        match bincode::deserialize(pniCredentialPresentationIn) {
+            Ok(result) => result,
+            Err(_) => return FFI_RETURN_INTERNAL_ERROR,
+        };
+    let profile_key_ciphertext = pni_credential_presentation.get_profile_key_ciphertext();
     profileKeyCiphertextOut.copy_from_slice(&bincode::serialize(&profile_key_ciphertext).unwrap());
     FFI_RETURN_OK
 }

@@ -11,7 +11,7 @@ import FFICompatArray, { FFICompatArrayType } from './internal/FFICompatArray'
 
 export default class ServerPublicParams extends ByteArray {
 
-  static SIZE = 225;
+  static SIZE = 289;
 
   constructor (contents: FFICompatArrayType)  {
     super(contents, ServerPublicParams.SIZE, true);

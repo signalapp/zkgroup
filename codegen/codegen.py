@@ -176,7 +176,7 @@ def define_classes():
 
     classes.append(c)
 
-    c = ClassDescriptor("server_secret_params", "", "api::ServerSecretParams", 1121, runtime_error_on_serialize=True)
+    c = ClassDescriptor("server_secret_params", "", "api::ServerSecretParams", 1537, runtime_error_on_serialize=True)
     c.add_static_method("generate_deterministic", "class", "server_secret_params", [("class", "randomness")],
             """    let server_secret_params = api::ServerSecretParams::generate(randomness);""")
 
@@ -209,14 +209,26 @@ def define_classes():
     c.add_method("create_profile_key_credential_request_context_deterministic", "class", "profile_key_credential_request_context", [("class", "randomness"), ("UUID", "uuid"), ("class", "profile_key")],
     """    let profile_key_credential_request_context = server_public_params.create_profile_key_credential_request_context(randomness, uuid, profile_key);""", runtime_error=True)
 
-    c.add_method("receive_profile_key_credential", "class", "profile_key_credential", [("class", "profile_key_credential_request_context"), ("class",  "profile_key_credential_response")],
+    c.add_method("create_pni_credential_request_context_deterministic", "class", "pni_credential_request_context", [("class", "randomness"), ("UUID", "aci"), ("UUID", "pni"), ("class", "profile_key")],
+    """    let pni_credential_request_context = server_public_params.create_pni_credential_request_context(randomness, aci, pni, profile_key);""", runtime_error=True)
+
+    c.add_method("receive_profile_key_credential", "class", "profile_key_credential", [("class", "profile_key_credential_request_context"), ("class", "profile_key_credential_response")],
      """    let profile_key_credential = match server_public_params.receive_profile_key_credential(&profile_key_credential_request_context, &profile_key_credential_response) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };""")
+
+    c.add_method("receive_pni_credential", "class", "pni_credential", [("class", "pni_credential_request_context"), ("class", "pni_credential_response")],
+     """    let pni_credential = match server_public_params.receive_pni_credential(&pni_credential_request_context, &pni_credential_response) {
         Ok(result) => result,
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     };""")
 
     c.add_method("create_profile_key_credential_presentation_deterministic", "class", "profile_key_credential_presentation", [("class", "randomness"), ("class", "group_secret_params"), ("class", "profile_key_credential") ],
     """    let profile_key_credential_presentation = server_public_params.create_profile_key_credential_presentation(randomness, group_secret_params, profile_key_credential);""", runtime_error=True)
+
+    c.add_method("create_pni_credential_presentation_deterministic", "class", "pni_credential_presentation", [("class", "randomness"), ("class", "group_secret_params"), ("class", "pni_credential") ],
+    """    let pni_credential_presentation = server_public_params.create_pni_credential_presentation(randomness, group_secret_params, pni_credential);""", runtime_error=True)
 
     classes.append(c)
 
@@ -262,8 +274,26 @@ def define_classes():
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     };""")
 
+    c.add_method("issue_pni_credential_deterministic", "class", "pni_credential_response", [("class", "randomness"), ("class", "profile_key_credential_request"), ("UUID", "aci"), ("UUID", "pni"), ("class", "profile_key_commitment")],
+            """    let pni_credential_response = match server_secret_params.issue_pni_credential(
+        randomness,
+        &profile_key_credential_request,
+        aci,
+        pni,
+        profile_key_commitment,
+    ) {
+        Ok(result) => result,
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    };""")
+
     c.add_method("verify_profile_key_credential_presentation", "boolean", "None", [("class", "group_public_params"), ("class", "profile_key_credential_presentation") ],
     """    match server_secret_params.verify_profile_key_credential_presentation(group_public_params, &profile_key_credential_presentation) {
+        Ok(_) => (),
+        Err(_) => return FFI_RETURN_INPUT_ERROR,
+    }""")
+
+    c.add_method("verify_pni_credential_presentation", "boolean", "None", [("class", "group_public_params"), ("class", "pni_credential_presentation") ],
+    """    match server_secret_params.verify_pni_credential_presentation(group_public_params, &pni_credential_presentation) {
         Ok(_) => (),
         Err(_) => return FFI_RETURN_INPUT_ERROR,
     }""")
@@ -294,7 +324,7 @@ def define_classes():
 
     classes.append(c)
 
-    c = ClassDescriptor("server_public_params", "", "api::ServerPublicParams", 225, runtime_error_on_serialize=True)
+    c = ClassDescriptor("server_public_params", "", "api::ServerPublicParams", 289, runtime_error_on_serialize=True)
 
     c.add_method("verify_signature", "boolean", "None", [("byte[]", "message"), ("class", "notary_signature")],
             """    match server_public_params.verify_signature(message, notary_signature) {
@@ -320,15 +350,26 @@ def define_classes():
     c = ClassDescriptor("profile_key_credential_request_context", "profiles", "api::profiles::ProfileKeyCredentialRequestContext", 473)
     c.add_method("get_request", "class", "profile_key_credential_request", [],
             """    let profile_key_credential_request = profile_key_credential_request_context.get_request();""" )
-
     classes.append(c)
+
+    c = ClassDescriptor("pni_credential_request_context", "profiles", "api::profiles::PniCredentialRequestContext", 489)
+    c.add_method("get_request", "class", "profile_key_credential_request", [],
+            """    let profile_key_credential_request = pni_credential_request_context.get_request();""" )
+    classes.append(c)
+
     c = ClassDescriptor("profile_key_credential_request", "profiles", "api::profiles::ProfileKeyCredentialRequest", 329)
     classes.append(c)
 
     c = ClassDescriptor("profile_key_credential_response", "profiles", "api::profiles::ProfileKeyCredentialResponse", 457)
     classes.append(c)
 
+    c = ClassDescriptor("pni_credential_response", "profiles", "api::profiles::PniCredentialResponse", 521)
+    classes.append(c)
+
     c = ClassDescriptor("profile_key_credential", "profiles", "api::profiles::ProfileKeyCredential", 145)
+    classes.append(c)
+
+    c = ClassDescriptor("pni_credential", "profiles", "api::profiles::PniCredential", 161)
     classes.append(c)
 
     c = ClassDescriptor("profile_key_credential_presentation", "profiles", "api::profiles::ProfileKeyCredentialPresentation", 713)
@@ -336,7 +377,15 @@ def define_classes():
             """    let uuid_ciphertext = profile_key_credential_presentation.get_uuid_ciphertext();""");
     c.add_method("get_profile_key_ciphertext", "class", "profile_key_ciphertext", [],
             """    let profile_key_ciphertext = profile_key_credential_presentation.get_profile_key_ciphertext();""");
+    classes.append(c)
 
+    c = ClassDescriptor("pni_credential_presentation", "profiles", "api::profiles::PniCredentialPresentation", 841)
+    c.add_method("get_aci_ciphertext", "class", "uuid_ciphertext", [],
+            """    let uuid_ciphertext = pni_credential_presentation.get_aci_ciphertext();""");
+    c.add_method("get_pni_ciphertext", "class", "uuid_ciphertext", [],
+            """    let uuid_ciphertext = pni_credential_presentation.get_pni_ciphertext();""");
+    c.add_method("get_profile_key_ciphertext", "class", "profile_key_ciphertext", [],
+            """    let profile_key_ciphertext = pni_credential_presentation.get_profile_key_ciphertext();""");
     classes.append(c)
 
     c = ClassDescriptor("receipt_credential_request_context", "receipts", "api::receipts::ReceiptCredentialRequestContext", 177)

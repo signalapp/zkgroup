@@ -597,6 +597,53 @@ pub extern "C" fn FFI_ServerPublicParams_createProfileKeyCredentialRequestContex
 }
 
 #[no_mangle]
+pub extern "C" fn FFI_ServerPublicParams_createPniCredentialRequestContextDeterministic(
+    serverPublicParams: *const u8,
+    serverPublicParamsLen: u32,
+    randomness: *const u8,
+    randomnessLen: u32,
+    aci: *const u8,
+    aciLen: u32,
+    pni: *const u8,
+    pniLen: u32,
+    profileKey: *const u8,
+    profileKeyLen: u32,
+    pniCredentialRequestContextOut: *mut u8,
+    pniCredentialRequestContextLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let aci: &[u8] = unsafe { slice::from_raw_parts(aci, aciLen as usize) };
+        let pni: &[u8] = unsafe { slice::from_raw_parts(pni, pniLen as usize) };
+        let profile_key: &[u8] =
+            unsafe { slice::from_raw_parts(profileKey, profileKeyLen as usize) };
+        let pni_credential_request_context: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                pniCredentialRequestContextOut,
+                pniCredentialRequestContextLen as usize,
+            )
+        };
+
+        simpleapi::ServerPublicParams_createPniCredentialRequestContextDeterministic(
+            server_public_params,
+            randomness,
+            aci,
+            pni,
+            profile_key,
+            pni_credential_request_context,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn FFI_ServerPublicParams_receiveProfileKeyCredential(
     serverPublicParams: *const u8,
     serverPublicParamsLen: u32,
@@ -631,6 +678,46 @@ pub extern "C" fn FFI_ServerPublicParams_receiveProfileKeyCredential(
             profile_key_credential_request_context,
             profile_key_credential_response,
             profile_key_credential,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ServerPublicParams_receivePniCredential(
+    serverPublicParams: *const u8,
+    serverPublicParamsLen: u32,
+    pniCredentialRequestContext: *const u8,
+    pniCredentialRequestContextLen: u32,
+    pniCredentialResponse: *const u8,
+    pniCredentialResponseLen: u32,
+    pniCredentialOut: *mut u8,
+    pniCredentialLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let pni_credential_request_context: &[u8] = unsafe {
+            slice::from_raw_parts(
+                pniCredentialRequestContext,
+                pniCredentialRequestContextLen as usize,
+            )
+        };
+        let pni_credential_response: &[u8] = unsafe {
+            slice::from_raw_parts(pniCredentialResponse, pniCredentialResponseLen as usize)
+        };
+        let pni_credential: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(pniCredentialOut, pniCredentialLen as usize) };
+
+        simpleapi::ServerPublicParams_receivePniCredential(
+            server_public_params,
+            pni_credential_request_context,
+            pni_credential_response,
+            pni_credential,
         )
     });
 
@@ -676,6 +763,50 @@ pub extern "C" fn FFI_ServerPublicParams_createProfileKeyCredentialPresentationD
             group_secret_params,
             profile_key_credential,
             profile_key_credential_presentation,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ServerPublicParams_createPniCredentialPresentationDeterministic(
+    serverPublicParams: *const u8,
+    serverPublicParamsLen: u32,
+    randomness: *const u8,
+    randomnessLen: u32,
+    groupSecretParams: *const u8,
+    groupSecretParamsLen: u32,
+    pniCredential: *const u8,
+    pniCredentialLen: u32,
+    pniCredentialPresentationOut: *mut u8,
+    pniCredentialPresentationLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let server_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverPublicParams, serverPublicParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let group_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupSecretParams, groupSecretParamsLen as usize) };
+        let pni_credential: &[u8] =
+            unsafe { slice::from_raw_parts(pniCredential, pniCredentialLen as usize) };
+        let pni_credential_presentation: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                pniCredentialPresentationOut,
+                pniCredentialPresentationLen as usize,
+            )
+        };
+
+        simpleapi::ServerPublicParams_createPniCredentialPresentationDeterministic(
+            server_public_params,
+            randomness,
+            group_secret_params,
+            pni_credential,
+            pni_credential_presentation,
         )
     });
 
@@ -936,6 +1067,60 @@ pub extern "C" fn FFI_ServerSecretParams_issueProfileKeyCredentialDeterministic(
 }
 
 #[no_mangle]
+pub extern "C" fn FFI_ServerSecretParams_issuePniCredentialDeterministic(
+    serverSecretParams: *const u8,
+    serverSecretParamsLen: u32,
+    randomness: *const u8,
+    randomnessLen: u32,
+    profileKeyCredentialRequest: *const u8,
+    profileKeyCredentialRequestLen: u32,
+    aci: *const u8,
+    aciLen: u32,
+    pni: *const u8,
+    pniLen: u32,
+    profileKeyCommitment: *const u8,
+    profileKeyCommitmentLen: u32,
+    pniCredentialResponseOut: *mut u8,
+    pniCredentialResponseLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let randomness: &[u8] =
+            unsafe { slice::from_raw_parts(randomness, randomnessLen as usize) };
+        let profile_key_credential_request: &[u8] = unsafe {
+            slice::from_raw_parts(
+                profileKeyCredentialRequest,
+                profileKeyCredentialRequestLen as usize,
+            )
+        };
+        let aci: &[u8] = unsafe { slice::from_raw_parts(aci, aciLen as usize) };
+        let pni: &[u8] = unsafe { slice::from_raw_parts(pni, pniLen as usize) };
+        let profile_key_commitment: &[u8] = unsafe {
+            slice::from_raw_parts(profileKeyCommitment, profileKeyCommitmentLen as usize)
+        };
+        let pni_credential_response: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(pniCredentialResponseOut, pniCredentialResponseLen as usize)
+        };
+
+        simpleapi::ServerSecretParams_issuePniCredentialDeterministic(
+            server_secret_params,
+            randomness,
+            profile_key_credential_request,
+            aci,
+            pni,
+            profile_key_commitment,
+            pni_credential_response,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn FFI_ServerSecretParams_verifyProfileKeyCredentialPresentation(
     serverSecretParams: *const u8,
     serverSecretParamsLen: u32,
@@ -960,6 +1145,40 @@ pub extern "C" fn FFI_ServerSecretParams_verifyProfileKeyCredentialPresentation(
             server_secret_params,
             group_public_params,
             profile_key_credential_presentation,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_ServerSecretParams_verifyPniCredentialPresentation(
+    serverSecretParams: *const u8,
+    serverSecretParamsLen: u32,
+    groupPublicParams: *const u8,
+    groupPublicParamsLen: u32,
+    pniCredentialPresentation: *const u8,
+    pniCredentialPresentationLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let server_secret_params: &[u8] =
+            unsafe { slice::from_raw_parts(serverSecretParams, serverSecretParamsLen as usize) };
+        let group_public_params: &[u8] =
+            unsafe { slice::from_raw_parts(groupPublicParams, groupPublicParamsLen as usize) };
+        let pni_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                pniCredentialPresentation,
+                pniCredentialPresentationLen as usize,
+            )
+        };
+
+        simpleapi::ServerSecretParams_verifyPniCredentialPresentation(
+            server_secret_params,
+            group_public_params,
+            pni_credential_presentation,
         )
     });
 
@@ -1309,6 +1528,61 @@ pub extern "C" fn FFI_ProfileKeyCredentialRequestContext_getRequest(
 }
 
 #[no_mangle]
+pub extern "C" fn FFI_PniCredentialRequestContext_checkValidContents(
+    pniCredentialRequestContext: *const u8,
+    pniCredentialRequestContextLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let pni_credential_request_context: &[u8] = unsafe {
+            slice::from_raw_parts(
+                pniCredentialRequestContext,
+                pniCredentialRequestContextLen as usize,
+            )
+        };
+
+        simpleapi::PniCredentialRequestContext_checkValidContents(pni_credential_request_context)
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_PniCredentialRequestContext_getRequest(
+    pniCredentialRequestContext: *const u8,
+    pniCredentialRequestContextLen: u32,
+    profileKeyCredentialRequestOut: *mut u8,
+    profileKeyCredentialRequestLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let pni_credential_request_context: &[u8] = unsafe {
+            slice::from_raw_parts(
+                pniCredentialRequestContext,
+                pniCredentialRequestContextLen as usize,
+            )
+        };
+        let profile_key_credential_request: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(
+                profileKeyCredentialRequestOut,
+                profileKeyCredentialRequestLen as usize,
+            )
+        };
+
+        simpleapi::PniCredentialRequestContext_getRequest(
+            pni_credential_request_context,
+            profile_key_credential_request,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCredentialRequest_checkValidContents(
     profileKeyCredentialRequest: *const u8,
     profileKeyCredentialRequestLen: u32,
@@ -1353,6 +1627,25 @@ pub extern "C" fn FFI_ProfileKeyCredentialResponse_checkValidContents(
 }
 
 #[no_mangle]
+pub extern "C" fn FFI_PniCredentialResponse_checkValidContents(
+    pniCredentialResponse: *const u8,
+    pniCredentialResponseLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let pni_credential_response: &[u8] = unsafe {
+            slice::from_raw_parts(pniCredentialResponse, pniCredentialResponseLen as usize)
+        };
+
+        simpleapi::PniCredentialResponse_checkValidContents(pni_credential_response)
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn FFI_ProfileKeyCredential_checkValidContents(
     profileKeyCredential: *const u8,
     profileKeyCredentialLen: u32,
@@ -1363,6 +1656,24 @@ pub extern "C" fn FFI_ProfileKeyCredential_checkValidContents(
         };
 
         simpleapi::ProfileKeyCredential_checkValidContents(profile_key_credential)
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_PniCredential_checkValidContents(
+    pniCredential: *const u8,
+    pniCredentialLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let pni_credential: &[u8] =
+            unsafe { slice::from_raw_parts(pniCredential, pniCredentialLen as usize) };
+
+        simpleapi::PniCredential_checkValidContents(pni_credential)
     });
 
     match result {
@@ -1444,6 +1755,116 @@ pub extern "C" fn FFI_ProfileKeyCredentialPresentation_getProfileKeyCiphertext(
 
         simpleapi::ProfileKeyCredentialPresentation_getProfileKeyCiphertext(
             profile_key_credential_presentation,
+            profile_key_ciphertext,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_PniCredentialPresentation_checkValidContents(
+    pniCredentialPresentation: *const u8,
+    pniCredentialPresentationLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let pni_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                pniCredentialPresentation,
+                pniCredentialPresentationLen as usize,
+            )
+        };
+
+        simpleapi::PniCredentialPresentation_checkValidContents(pni_credential_presentation)
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_PniCredentialPresentation_getAciCiphertext(
+    pniCredentialPresentation: *const u8,
+    pniCredentialPresentationLen: u32,
+    uuidCiphertextOut: *mut u8,
+    uuidCiphertextLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let pni_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                pniCredentialPresentation,
+                pniCredentialPresentationLen as usize,
+            )
+        };
+        let uuid_ciphertext: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(uuidCiphertextOut, uuidCiphertextLen as usize) };
+
+        simpleapi::PniCredentialPresentation_getAciCiphertext(
+            pni_credential_presentation,
+            uuid_ciphertext,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_PniCredentialPresentation_getPniCiphertext(
+    pniCredentialPresentation: *const u8,
+    pniCredentialPresentationLen: u32,
+    uuidCiphertextOut: *mut u8,
+    uuidCiphertextLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let pni_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                pniCredentialPresentation,
+                pniCredentialPresentationLen as usize,
+            )
+        };
+        let uuid_ciphertext: &mut [u8] =
+            unsafe { slice::from_raw_parts_mut(uuidCiphertextOut, uuidCiphertextLen as usize) };
+
+        simpleapi::PniCredentialPresentation_getPniCiphertext(
+            pni_credential_presentation,
+            uuid_ciphertext,
+        )
+    });
+
+    match result {
+        Ok(result) => result,
+        Err(_) => FFI_RETURN_INTERNAL_ERROR,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn FFI_PniCredentialPresentation_getProfileKeyCiphertext(
+    pniCredentialPresentation: *const u8,
+    pniCredentialPresentationLen: u32,
+    profileKeyCiphertextOut: *mut u8,
+    profileKeyCiphertextLen: u32,
+) -> i32 {
+    let result = panic::catch_unwind(|| {
+        let pni_credential_presentation: &[u8] = unsafe {
+            slice::from_raw_parts(
+                pniCredentialPresentation,
+                pniCredentialPresentationLen as usize,
+            )
+        };
+        let profile_key_ciphertext: &mut [u8] = unsafe {
+            slice::from_raw_parts_mut(profileKeyCiphertextOut, profileKeyCiphertextLen as usize)
+        };
+
+        simpleapi::PniCredentialPresentation_getProfileKeyCiphertext(
+            pni_credential_presentation,
             profile_key_ciphertext,
         )
     });
