@@ -41,6 +41,8 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 `rustup show` should indicate that the `x86_64-unknown-linux-gnu` is the host and stable, active toolchain.
 
+For arm64 cross compiles, the `libc6-dev:arm64`, `gcc-aarch64-linux-gnu` and `binutils-aarch64-linux-gnu` packages are required as well as the `aarch64-unknown-linux-gnu` rust target.
+
 ### Mac
 Install Rust.
 
@@ -95,6 +97,12 @@ If all tests pass, go to the packaging step.
 You can manually build the library by going to the project root and running a cargo command. For example, to build a debug library:
 ```
 cargo build
+```
+
+### Cross Building
+To cross build for arm64, from this directory run:
+```sh 
+CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=/usr/bin/aarch64-linux-gnu-gcc NODE_ARCH=arm64 CARGO_BUILD_TARGET="aarch64-unknown-linux-gnu" make libzkgroup
 ```
 
 ## Packaging

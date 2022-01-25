@@ -1,7 +1,8 @@
 ZKGROUP_RUST_DIR=../../rust
 ZKGROUP_TARGET_DIR=../../target
 
-NODE_ARCH := $(shell node -p "process.arch" || echo x64)
+NODE_ARCH ?= $(shell node -p "process.arch" || echo x64)
+
 
 ifeq ($(OS),Windows_NT)
 	DETECTED_OS := Windows

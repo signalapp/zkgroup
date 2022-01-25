@@ -17,7 +17,10 @@ jobs:
       - name: Install pre-requisites
         run: |
           cargo install --version=1.0.0 cargo-ndk
-          rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android
+          rustup target add armv7-linux-androideabi aarch64-linux-android i686-linux-android x86_64-linux-android aarch64-unknown-linux-gnu
+          dpkg --add-architecture arm64
+          apt update
+          apt install -y libc6-dev:arm64 gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu
 
       - name: Build Android
         run: |
@@ -41,12 +44,23 @@ jobs:
         with:
           node-version: '${{ steps.node_version.outputs.NODE_VERSION }}'
 
-      - name: Build Linux
+      - name: Build Linux x64
         working-directory: ffi/node
         run: |
           npm --version
           node --version
           make libzkgroup
+
+      - name: Build Linux arm64
+        working-directory: ffi/node
+        run: |
+          npm --version
+          node --version
+          make libzkgroup
+        env:
+          NODE_ARCH: arm64
+          CARGO_TARGET: aarch64-unknown-linux-gnu
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: /usr/bin/aarch64-linux-gnu-gcc
 
       - name: Upload Android
         uses: svenstaro/upload-release-action@v1-release
@@ -57,12 +71,21 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
-      - name: Upload Linux
+      - name: Upload Linux x64
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ffi/node/libzkgroup-x64.so
           asset_name: libzkgroup-x64.so
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload Linux arm64
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ffi/node/libzkgroup-arm64.so
+          asset_name: libzkgroup-arm64.so
           tag: ${{ github.ref }}
           overwrite: true
 
