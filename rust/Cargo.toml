@@ -33,8 +33,7 @@ git = "https://github.com/signalapp/curve25519-dalek.git"
 branch = "lizard2"
 
 [dependencies.poksho]
-path = "/home/andhell/Documents/Dev/Signal/poksho"
-# git = "https://github.com/signalapp/poksho.git"
+git = "https://github.com/signalapp/poksho.git"
 
 [features]
 default = ["u64_backend"]

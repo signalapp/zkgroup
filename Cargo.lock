@@ -34,7 +34,7 @@ dependencies = [
  "cipher",
  "ctr",
  "polyval",
- "subtle 2.4.0",
+ "subtle",
  "zeroize",
 ]
 
@@ -86,6 +86,15 @@ dependencies = [
  "byte-tools",
  "byteorder",
  "generic-array 0.12.4",
+]
+
+[[package]]
+name = "block-buffer"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4152116fd6e9dadb291ae18fc1ec3575ed6d84c29642d97890f4b4a3417297e4"
+dependencies = [
+ "generic-array 0.14.4",
 ]
 
 [[package]]
@@ -278,12 +287,12 @@ dependencies = [
 
 [[package]]
 name = "crypto-mac"
-version = "0.7.0"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4434400df11d95d556bac068ddfedd482915eb18fe8bea89bc80b6e4b1c179e5"
+checksum = "b1d1a86f49236c215f271d40892d5fc950490551400b02ef360692c29815c714"
 dependencies = [
- "generic-array 0.12.4",
- "subtle 1.0.0",
+ "generic-array 0.14.4",
+ "subtle",
 ]
 
 [[package]]
@@ -323,11 +332,11 @@ version = "2.0.0"
 source = "git+https://github.com/signalapp/curve25519-dalek.git?branch=lizard2#477356e017c7cc2aa168f956786b34690870768f"
 dependencies = [
  "byteorder",
- "digest",
+ "digest 0.8.1",
  "packed_simd",
  "rand_core",
  "serde",
- "subtle 2.4.0",
+ "subtle",
  "zeroize",
 ]
 
@@ -338,6 +347,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f3d0c8c8752312f9713efd397ff63acb9f85585afbf179282e720e7704954dd5"
 dependencies = [
  "generic-array 0.12.4",
+]
+
+[[package]]
+name = "digest"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3dd60d1080a57a05ab032377049e0591415d2b31afd7028356dbf3cc6dcb066"
+dependencies = [
+ "generic-array 0.14.4",
 ]
 
 [[package]]
@@ -414,12 +432,12 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hmac"
-version = "0.7.1"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5dcb5e64cda4c23119ab41ba960d1e170a774c8e4b9d9e6a9bc18aabf5e59695"
+checksum = "2a2a2320eb7ec0ebe8da8f744d7812d9fc4cb4d09344ac01898dbcb6a20ae69b"
 dependencies = [
  "crypto-mac",
- "digest",
+ "digest 0.9.0",
 ]
 
 [[package]]
@@ -596,11 +614,12 @@ dependencies = [
 
 [[package]]
 name = "poksho"
-version = "0.7.0"
+version = "0.7.1"
+source = "git+https://github.com/signalapp/poksho.git#63193f24c8b47a8c5dd2b51334e8f2d607ce6a80"
 dependencies = [
  "curve25519-dalek",
  "hmac",
- "sha2",
+ "sha2 0.9.5",
 ]
 
 [[package]]
@@ -783,17 +802,24 @@ version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a256f46ea78a0c0d9ff00077504903ac881a1dafdc20da66545699e7776b3e69"
 dependencies = [
- "block-buffer",
- "digest",
+ "block-buffer 0.7.3",
+ "digest 0.8.1",
  "fake-simd",
  "opaque-debug 0.2.3",
 ]
 
 [[package]]
-name = "subtle"
-version = "1.0.0"
+name = "sha2"
+version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d67a5a62ba6e01cb2192ff309324cb4875d0c451d55fe2319433abe7a05a8ee"
+checksum = "b362ae5752fd2137731f9fa25fd4d9058af34666ca1966fb969119cc35719f12"
+dependencies = [
+ "block-buffer 0.9.0",
+ "cfg-if 1.0.0",
+ "cpufeatures",
+ "digest 0.9.0",
+ "opaque-debug 0.3.0",
+]
 
 [[package]]
 name = "subtle"
@@ -862,7 +888,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8326b2c654932e3e4f9196e69d08fdf7cfd718e1dc6f66b347e6024a0c961402"
 dependencies = [
  "generic-array 0.14.4",
- "subtle 2.4.0",
+ "subtle",
 ]
 
 [[package]]
@@ -1017,5 +1043,5 @@ dependencies = [
  "jni",
  "poksho",
  "serde",
- "sha2",
+ "sha2 0.8.2",
 ]
