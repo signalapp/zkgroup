@@ -11,7 +11,7 @@ import libzkgroup
 
 public class ServerPublicParams : ByteArray {
 
-  public static let SIZE: Int = 225
+  public static let SIZE: Int = 289
 
   public init(contents: [UInt8]) throws  {
     try super.init(newContents: contents, expectedLength: ServerPublicParams.SIZE, unrecoverable: true)

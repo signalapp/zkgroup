@@ -597,7 +597,6 @@ dependencies = [
 [[package]]
 name = "poksho"
 version = "0.7.0"
-source = "git+https://github.com/signalapp/poksho.git?tag=v0.7.0#8bb8c61c18e7bbe93c094ed91be52b9f96c1c5cd"
 dependencies = [
  "curve25519-dalek",
  "hmac",
@@ -1007,7 +1006,7 @@ checksum = "4756f7db3f7b5574938c3eb1c117038b8e07f95ee6718c0efad4ac21508f1efd"
 
 [[package]]
 name = "zkgroup"
-version = "0.8.1"
+version = "0.9.0"
 dependencies = [
  "aead",
  "aes-gcm-siv",

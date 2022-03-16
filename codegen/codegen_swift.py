@@ -541,11 +541,8 @@ def print_class(c, runtime_error_on_serialize_dict, class_dir_dict):
         elif method.return_type == "byte[]": # copied from UUID?
             template = template_method_bytearray
             param_args = get_args(method.params, import_strings, True)
-            return_len = method.params[0][1].lower_camel()  # hardcode to first arg
-            if method.return_size_increment >= 0:
-                return_len += ".count+%d" % method.return_size_increment
-            if method.return_size_increment < 0:
-                return_len += ".count+%d" % method.return_size_increment
+            if method.relative_return_size is not None:
+                return_len = f"{method.params[method.relative_return_size][1].lower_camel()}.count + {method.return_size_increment}"
         else:
             add_import(import_strings, class_dir_dict, my_dir_name, method.return_name)
             if runtime_error_on_serialize_dict[method.return_name.snake()]:
@@ -553,9 +550,9 @@ def print_class(c, runtime_error_on_serialize_dict, class_dir_dict):
             else:
                 template = template_method
             param_args = get_args(method.params, import_strings, True)
-        if return_name == None:
+        if return_name is None:
             return_name = method.return_name.camel()
-        if return_len == None:
+        if return_len is None:
             return_len = method.return_name.camel() + ".SIZE"
 
 

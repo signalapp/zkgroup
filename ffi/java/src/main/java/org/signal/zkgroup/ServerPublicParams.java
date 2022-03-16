@@ -14,7 +14,7 @@ import org.signal.zkgroup.internal.Native;
 
 public final class ServerPublicParams extends ByteArray {
 
-  public static final int SIZE = 225;
+  public static final int SIZE = 289;
 
   public ServerPublicParams(byte[] contents)  {
     super(contents, SIZE, true);

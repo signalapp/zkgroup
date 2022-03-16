@@ -27,6 +27,7 @@ impl Sho {
     pub fn get_point(&mut self) -> RistrettoPoint {
         let mut point_bytes = [0u8; 64];
         point_bytes.copy_from_slice(&self.internal_sho.squeeze_and_ratchet(64)[..]);
+        println!("{:#x?}", point_bytes);
         RistrettoPoint::from_uniform_bytes(&point_bytes)
     }
 

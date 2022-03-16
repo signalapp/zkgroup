@@ -54,8 +54,46 @@ public class ServerZkProfileOperations {
 
   }
 
+  public PniCredentialResponse issuePniCredential(ProfileKeyCredentialRequest profileKeyCredentialRequest, UUID aci, UUID pni, ProfileKeyCommitment profileKeyCommitment) throws VerificationFailedException {
+    return issuePniCredential(new SecureRandom(), profileKeyCredentialRequest, aci, pni, profileKeyCommitment);
+  }
+
+  public PniCredentialResponse issuePniCredential(SecureRandom secureRandom, ProfileKeyCredentialRequest profileKeyCredentialRequest, UUID aci, UUID pni, ProfileKeyCommitment profileKeyCommitment) throws VerificationFailedException {
+    byte[] newContents = new byte[PniCredentialResponse.SIZE];
+    byte[] random      = new byte[Native.RANDOM_LENGTH];
+
+    secureRandom.nextBytes(random);
+
+    int ffi_return = Native.serverSecretParamsIssuePniCredentialDeterministicJNI(serverSecretParams.getInternalContentsForJNI(), random, profileKeyCredentialRequest.getInternalContentsForJNI(), UUIDUtil.serialize(aci), UUIDUtil.serialize(pni), profileKeyCommitment.getInternalContentsForJNI(), newContents);
+    if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
+      throw new VerificationFailedException();
+    }
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw new ZkGroupError("FFI_RETURN!=OK");
+    }
+
+    try {
+      return new PniCredentialResponse(newContents);
+    } catch (InvalidInputException e) {
+      throw new AssertionError(e);
+    }
+
+  }
+
   public void verifyProfileKeyCredentialPresentation(GroupPublicParams groupPublicParams, ProfileKeyCredentialPresentation profileKeyCredentialPresentation) throws VerificationFailedException {
     int ffi_return = Native.serverSecretParamsVerifyProfileKeyCredentialPresentationJNI(serverSecretParams.getInternalContentsForJNI(), groupPublicParams.getInternalContentsForJNI(), profileKeyCredentialPresentation.getInternalContentsForJNI());
+    if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
+      throw new VerificationFailedException();
+    }
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw new ZkGroupError("FFI_RETURN!=OK");
+    }
+  }
+
+  public void verifyPniCredentialPresentation(GroupPublicParams groupPublicParams, PniCredentialPresentation pniCredentialPresentation) throws VerificationFailedException {
+    int ffi_return = Native.serverSecretParamsVerifyPniCredentialPresentationJNI(serverSecretParams.getInternalContentsForJNI(), groupPublicParams.getInternalContentsForJNI(), pniCredentialPresentation.getInternalContentsForJNI());
     if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
       throw new VerificationFailedException();
     }

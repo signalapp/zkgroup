@@ -33,4 +33,16 @@ impl ReceiptCredentialPresentation {
             receipt_level: self.receipt_level,
         }
     }
+
+    pub fn get_receipt_expiration_time(&self) -> ReceiptExpirationTime {
+        self.receipt_expiration_time
+    }
+
+    pub fn get_receipt_level(&self) -> ReceiptLevel {
+        self.receipt_level
+    }
+
+    pub fn get_receipt_serial_bytes(&self) -> ReceiptSerialBytes {
+        self.receipt_serial_bytes
+    }
 }

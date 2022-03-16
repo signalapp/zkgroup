@@ -50,12 +50,12 @@ index 464cf6d19ecc..5739505935b0 100644
    }
  
    public byte[] encryptBlob(SecureRandom secureRandom, byte[] plaintext) throws VerificationFailedException {
--    byte[] newContents = new byte[plaintext.length+29];
+-    byte[] newContents = new byte[plaintext.length + 29];
 +
 +    byte[] paddedPlaintext = new byte[plaintext.length + 4];
 +    System.arraycopy(plaintext, 0, paddedPlaintext, 4, plaintext.length);
 +
-+    byte[] newContents = new byte[paddedPlaintext.length+29];
++    byte[] newContents = new byte[paddedPlaintext.length + 29];
      byte[] random      = new byte[Native.RANDOM_LENGTH];
  
      secureRandom.nextBytes(random);
@@ -80,7 +80,7 @@ index 464cf6d19ecc..5739505935b0 100644
 +    if (newContents.length < (4 + padLen))  {
 +        throw new VerificationFailedException();
 +    }
-+   
++
 +    byte[] depaddedContents = new byte[newContents.length - (4 + padLen)];
 +    System.arraycopy(newContents, 4, depaddedContents, 0, newContents.length - (4 + padLen));
 +
@@ -99,7 +99,7 @@ index cbc73ac60bee..57a252f5886d 100644
 +    if (profileKeyCredentialResponse == null) {
 +      throw new VerificationFailedException();
 +    }
-+    
++
      byte[] newContents = new byte[ProfileKeyCredential.SIZE];
  
      int ffi_return = Native.serverPublicParamsReceiveProfileKeyCredentialJNI(serverPublicParams.getInternalContentsForJNI(), profileKeyCredentialRequestContext.getInternalContentsForJNI(), profileKeyCredentialResponse.getInternalContentsForJNI(), newContents);
@@ -156,25 +156,13 @@ index 4d36edb46acf..fa7f1b4aba5c 100644
    }
  
    public func encryptBlob(randomness: [UInt8], plaintext: [UInt8]) throws  -> [UInt8] {
--    var newContents: [UInt8] = Array(repeating: 0, count: Int(randomness.count+29))
+-    var newContents: [UInt8] = Array(repeating: 0, count: Int(plaintext.count + 29))
 +    let paddedPlaintext = Array(repeating:0, count: 4) + plaintext
  
 -    let ffi_return = FFI_GroupSecretParams_encryptBlobDeterministic(groupSecretParams.getInternalContentsForFFI(), UInt32(groupSecretParams.getInternalContentsForFFI().count), randomness, UInt32(randomness.count), plaintext, UInt32(plaintext.count), &newContents, UInt32(newContents.count))
-+    var newContents: [UInt8] = Array(repeating: 0, count: Int(paddedPlaintext.count+29))
++    var newContents: [UInt8] = Array(repeating: 0, count: Int(paddedPlaintext.count + 29))
 +
 +    let ffi_return = FFI_GroupSecretParams_encryptBlobDeterministic(groupSecretParams.getInternalContentsForFFI(), UInt32(groupSecretParams.getInternalContentsForFFI().count), randomness, UInt32(randomness.count), paddedPlaintext, UInt32(paddedPlaintext.count), &newContents, UInt32(newContents.count))
-     if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
-       throw ZkGroupException.VerificationFailed
-     }
-@@ -117,9 +120,10 @@ public class ClientZkGroupCipher {
-   }
- 
-   public func decryptBlob(blobCiphertext: [UInt8]) throws  -> [UInt8] {
--    var newContents: [UInt8] = Array(repeating: 0, count: Int(blobCiphertext.count+-29))
-+    var newContents: [UInt8] = Array(repeating: 0, count: Int(blobCiphertext.count-29))
- 
-     let ffi_return = FFI_GroupSecretParams_decryptBlob(groupSecretParams.getInternalContentsForFFI(), UInt32(groupSecretParams.getInternalContentsForFFI().count), blobCiphertext, UInt32(blobCiphertext.count), &newContents, UInt32(newContents.count))
-+
      if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
        throw ZkGroupException.VerificationFailed
      }

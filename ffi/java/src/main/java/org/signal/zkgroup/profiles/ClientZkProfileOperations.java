@@ -51,11 +51,35 @@ public class ClientZkProfileOperations {
 
   }
 
+  public PniCredentialRequestContext createPniCredentialRequestContext(UUID aci, UUID pni, ProfileKey profileKey) {
+    return createPniCredentialRequestContext(new SecureRandom(), aci, pni, profileKey);
+  }
+
+  public PniCredentialRequestContext createPniCredentialRequestContext(SecureRandom secureRandom, UUID aci, UUID pni, ProfileKey profileKey) {
+    byte[] newContents = new byte[PniCredentialRequestContext.SIZE];
+    byte[] random      = new byte[Native.RANDOM_LENGTH];
+
+    secureRandom.nextBytes(random);
+
+    int ffi_return = Native.serverPublicParamsCreatePniCredentialRequestContextDeterministicJNI(serverPublicParams.getInternalContentsForJNI(), random, UUIDUtil.serialize(aci), UUIDUtil.serialize(pni), profileKey.getInternalContentsForJNI(), newContents);
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw new ZkGroupError("FFI_RETURN!=OK");
+    }
+
+    try {
+      return new PniCredentialRequestContext(newContents);
+    } catch (InvalidInputException e) {
+      throw new AssertionError(e);
+    }
+
+  }
+
   public ProfileKeyCredential receiveProfileKeyCredential(ProfileKeyCredentialRequestContext profileKeyCredentialRequestContext, ProfileKeyCredentialResponse profileKeyCredentialResponse) throws VerificationFailedException {
     if (profileKeyCredentialResponse == null) {
       throw new VerificationFailedException();
     }
-    
+
     byte[] newContents = new byte[ProfileKeyCredential.SIZE];
 
     int ffi_return = Native.serverPublicParamsReceiveProfileKeyCredentialJNI(serverPublicParams.getInternalContentsForJNI(), profileKeyCredentialRequestContext.getInternalContentsForJNI(), profileKeyCredentialResponse.getInternalContentsForJNI(), newContents);
@@ -69,6 +93,26 @@ public class ClientZkProfileOperations {
 
     try {
       return new ProfileKeyCredential(newContents);
+    } catch (InvalidInputException e) {
+      throw new AssertionError(e);
+    }
+
+  }
+
+  public PniCredential receivePniCredential(PniCredentialRequestContext pniCredentialRequestContext, PniCredentialResponse pniCredentialResponse) throws VerificationFailedException {
+    byte[] newContents = new byte[PniCredential.SIZE];
+
+    int ffi_return = Native.serverPublicParamsReceivePniCredentialJNI(serverPublicParams.getInternalContentsForJNI(), pniCredentialRequestContext.getInternalContentsForJNI(), pniCredentialResponse.getInternalContentsForJNI(), newContents);
+    if (ffi_return == Native.FFI_RETURN_INPUT_ERROR) {
+      throw new VerificationFailedException();
+    }
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw new ZkGroupError("FFI_RETURN!=OK");
+    }
+
+    try {
+      return new PniCredential(newContents);
     } catch (InvalidInputException e) {
       throw new AssertionError(e);
     }
@@ -93,6 +137,30 @@ public class ClientZkProfileOperations {
 
     try {
       return new ProfileKeyCredentialPresentation(newContents);
+    } catch (InvalidInputException e) {
+      throw new AssertionError(e);
+    }
+
+  }
+
+  public PniCredentialPresentation createPniCredentialPresentation(GroupSecretParams groupSecretParams, PniCredential pniCredential) {
+    return createPniCredentialPresentation(new SecureRandom(), groupSecretParams, pniCredential);
+  }
+
+  public PniCredentialPresentation createPniCredentialPresentation(SecureRandom secureRandom, GroupSecretParams groupSecretParams, PniCredential pniCredential) {
+    byte[] newContents = new byte[PniCredentialPresentation.SIZE];
+    byte[] random      = new byte[Native.RANDOM_LENGTH];
+
+    secureRandom.nextBytes(random);
+
+    int ffi_return = Native.serverPublicParamsCreatePniCredentialPresentationDeterministicJNI(serverPublicParams.getInternalContentsForJNI(), random, groupSecretParams.getInternalContentsForJNI(), pniCredential.getInternalContentsForJNI(), newContents);
+
+    if (ffi_return != Native.FFI_RETURN_OK) {
+      throw new ZkGroupError("FFI_RETURN!=OK");
+    }
+
+    try {
+      return new PniCredentialPresentation(newContents);
     } catch (InvalidInputException e) {
       throw new AssertionError(e);
     }
