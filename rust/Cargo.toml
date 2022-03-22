@@ -20,7 +20,7 @@ crate-type = [ "staticlib", "cdylib", "rlib"]
 [dependencies]
 bincode = "1.2.1"
 serde = { version = "1.0.106", features = ["derive"] }
-sha2 = "0.8.0"
+sha2 = "0.9"
 jni = { version = "0.16.0", default-features = false }
 hex = "0.4.0"
 aead = "0.4.0"
@@ -28,9 +28,9 @@ aes-gcm-siv = "0.10.0"
 
 [dependencies.curve25519-dalek]
 features = ["std", "serde", "alloc"]
-version = "2.0.0"
+version = "3"
 git = "https://github.com/signalapp/curve25519-dalek.git"
-branch = "lizard2"
+branch = "3.0.0-lizard2"
 
 [dependencies.poksho]
 git = "https://github.com/signalapp/poksho.git"
