@@ -1,6 +1,0 @@
-rootProject.name = 'zkgroup'
-
-include 'ffi:java'
-include 'ffi:android'
-include 'ffi:android:lib'
-include 'ffi:android:exampleApp'
